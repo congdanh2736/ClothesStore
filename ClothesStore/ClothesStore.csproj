@@ -26,7 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <Folder Include="src\Models\" />
+    <Folder Include="src\Data\" />
+    <Folder Include="src\Services\" />
   </ItemGroup>
 
 </Project>
