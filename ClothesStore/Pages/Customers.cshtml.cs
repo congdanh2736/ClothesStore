@@ -8,6 +8,11 @@ namespace ClothesStore.Pages
     {
         private readonly MyDbContext _context;
 
+        public List<Customer> Customers { get; set; } = new List<Customer>();
+
+        [BindProperty]
+        public Customer NewCustomer { get; set; }
+
         public CustomersModel(MyDbContext context)
         {
             _context = context;
@@ -15,6 +20,14 @@ namespace ClothesStore.Pages
 
         public void OnGet()
         {
+            Customers = _context.Customers.ToList();
+        }
+
+        public IActionResult OnPost()
+        {
+            _context.Customers.Add(NewCustomer);
+            _context.SaveChanges();
+            return RedirectToPage();
         }
     }
 }
