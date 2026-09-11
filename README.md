@@ -34,6 +34,8 @@ Cấu trúc được thiết kế tối ưu với **20 bảng (Tables/Entities)*
 ### Nhóm 5: Chuỗi Cửa hàng & Tồn kho (2 bảng)
 19. **`Store` (Cửa hàng):** Thông tin các chi nhánh của YaMe.
 20. **`Store_Stock` (Tồn kho theo cửa hàng):** Quản lý số lượng tồn kho thực tế của từng `Product_Variant` tại từng `Store` (Hỗ trợ mô hình Click & Collect).
+21. Bảng Store_Daily_Stat (Thống kê tổng quan cửa hàng theo ngày)
+22. Bảng Store_Item_Stat (Thống kê mặt hàng/variant theo cửa hàng)
 
 ---
 
