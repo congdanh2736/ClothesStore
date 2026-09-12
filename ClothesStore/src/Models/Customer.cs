@@ -10,8 +10,8 @@ namespace ClothesStore.src.Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
 
-        //public string? MembershipTierId { get; set; }
-        //[ForeignKey("MembershipTierId")]
-        //public virtual Membership_Tier? MembershipTier { get; set; }
+        public string? MembershipTierId { get; set; }
+        [ForeignKey("MembershipTierId")]
+        public virtual MembershipTier? MembershipTier { get; set; }
     }
 }
