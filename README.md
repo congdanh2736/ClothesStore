@@ -34,6 +34,8 @@ Cấu trúc được thiết kế tối ưu với **20 bảng (Tables/Entities)*
 ### Nhóm 5: Chuỗi Cửa hàng & Tồn kho (2 bảng)
 19. **`Store` (Cửa hàng):** Thông tin các chi nhánh của YaMe.
 20. **`Store_Stock` (Tồn kho theo cửa hàng):** Quản lý số lượng tồn kho thực tế của từng `Product_Variant` tại từng `Store` (Hỗ trợ mô hình Click & Collect).
+21. Bảng Store_Daily_Stat (Thống kê tổng quan cửa hàng theo ngày)
+22. Bảng Store_Item_Stat (Thống kê mặt hàng/variant theo cửa hàng)
 
 ---
 
@@ -52,6 +54,8 @@ erDiagram
     
     STORE ||--o{ EMPLOYEE : "employs"
     STORE ||--o{ STORE_STOCK : "holds"
+    STORE ||--o{ STORE_DAILY_STAT : "generates_daily_stat"
+    STORE ||--o{ STORE_ITEM_STAT : "generates_item_stat"
     
     CATEGORY ||--o{ PRODUCT : "contains"
     CATEGORY ||--o{ CATEGORY : "parent_of"
@@ -66,6 +70,7 @@ erDiagram
     PRODUCT_VARIANT ||--o{ STORE_STOCK : "stocked_as"
     PRODUCT_VARIANT ||--o{ CART_ITEM : "in_cart"
     PRODUCT_VARIANT ||--o{ ORDER_ITEM : "in_order"
+    PRODUCT_VARIANT ||--o{ STORE_ITEM_STAT : "tracked_in_stat"
     
     CART ||--o{ CART_ITEM : "contains"
     
@@ -75,23 +80,48 @@ erDiagram
     ORDER ||--|{ ORDER_ITEM : "contains"
     ORDER ||--o| PAYMENT_TRANSACTION : "paid_via"
 
-    %% Basic schema definitions
+    %% Defining attributes for 22 tables
     MEMBERSHIP_TIER { int tier_id PK string name }
     CUSTOMER { int customer_id PK int tier_id FK string full_name }
     ADDRESS { int address_id PK int customer_id FK string full_address }
     EMPLOYEE { int employee_id PK int store_id FK string full_name }
+    
     CATEGORY { int category_id PK int parent_id FK string name }
     COLLECTION_TECH { int collection_id PK string type string name }
     PRODUCT { int product_id PK int category_id FK string name }
     PRODUCT_COLLECTION { int product_id PK int collection_id PK }
     PRODUCT_IMAGE { int image_id PK int product_id FK string image_url }
     PRODUCT_VARIANT { int variant_id PK int product_id FK string color string size decimal price }
+    
     STORE { int store_id PK string name string location }
     STORE_STOCK { int stock_id PK int store_id FK int variant_id FK int quantity }
+    
+    %% NEW: Statistics Tables
+    STORE_DAILY_STAT {
+        int stat_id PK
+        int store_id FK
+        date stat_date
+        int total_orders
+        int completed_orders
+        int canceled_orders
+        decimal total_revenue
+        int total_items_sold
+    }
+    STORE_ITEM_STAT {
+        int stat_id PK
+        int store_id FK
+        int variant_id FK
+        date stat_date
+        int quantity_sold
+        decimal total_revenue
+        int return_quantity
+    }
+    
     CART { int cart_id PK int customer_id FK }
     CART_ITEM { int cart_item_id PK int cart_id FK int variant_id FK int quantity }
     WISHLIST { int wishlist_id PK int customer_id FK int product_id FK }
-    REVIEW { int review_id PK int customer_id FK int product_id FK int rating string comment }
+    REVIEW { int review_id PK int customer_id FK int product_id FK int rating }
+    
     PROMOTION { int promo_id PK string code decimal discount_value }
     ORDER { int order_id PK int customer_id FK int address_id FK int promo_id FK decimal total_amount }
     ORDER_ITEM { int order_item_id PK int order_id FK int variant_id FK int quantity decimal price }
