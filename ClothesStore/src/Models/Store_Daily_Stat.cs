@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.src.Models
 {
-    public class Store_Item_Stat
+    public class Store_Daily_Stat
     {
         [Key]
         public int stat_id { get; set; }
@@ -12,13 +12,11 @@ namespace ClothesStore.src.Models
         [ForeignKey("store_id")]
         public Store? store { get; set; }
 
-        public int variant_id { get; set; }
-        [ForeignKey("variant_id")]
-        public Product_Variant? product_Variant { get; set; }
-
         public DateOnly stat_date { get; set; }
-        public int quantity_sold { get; set; }
+        public int total_orders { get; set; }
+        public int completed_orders { get; set; }
+        public int canceled_orders { get; set; }
         public decimal total_revenue { get; set; }
-        public int return_quantity { get; set; }
+        public int total_items_sold { get; set; }
     }
 }
