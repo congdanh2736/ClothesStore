@@ -18,6 +18,8 @@ namespace ClothesStore.Api.Models
         public ICollection<Address> Addresses = new List<Address>();
         public Cart Cart { get; set; } = new Cart();
         public ICollection<Wishlist> Wishlists = new List<Wishlist>();
+        public ICollection<Review> Reviews = new List<Review>();
+        public ICollection<Order> Orders = new List<Order>();
 
         // Link to account
         public string? ApplicationUserId { get; set; }

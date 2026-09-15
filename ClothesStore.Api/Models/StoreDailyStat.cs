@@ -6,13 +6,13 @@ namespace ClothesStore.Api.Models
     public class StoreDailyStat
     {
         [Key]
-        public int StatID { get; set; }
+        public int Id { get; set; }
 
-        public int StoreID { get; set; }
-        [ForeignKey("StoreID")]
+        public int StoreId { get; set; }
+        [ForeignKey("StoreId")]
         public Store? Store { get; set; }
 
-        public DateOnly Statdate { get; set; }
+        public DateOnly StatDate { get; set; }
         public int TotalOrders { get; set; }
         public int CompletedOrders { get; set; }
         public int CanceledOrders { get; set; }
