@@ -25,8 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Interface\Services\" />
+    <Folder Include="Mappings\" />
+    <Folder Include="MiddleWare\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Extensions\" />
     <Folder Include="Services\" />
-    <Folder Include="Repositories\" />
+    <Folder Include="Validators\" />
   </ItemGroup>
 
 </Project>
