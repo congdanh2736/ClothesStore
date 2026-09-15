@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ClothesStore.src.Models
+namespace ClothesStore.Api.Models
 {
     public class Category {
         [Key]

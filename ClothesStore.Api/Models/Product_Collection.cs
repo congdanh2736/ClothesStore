@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ClothesStore.src.Models
+namespace ClothesStore.Api.Models
 {
     //class trung gian của collection_tech với products
     public class Product_Collection

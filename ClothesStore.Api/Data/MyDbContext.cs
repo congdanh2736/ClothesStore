@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ClothesStore.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace ClothesStore.src.Models
+namespace ClothesStore.Api.Data
 {
     public class MyDbContext : DbContext
     {

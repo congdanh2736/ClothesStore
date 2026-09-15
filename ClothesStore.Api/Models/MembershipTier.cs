@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ClothesStore.src.Models
+namespace ClothesStore.Api.Models
 {
     public class MembershipTier
     {

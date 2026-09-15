@@ -1,4 +1,4 @@
-namespace ClothesStore.src.Models
+namespace ClothesStore.Api.Models
 {
     public class Review {
         
