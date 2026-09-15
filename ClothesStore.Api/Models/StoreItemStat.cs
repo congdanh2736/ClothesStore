@@ -16,7 +16,7 @@ namespace ClothesStore.Api.Models
         [ForeignKey("VariantId")]
         public ProductVariant? ProductVariant { get; set; }
 
-        public DateOnly Statdate { get; set; }
+        public DateOnly StatDate { get; set; }
         public int QuantitySold { get; set; }
         public decimal TotalRevenue { get; set; }
         public int ReturnQuantity { get; set; }
