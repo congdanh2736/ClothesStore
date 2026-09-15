@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ClothesStore.Api.Models
 {
     //class trung gian của collection_tech với products
-    public class Product_Collection
+    public class ProductCollection
     {
         public int product_id {get;set;}
         [ForeignKey("product_id")]
@@ -12,6 +12,6 @@ namespace ClothesStore.Api.Models
 
         public int Collection_id {get; set;}
         [ForeignKey("collection_id")]
-        public Collection_Tech? collection_Techs {get; set;}
+        public CollectionTech? collection_Techs {get; set;}
     }
 }

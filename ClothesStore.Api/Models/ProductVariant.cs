@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.Api.Models
 {
-    public class Product_Variant
+    public class ProductVariant
     {
         [Key]
         public int Variant_id {get; set;}
@@ -15,9 +15,9 @@ namespace ClothesStore.Api.Models
         [ForeignKey("product_id")]
         public Product? product {get; set;}
     
-        public ICollection<Cart_Item> cart_Items {get;set;} = new List<Cart_Item>();
-        public ICollection<Store_Item_Stat> store_Item_Stats {get; set;} = new List<Store_Item_Stat>();
-        public ICollection<Store_Stock> store_Stocks {get; set;} = new List<Store_Stock>();
-        public ICollection<Order_Item> Order_Items { get; set; } = new List<Order_Item>();
+        public ICollection<CartItem> cart_Items {get;set;} = new List<CartItem>();
+        public ICollection<StoreItemStat> store_Item_Stats {get; set;} = new List<StoreItemStat>();
+        public ICollection<StoreStock> store_Stocks {get; set;} = new List<StoreStock>();
+        public ICollection<OrderItem> Order_Items { get; set; } = new List<OrderItem>();
     }
 }

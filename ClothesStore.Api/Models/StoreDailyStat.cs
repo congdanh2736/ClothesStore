@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.Api.Models
 {
-    public class Store_Daily_Stat
+    public class StoreDailyStat
     {
         [Key]
         public int stat_id { get; set; }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.Api.Models
 {
-    public class Product_Image
+    public class ProductImage
     {
         [Key]
         public int Image_id {get; set;}

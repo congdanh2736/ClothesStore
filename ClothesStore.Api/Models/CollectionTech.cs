@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.Api.Models
 {
-    public class Collection_Tech
+    public class CollectionTech
     {
         [Key]
         public int Collection_id {get; set;}
@@ -13,6 +13,6 @@ namespace ClothesStore.Api.Models
         public string? type {get; set;}
         //tên của colection hoặc Techology
         public string? name {get; set;} 
-        public ICollection<Product_Collection> product_Collections { get; set;} = new List<Product_Collection>();
+        public ICollection<ProductCollection> product_Collections { get; set;} = new List<ProductCollection>();
     }
 }
