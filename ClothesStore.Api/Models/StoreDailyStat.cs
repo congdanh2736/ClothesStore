@@ -10,9 +10,9 @@ namespace ClothesStore.Api.Models
 
         public int StoreID { get; set; }
         [ForeignKey("StoreID")]
-        public Store? store { get; set; }
+        public Store? Store { get; set; }
 
-        public DateOnly statdate { get; set; }
+        public DateOnly Statdate { get; set; }
         public int TotalOrders { get; set; }
         public int CompletedOrders { get; set; }
         public int CanceledOrders { get; set; }

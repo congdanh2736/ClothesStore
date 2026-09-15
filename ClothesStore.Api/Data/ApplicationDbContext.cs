@@ -320,7 +320,7 @@ namespace ClothesStore.Api.Data
                     .HasForeignKey(x => x.OrderId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasOne(x => x.Variant)
+                e.HasOne(x => x.ProductVariant)
                     .WithMany(v => v.OrderItems)
                     .HasForeignKey(x => x.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
