@@ -6,10 +6,10 @@ namespace ClothesStore.Api.Models
     public class ProductImage
     {
         [Key]
-        public int Image_id {get; set;}
-        public string? image_url {get; set;}
-        public int collection_id {get;set;}
-        [ForeignKey("collection_id")]
-        public Product? products {get; set;}
+        public int ImageId {get; set;}
+        public string? ImageUrl {get; set;}
+        public int CollectionId {get;set;}
+        [ForeignKey("CollectionId")]
+        public Product? Products {get; set;}
     }
 }

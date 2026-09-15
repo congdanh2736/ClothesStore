@@ -6,13 +6,13 @@ namespace ClothesStore.Api.Models
 {
     public class Category {
         [Key]
-        public int Category_id { get; set; }
-        public string? name { get; set; }
+        public int Id { get; set; }
+        public string? Name { get; set; }
 
-        public int? Parent_Category_id {get; set;}
-        [ForeignKey("Parent_Category_id")]
-        public Category? Parent_Category {get; set;}
+        public int? ParentCategoryId {get; set;}
+        [ForeignKey("ParentCategoryId")]
+        public Category? ParentCategory {get; set;}
 
-        public ICollection<Product>? products {get; set;} = new List<Product>();
+        public ICollection<Product>? Products {get; set;} = new List<Product>();
     }
 }
