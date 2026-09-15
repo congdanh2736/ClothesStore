@@ -47,17 +47,17 @@ namespace ClothesStore.Api.Data
             // ============ MEMBERSHIP / CUSTOMER ============
             builder.Entity<MembershipTier>(e =>
             {
-                e.HasKey(x => x.TierId);
-                e.Property(x => x.Name).IsRequired().HasMaxLength(100);
+                e.HasKey(x => x.Id);
+                e.Property(x => x.TierName).IsRequired().HasMaxLength(100);
             });
 
             builder.Entity<Customer>(e =>
             {
-                e.HasKey(x => x.CustomerId);
+                e.HasKey(x => x.Id);
 
-                e.HasOne(x => x.Tier)
+                e.HasOne(x => x.MembershipTier)
                     .WithMany(t => t.Customers)
-                    .HasForeignKey(x => x.TierId)
+                    .HasForeignKey(x => x.Id)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 // Optional 1-1 link to an Identity login account
@@ -69,7 +69,7 @@ namespace ClothesStore.Api.Data
 
             builder.Entity<Address>(e =>
             {
-                e.HasKey(x => x.AddressId);
+                e.HasKey(x => x.Id);
 
                 e.HasOne(x => x.Customer)
                     .WithMany(c => c.Addresses)
@@ -80,7 +80,7 @@ namespace ClothesStore.Api.Data
             // ============ CART ============
             builder.Entity<Cart>(e =>
             {
-                e.HasKey(x => x.CartId);
+                e.HasKey(x => x.Id);
 
                 // 1 customer <-> 1 cart
                 e.HasOne(x => x.Customer)
@@ -88,12 +88,12 @@ namespace ClothesStore.Api.Data
                     .HasForeignKey<Cart>(x => x.CustomerId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasIndex(x => x.CustomerId).IsUnique();
+                e.HasIndex(x => x.Id).IsUnique();
             });
 
             builder.Entity<CartItem>(e =>
             {
-                e.HasKey(x => x.CartItemId);
+                e.HasKey(x => x.Id);
 
                 e.HasOne(x => x.Cart)
                     .WithMany(c => c.CartItems)
@@ -109,7 +109,7 @@ namespace ClothesStore.Api.Data
             // ============ WISHLIST / REVIEW ============
             builder.Entity<Wishlist>(e =>
             {
-                e.HasKey(x => x.WishlistId);
+                e.HasKey(x => x.Id);
 
                 e.HasOne(x => x.Customer)
                     .WithMany(c => c.Wishlists)
@@ -143,13 +143,13 @@ namespace ClothesStore.Api.Data
             // ============ STORE ============
             builder.Entity<Store>(e =>
             {
-                e.HasKey(x => x.StoreId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.Name).IsRequired().HasMaxLength(200);
             });
 
             builder.Entity<Employee>(e =>
             {
-                e.HasKey(x => x.EmployeeId);
+                e.HasKey(x => x.Id);
 
                 e.HasOne(x => x.Store)
                     .WithMany(s => s.Employees)
