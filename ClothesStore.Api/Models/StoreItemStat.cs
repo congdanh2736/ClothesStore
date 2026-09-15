@@ -6,14 +6,14 @@ namespace ClothesStore.Api.Models
     public class StoreItemStat
     {
         [Key]
-        public int StatID { get; set; }
+        public int Id { get; set; }
 
-        public int StoreID { get; set; }
-        [ForeignKey("StoreID")]
+        public int StoreId { get; set; }
+        [ForeignKey("StoreId")]
         public Store? Store { get; set; }
 
-        public int VariantID { get; set; }
-        [ForeignKey("VariantID")]
+        public int VariantId { get; set; }
+        [ForeignKey("VariantId")]
         public ProductVariant? ProductVariant { get; set; }
 
         public DateOnly Statdate { get; set; }

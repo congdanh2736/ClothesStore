@@ -102,7 +102,7 @@ namespace ClothesStore.Api.Data
 
                 e.HasOne(x => x.ProductVariant)
                     .WithMany(v => v.CartItems)
-                    .HasForeignKey(x => x.ProductVariantId)
+                    .HasForeignKey(x => x.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -127,7 +127,7 @@ namespace ClothesStore.Api.Data
 
             builder.Entity<Review>(e =>
             {
-                e.HasKey(x => x.ReviewId);
+                e.HasKey(x => x.Id);
 
                 e.HasOne(x => x.Customer)
                     .WithMany(c => c.Reviews)
@@ -164,14 +164,14 @@ namespace ClothesStore.Api.Data
 
             builder.Entity<StoreStock>(e =>
             {
-                e.HasKey(x => x.StockId);
+                e.HasKey(x => x.Id);
 
                 e.HasOne(x => x.Store)
                     .WithMany(s => s.StoreStocks)
                     .HasForeignKey(x => x.StoreId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasOne(x => x.Variant)
+                e.HasOne(x => x.ProductVariant)
                     .WithMany(v => v.StoreStocks)
                     .HasForeignKey(x => x.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -182,7 +182,7 @@ namespace ClothesStore.Api.Data
 
             builder.Entity<StoreDailyStat>(e =>
             {
-                e.HasKey(x => x.StatId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.TotalRevenue).HasPrecision(18, 2);
 
                 e.HasOne(x => x.Store)
@@ -195,7 +195,7 @@ namespace ClothesStore.Api.Data
 
             builder.Entity<StoreItemStat>(e =>
             {
-                e.HasKey(x => x.StatId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.TotalRevenue).HasPrecision(18, 2);
 
                 e.HasOne(x => x.Store)
@@ -203,7 +203,7 @@ namespace ClothesStore.Api.Data
                     .HasForeignKey(x => x.StoreId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasOne(x => x.Variant)
+                e.HasOne(x => x.ProductVariant)
                     .WithMany(v => v.StoreItemStats)
                     .HasForeignKey(x => x.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -214,26 +214,26 @@ namespace ClothesStore.Api.Data
             // ============ CATALOG ============
             builder.Entity<Category>(e =>
             {
-                e.HasKey(x => x.CategoryId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.Name).IsRequired().HasMaxLength(150);
 
                 // self-referencing parent/child; Restrict to avoid multiple cascade paths
-                e.HasOne(x => x.Parent)
-                    .WithMany(x => x.Children)
-                    .HasForeignKey(x => x.ParentId)
+                e.HasOne(x => x.ParentCategory)
+                    .WithMany(x => x.ChildrenCategories)
+                    .HasForeignKey(x => x.Id)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<CollectionTech>(e =>
             {
-                e.HasKey(x => x.CollectionId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.Type).IsRequired().HasMaxLength(100);
                 e.Property(x => x.Name).IsRequired().HasMaxLength(150);
             });
 
             builder.Entity<Product>(e =>
             {
-                e.HasKey(x => x.ProductId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.Name).IsRequired().HasMaxLength(200);
 
                 e.HasOne(x => x.Category)
@@ -248,7 +248,7 @@ namespace ClothesStore.Api.Data
                 e.Property(x => x.Price).HasPrecision(18, 2);
 
                 e.HasOne(x => x.Product)
-                    .WithMany(p => p.Variants)
+                    .WithMany(p => p.ProductVariants)
                     .HasForeignKey(x => x.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
@@ -259,8 +259,8 @@ namespace ClothesStore.Api.Data
                 e.Property(x => x.ImageUrl).IsRequired().HasMaxLength(500);
 
                 e.HasOne(x => x.Product)
-                    .WithMany(p => p.Images)
-                    .HasForeignKey(x => x.ProductId)
+                    .WithMany(p => p.ProductImages)
+                    .HasForeignKey(x => x.CollectionId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -274,7 +274,7 @@ namespace ClothesStore.Api.Data
                     .HasForeignKey(x => x.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasOne(x => x.Collection)
+                e.HasOne(x => x.CollectionTech)
                     .WithMany(c => c.ProductCollections)
                     .HasForeignKey(x => x.CollectionId)
                     .OnDelete(DeleteBehavior.Cascade);
@@ -320,7 +320,7 @@ namespace ClothesStore.Api.Data
                     .HasForeignKey(x => x.OrderId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasOne(x => x.Variant)
+                e.HasOne(x => x.ProductVariant)
                     .WithMany(v => v.OrderItems)
                     .HasForeignKey(x => x.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);

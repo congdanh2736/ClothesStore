@@ -9,7 +9,7 @@ namespace ClothesStore.Api.Models
         public int VariantId {get; set;}
         public string? Color {get;set;}
         public string? Size {get; set;}
-        public double Srice {get;set;}
+        public double Price {get;set;}
 
         public int ProductId {get;set;}
         [ForeignKey("ProductId")]

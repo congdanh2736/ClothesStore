@@ -8,10 +8,10 @@ namespace ClothesStore.Api.Models
     {
         public int ProductId {get;set;}
         [ForeignKey("ProductId")]
-        public Product? Products {get; set;}
+        public Product? Product {get; set;}
 
         public int CollectionId {get; set;}
         [ForeignKey("CollectionId")]
-        public CollectionTech? CollectionTechs {get; set;}
+        public CollectionTech? CollectionTech {get; set;}
     }
 }

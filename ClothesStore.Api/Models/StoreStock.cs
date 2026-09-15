@@ -6,14 +6,14 @@ namespace ClothesStore.Api.Models
     public class StoreStock
     {
         [Key]
-        public int StockID { get; set; }
+        public int Id { get; set; }
 
-        public int StoreID { get; set; }
-        [ForeignKey("StoreID")]
+        public int StoreId { get; set; }
+        [ForeignKey("StoreId")]
         public Store? Store { get; set; }
 
-        public int VariantID { get; set; }
-        [ForeignKey("VariantID")]
+        public int VariantId { get; set; }
+        [ForeignKey("VariantId")]
         public ProductVariant? ProductVariant { get; set; }
 
         public int Quantity { get; set; }

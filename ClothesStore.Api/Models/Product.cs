@@ -11,7 +11,7 @@ namespace ClothesStore.Api.Models
 
         public int CategoryId {get; set;}
         [ForeignKey("CategoryId")]
-        public Category? Categorys {get; set;}
+        public Category? Category {get; set;}
 
         public ICollection<ProductVariant> ProductVariants {get; set;} = new List<ProductVariant>();
         public ICollection<ProductImage> ProductImages {get; set;} = new List<ProductImage>();
