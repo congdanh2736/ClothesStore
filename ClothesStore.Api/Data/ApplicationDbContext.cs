@@ -100,9 +100,9 @@ namespace ClothesStore.Api.Data
                     .HasForeignKey(x => x.CartId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasOne(x => x.Variant)
+                e.HasOne(x => x.ProductVariant)
                     .WithMany(v => v.CartItems)
-                    .HasForeignKey(x => x.VariantId)
+                    .HasForeignKey(x => x.ProductVariantId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -312,7 +312,7 @@ namespace ClothesStore.Api.Data
 
             builder.Entity<OrderItem>(e =>
             {
-                e.HasKey(x => x.OrderItemId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.Price).HasPrecision(18, 2);
 
                 e.HasOne(x => x.Order)
@@ -328,7 +328,7 @@ namespace ClothesStore.Api.Data
 
             builder.Entity<PaymentTransaction>(e =>
             {
-                e.HasKey(x => x.TransactionId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.PaymentMethod).IsRequired().HasMaxLength(50);
                 e.Property(x => x.Status).IsRequired().HasMaxLength(50);
 
