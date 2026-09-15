@@ -18,5 +18,9 @@ namespace ClothesStore.Api.Models
         public ICollection<Address> Addresses = new List<Address>();
         public Cart Cart { get; set; } = new Cart();
         public ICollection<Wishlist> Wishlists = new List<Wishlist>();
+
+        // Link to account
+        public string? ApplicationUserId { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }
