@@ -7,11 +7,15 @@ namespace ClothesStore.Api.Models
         [Key]
         public int Id { get; set; }
         public int OrderId { get; set; }
-         [ForeignKey("OrderId")]
         public int VariantId { get; set; }
-        [ForeignKey("VariantId")]
         public int Quantity { get; set; }
         public decimal Price { get; set; }
+
+        //Navigation
+        [ForeignKey("OrderId")]
+        public Order Order { get; set; }
+        [ForeignKey("VariantId")]
+        public ProductVariant ProductVariant { get; set;}
         
     }
 }

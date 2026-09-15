@@ -8,14 +8,17 @@ namespace ClothesStore.Api.Models
         [Key]
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        [ForeignKey("CustomerId")]
         public int AddressId { get; set; }
-        [ForeignKey("AddressId")]
         public int PromotionId { get; set; }
-        [ForeignKey("PromotionId")]
         public decimal TotalAmount { get; set;}
 
         //Navigation
+        [ForeignKey("CustomerId")]
+        public Customer Customer { get; set; }
+        [ForeignKey("AddressId")]
+        public Address Address { get; set; }
+        [ForeignKey("PromotionId")]
+        public Promotion Promotion { get; set; }
         public ICollection<OrderItem> OrderItems = new List<OrderItem>();
         public PaymentTransaction PaymentTransaction { get; set; } = new PaymentTransaction();
 
