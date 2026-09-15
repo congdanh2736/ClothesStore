@@ -283,7 +283,7 @@ namespace ClothesStore.Api.Data
             // ============ SALES ============
             builder.Entity<Promotion>(e =>
             {
-                e.HasKey(x => x.PromoId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.Code).IsRequired().HasMaxLength(50);
                 e.Property(x => x.DiscountValue).HasPrecision(18, 2);
                 e.HasIndex(x => x.Code).IsUnique();
@@ -291,7 +291,7 @@ namespace ClothesStore.Api.Data
 
             builder.Entity<Order>(e =>
             {
-                e.HasKey(x => x.OrderId);
+                e.HasKey(x => x.Id);
                 e.Property(x => x.TotalAmount).HasPrecision(18, 2);
 
                 e.HasOne(x => x.Customer)
@@ -306,7 +306,7 @@ namespace ClothesStore.Api.Data
 
                 e.HasOne(x => x.Promotion)
                     .WithMany(p => p.Orders)
-                    .HasForeignKey(x => x.PromoId)
+                    .HasForeignKey(x => x.Id)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
