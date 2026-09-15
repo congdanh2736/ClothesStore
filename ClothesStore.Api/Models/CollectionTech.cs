@@ -7,12 +7,12 @@ namespace ClothesStore.Api.Models
     public class CollectionTech
     {
         [Key]
-        public int Collection_id {get; set;}
+        public int Id {get; set;}
 
         //type gồm: colection hoặc Techology
-        public string? type {get; set;}
+        public string? Type {get; set;}
         //tên của colection hoặc Techology
-        public string? name {get; set;} 
-        public ICollection<ProductCollection> product_Collections { get; set;} = new List<ProductCollection>();
+        public string? Name {get; set;} 
+        public ICollection<ProductCollection> ProductCollections { get; set;} = new List<ProductCollection>();
     }
 }
