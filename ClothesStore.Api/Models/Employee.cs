@@ -13,5 +13,9 @@ namespace ClothesStore.Api.Models
         public int StoreId { get; set; }
         [ForeignKey("StoreId")]
         public Store? Store { get; set; }
+
+        // Link to account
+        public string? ApplicationUserId { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }
