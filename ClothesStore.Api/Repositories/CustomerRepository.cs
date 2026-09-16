@@ -1,10 +1,11 @@
 ﻿using ClothesStore.Api.Data;
 using ClothesStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using ClothesStore.Api.Interface.Repositories;
 
 namespace ClothesStore.Api.Repositories
 {
-    public class CustomerRepository
+    public class CustomerRepository : ICustomerRepository
     {
         private readonly ApplicationDbContext _context;
         public CustomerRepository(ApplicationDbContext context) => _context = context;
