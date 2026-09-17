@@ -1,6 +1,13 @@
 using ClothesStore.Api.Data;
+using ClothesStore.Api.Interface.Repositories;
+using ClothesStore.Api.Interface.Services;
+using ClothesStore.Api.Mappings;
+using ClothesStore.Api.Repositories;
+using ClothesStore.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using AutoMapper;
+using ClothesStore.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +25,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add dependency injection for repositories and services
+// Customer
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+
+builder.Services.AddAutoMapper(typeof(CustomerProfile));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,6 +40,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Use Swagger middleware to serve the generated OpenAPI specification and Swagger UI in all environments
 app.UseSwagger();

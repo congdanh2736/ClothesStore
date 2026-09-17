@@ -1,17 +1,23 @@
-﻿using ClothesStore.Api.Interface.Services;
+﻿using ClothesStore.Api.DTOs.Customer;
+using ClothesStore.Api.Interface.Services;
 using ClothesStore.Api.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClothesStore.Api.Controllers
 {
-    public class CustomerController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class CustomerController : ControllerBase
     {
-        private readonly ICustomerService _customerService;
+        private readonly ICustomerService _service;
 
         public CustomerController(ICustomerService customerService)
         {
-            _customerService = customerService;
+            _service = customerService;
         }
 
-
+        [HttpGet]
+        public async Task<ActionResult<List<CustomerDto>>> GetAll()
+            => Ok(await _service.GetAllAsync());
     }
 }
