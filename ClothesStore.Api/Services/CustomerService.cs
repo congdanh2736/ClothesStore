@@ -52,8 +52,7 @@ namespace ClothesStore.Api.Services
             var customer = await _repository.GetByIdAsync(id);
             if (customer is null) return (false, "Không tìm thấy khách hàng.");
 
-            if (dto.MembershipTierId.HasValue &&
-                !await _repository.MembershipTierExistsAsync(dto.MembershipTierId.Value))
+            if (dto.MembershipTierId.HasValue && !await _repository.MembershipTierExistsAsync(dto.MembershipTierId.Value))
                 return (false, "Hạng thành viên không tồn tại.");
 
             customer.FirstName = dto.FirstName;
