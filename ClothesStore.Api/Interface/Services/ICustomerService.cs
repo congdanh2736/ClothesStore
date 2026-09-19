@@ -1,13 +1,10 @@
 ﻿using ClothesStore.Api.DTOs.Customer;
+using ClothesStore.Api.Interface.Services.Base;
 
 namespace ClothesStore.Api.Interface.Services
 {
-    public interface ICustomerService
+    public interface ICustomerService : IService<CustomerDto, CreateCustomerDto, UpdateCustomerDto>
     {
-        Task<List<CustomerDto>> GetAllAsync();
-        Task<CustomerDto?> GetByIdAsync(int id);
-        Task<(bool Success, string? Error, CustomerDto? Data)> CreateAsync(CreateCustomerDto dto);
-        Task<(bool Success, string? Error)> UpdateAsync(int id, UpdateCustomerDto dto);
-        Task<bool> DeleteAsync(int id);
+        
     }
 }
