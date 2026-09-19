@@ -10,7 +10,7 @@ namespace ClothesStore.Api.Repositories
         private readonly ApplicationDbContext _context;
         public CustomerRepository(ApplicationDbContext context) => _context = context;
 
-        public async Task<List<Customer>> GetAllAsync()
+        public async Task<IEnumerable<Customer>> GetAllAsync()
             => await _context.Customers
                 .Include(c => c.MembershipTier)
                 .Include(c => c.Addresses)

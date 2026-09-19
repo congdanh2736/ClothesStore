@@ -1,13 +1,17 @@
+using AutoMapper;
+using AutoMapper.Configuration;
 using ClothesStore.Api.Data;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Interface.Services;
 using ClothesStore.Api.Mappings;
+using ClothesStore.Api.Middleware;
 using ClothesStore.Api.Repositories;
 using ClothesStore.Api.Services;
+using ClothesStore.Api.Validators.Customer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
-using AutoMapper;
-using ClothesStore.Api.Middleware;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +35,9 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 
-builder.Services.AddAutoMapper(typeof(CustomerProfile));
-builder.Services.AddValidatorFromAssemblyContaining<CreateCustomerDtoValidator>();
+builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
+builder.Services.AddValidatorsFromAssemblyContaining<CreateCustomerValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
 
