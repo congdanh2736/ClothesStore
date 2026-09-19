@@ -17,7 +17,7 @@ namespace ClothesStore.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<List<CustomerDto>> GetAllAsync()
+        public async Task<IEnumerable<CustomerDto>> GetAllAsync()
         {
             var customers = await _repository.GetAllAsync();
             return _mapper.Map<List<CustomerDto>>(customers);
