@@ -32,6 +32,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 
 builder.Services.AddAutoMapper(typeof(CustomerProfile));
+builder.Services.AddValidatorFromAssemblyContaining<CreateCustomerDtoValidator>();
 
 var app = builder.Build();
 
