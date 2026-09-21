@@ -8,6 +8,6 @@ namespace ClothesStore.Api.Models
         public int Id { get; set; }
         public string? TierName { get; set; }
 
-        public ICollection<Customer>? Customers { get; set; } = new List<Customer>();
+        public ICollection<Customer> Customers { get; set; } = new List<Customer>();
     }
 }
