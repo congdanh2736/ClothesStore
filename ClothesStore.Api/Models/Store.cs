@@ -5,13 +5,15 @@ namespace ClothesStore.Api.Models
     public class Store
     {
         [Key]
-        public int store_id { get; set; }
+        public int Id{ get; set; }
 
-        public string? name { get; set; }
-        public string? location { get; set; }
+        public string? Name { get; set; }
+        public string? Location { get; set; }
 
-        public ICollection<StoreStock> store_Stocks { get; set; } = new List<StoreStock>();
-        public ICollection<StoreDailyStat> store_Daily_Stats { get; set; } = new List<StoreDailyStat>();
-        public ICollection<StoreItemStat> store_Item_Stats { get; set; } = new List<StoreItemStat>();
+        public ICollection<StoreStock> StoreStocks { get; set; } = new List<StoreStock>();
+        public ICollection<StoreDailyStat> StoreDailyStats { get; set; } = new List<StoreDailyStat>();
+        public ICollection<StoreItemStat> StoreItemStats { get; set; } = new List<StoreItemStat>();
+        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+       
     }
 }

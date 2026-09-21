@@ -10,14 +10,16 @@ namespace ClothesStore.Api.Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
 
-        public string? MembershipTierId { get; set; }
+        public int? MembershipTierId { get; set; }
         [ForeignKey("MembershipTierId")]
         public virtual MembershipTier? MembershipTier { get; set; }
 
         //Relashionships
-        public ICollection<Address> Addresses = new List<Address>();
+        public ICollection<Address> Addresses { get; set; } = new List<Address>();
         public Cart Cart { get; set; } = new Cart();
-        public ICollection<Wishlist> Wishlists = new List<Wishlist>();
+        public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
 
         // Link to account
         public string? ApplicationUserId { get; set; }

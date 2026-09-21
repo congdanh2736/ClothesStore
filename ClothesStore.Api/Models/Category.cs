@@ -13,6 +13,8 @@ namespace ClothesStore.Api.Models
         [ForeignKey("ParentCategoryId")]
         public Category? ParentCategory {get; set;}
 
+        
+        public ICollection<Category>? ChildrenCategories { get; set; } = new List<Category>();
         public ICollection<Product>? Products {get; set;} = new List<Product>();
     }
 }
