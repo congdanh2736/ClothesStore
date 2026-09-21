@@ -57,7 +57,7 @@ namespace ClothesStore.Api.Data
 
                 e.HasOne(x => x.MembershipTier)
                     .WithMany(t => t.Customers)
-                    .HasForeignKey(x => x.Id)
+                    .HasForeignKey(x => x.MembershipTierId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 // Optional 1-1 link to an Identity login account
