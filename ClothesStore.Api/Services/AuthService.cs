@@ -16,13 +16,21 @@ namespace ClothesStore.Api.Services
         private readonly ICustomerRepository _customerRepository;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IJwtService _jwtService;
 
-        public AuthService(UserManager<ApplicationUser> userManager, ICustomerRepository customerRepository, ApplicationDbContext context, IMapper mapper)
+        public AuthService(
+            UserManager<ApplicationUser> userManager, 
+            ICustomerRepository customerRepository, 
+            ApplicationDbContext context, 
+            IJwtService jwtService,
+            IMapper mapper
+            )
         {
             _userManager = userManager;
             _customerRepository = customerRepository;
             _context = context;
             _mapper = mapper;
+            _jwtService = jwtService;
         }
 
         public async Task<(bool Success, string? Error, RegisterResultDto? Data)> RegisterAsync(RegisterDto dto)
@@ -69,6 +77,32 @@ namespace ClothesStore.Api.Services
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<(bool Success, string? Error, LoginResultDto? Data)> LoginAsync(LoginDto dto)
+        {
+            // Tìm người dùng có tồn tại không bằng cách kiểm tra email
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user is null)
+                return (false, "Email hoặc mật khẩu không đúng.", null);
+
+            // Kiểm tra mật khẩu có đúng không khi đăng nhập
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+            if (!isPasswordValid)
+                return (false, "Email hoặc mật khẩu không đúng.", null);
+
+            // Tạo token JWT cho người dùng
+            var token = await _jwtService.GenerateTokenAsync(user);
+            // Lấy danh sách vai trò của người dùng
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // Trả về kết quả đăng nhập thành công với token, email và danh sách vai trò
+            return (true, null, new LoginResultDto
+            {
+                Token = token,
+                Email = user.Email!,
+                Roles = roles.ToList()
+            });
         }
     }
 }
