@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClothesStore.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260915065046_InitialCreate")]
+    [Migration("20260921103037_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -218,7 +218,10 @@ namespace ClothesStore.Api.Migrations
             modelBuilder.Entity("ClothesStore.Api.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
@@ -229,14 +232,16 @@ namespace ClothesStore.Api.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MembershipTierId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("MembershipTierId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId")
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
+
+                    b.HasIndex("MembershipTierId");
 
                     b.ToTable("Customers");
                 });
@@ -854,9 +859,8 @@ namespace ClothesStore.Api.Migrations
 
                     b.HasOne("ClothesStore.Api.Models.MembershipTier", "MembershipTier")
                         .WithMany("Customers")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("MembershipTierId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ApplicationUser");
 
