@@ -98,6 +98,16 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 // Membership Tier
 builder.Services.AddScoped<IMembershipTierRepository, MembershipTierRepository>();
 builder.Services.AddScoped<IMembershipTierService, MembershipTierService>();
+// Store and inventory
+builder.Services.AddScoped<IStoreRepository, StoreRepository>();
+builder.Services.AddScoped<IStoreService, StoreService>();
+builder.Services.AddScoped<IStoreStockRepository, StoreStockRepository>();
+builder.Services.AddScoped<IStoreStockService, StoreStockService>();
+builder.Services.AddScoped<IStoreDailyStatRepository, StoreDailyStatRepository>();
+builder.Services.AddScoped<IStoreDailyStatService, StoreDailyStatService>();
+builder.Services.AddScoped<IStoreItemStatRepository, StoreItemStatRepository>();
+builder.Services.AddScoped<IStoreItemStatService, StoreItemStatService>();
+
 // Employee
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
