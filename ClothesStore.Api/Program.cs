@@ -49,6 +49,9 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 // Membership Tier
 builder.Services.AddScoped<IMembershipTierRepository, MembershipTierRepository>();
 builder.Services.AddScoped<IMembershipTierService, MembershipTierService>();
+// Employee
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 // Add AutoMapper and FluentValidation services
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);

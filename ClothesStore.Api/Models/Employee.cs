@@ -10,7 +10,7 @@ namespace ClothesStore.Api.Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
 
-        public int StoreId { get; set; }
+        public int? StoreId { get; set; }
         [ForeignKey("StoreId")]
         public Store? Store { get; set; }
 

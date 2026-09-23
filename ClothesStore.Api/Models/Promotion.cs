@@ -6,7 +6,7 @@ namespace ClothesStore.Api.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Code { get; set; }
+        public string? Code { get; set; }
         public decimal DiscountValue { get; set; }
         public ICollection<Order> Orders = new List<Order>();
     }

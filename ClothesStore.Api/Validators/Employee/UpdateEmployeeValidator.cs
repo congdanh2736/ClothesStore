@@ -1,11 +1,11 @@
-﻿using ClothesStore.Api.DTOs.Customer;
+﻿using ClothesStore.Api.DTOs.Employee;
 using FluentValidation;
 
-namespace ClothesStore.Api.Validators.Customer
+namespace ClothesStore.Api.Validators.Employee
 {
-    public class UpdateCustomerValidator : AbstractValidator<UpdateCustomerDto>
+    public class UpdateEmployeeValidator : AbstractValidator<UpdateEmployeeDto>
     {
-        public UpdateCustomerValidator()
+        public UpdateEmployeeValidator()
         {
             RuleFor(x => x.FirstName)
                 .NotEmpty().WithMessage("FirstName is required")
