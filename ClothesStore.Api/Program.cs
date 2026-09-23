@@ -116,10 +116,11 @@ builder.Services.AddFluentValidationAutoValidation();
 //-------------------------------------------------------------[CẤU HÌNH APPLICATION]---------------------------------------------------------------//
 var app = builder.Build();
 
-// Seed roles into the database
+// Gán role và tạo admin mặc định khi ứng dụng khởi động
 using (var scope = app.Services.CreateScope())
 {
     await RoleSeeder.SeedRolesAsync(scope.ServiceProvider);
+    await AdminSeeder.SeedAdminAsync(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.
