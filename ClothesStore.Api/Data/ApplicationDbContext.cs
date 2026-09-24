@@ -220,7 +220,7 @@ namespace ClothesStore.Api.Data
                 // self-referencing parent/child; Restrict to avoid multiple cascade paths
                 e.HasOne(x => x.ParentCategory)
                     .WithMany(x => x.ChildrenCategories)
-                    .HasForeignKey(x => x.Id)
+                    .HasForeignKey(x => x.ParentCategoryId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 

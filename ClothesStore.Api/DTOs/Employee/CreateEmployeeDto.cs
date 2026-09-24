@@ -7,6 +7,5 @@
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public int? StoreId { get; set; }
-        public string ApplicationUserId { get; set; } = string.Empty;
     }
 }
