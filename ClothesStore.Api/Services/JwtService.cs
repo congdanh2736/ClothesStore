@@ -47,7 +47,7 @@ namespace ClothesStore.Api.Services
 
             // Tạo khóa bảo mật từ chuỗi bí mật trong cấu hình
             // Khóa này sẽ được sử dụng để ký token, đảm bảo rằng token không bị giả mạo
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
 
             /* 
              * Tạo thông tin xác thực ký token bằng thuật toán HMAC SHA256

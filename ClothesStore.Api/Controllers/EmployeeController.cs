@@ -36,6 +36,7 @@ namespace ClothesStore.Api.Controllers
         }
 
         // Hàm tạo mới một nhân viên
+        [HttpPost]
         public async Task<ActionResult<EmployeeDto>> Create(CreateEmployeeDto dto)
         {
             var (success, error, data) = await _service.CreateAsync(dto);
