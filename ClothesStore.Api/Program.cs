@@ -84,12 +84,47 @@ builder.Services.AddAuthentication(options =>
 //--------------------------------------------------------------------------------------------------------------------------------------------------//
 
 
-//-------------------------------------------------------[ĐĂNG KÍ CÁC DỊCH VỤ SERVICE VÀ REPOSITORY]------------------------------------------------//
+//------------------------------------------------------------[ĐĂNG KÍ DỊCH VỤ SWAGGER]-------------------------------------------------------------//
 // Add Swagger services to generate OpenAPI specification and Swagger UI
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+// SchemeId là tên của scheme xác thực mà Swagger sẽ sử dụng để xác thực các yêu cầu API.
+const string schemeId = "Bearer";
+
+/*
+ * Cấu hình Swagger để hỗ trợ xác thực JWT Bearer
+ * Khi người dùng truy cập Swagger UI, họ sẽ thấy một nút "Authorize" để nhập token JWT
+ * Token này sẽ được gửi trong header Authorization của các yêu cầu API
+ */
+builder.Services.AddSwaggerGen(options =>
+{
+    // Thêm định nghĩa scheme xác thực Bearer vào Swagger
+    options.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Nhập token theo dạng: Bearer {token}",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",       // chữ thường, theo chuẩn RFC 7235
+        BearerFormat = "JWT"
+    });
+
+    // Thêm yêu cầu xác thực vào Swagger, yêu cầu tất cả các endpoint phải có token JWT
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference(schemeId, document),
+            new List<string>()
+        }
+    });
+});
+//--------------------------------------------------------------------------------------------------------------------------------------------------//
+
+
+//-------------------------------------------------------[ĐĂNG KÍ CÁC DỊCH VỤ SERVICE VÀ REPOSITORY]------------------------------------------------//
 // Add dependency injection for repositories and services
+// Jwt
+builder.Services.AddScoped<IJwtService, JwtService>();
 // Auth
 builder.Services.AddScoped<IAuthService, AuthService>();
 // Customer
