@@ -57,6 +57,7 @@ erDiagram
     CUSTOMER ||--o{ WISHLIST : "saves"
     CUSTOMER ||--o{ REVIEW : "writes"
     CUSTOMER ||--o{ ORDER : "places"
+    CUSTOMER ||--o{ LOYALTY_TRANSACTION : "earns_spends"
 
     STORE ||--o{ EMPLOYEE : "employs"
     STORE ||--o{ STORE_STOCK : "holds"
@@ -65,6 +66,7 @@ erDiagram
 
     CATEGORY ||--o{ PRODUCT : "contains"
     CATEGORY ||--o{ CATEGORY : "parent_of"
+    CATEGORY ||--o{ SIZE_CHART : "defines"
 
     PRODUCT ||--|{ PRODUCT_VARIANT : "has_skus"
     PRODUCT ||--o{ PRODUCT_IMAGE : "has_images"
@@ -85,8 +87,14 @@ erDiagram
 
     ORDER ||--|{ ORDER_ITEM : "contains"
     ORDER ||--o| PAYMENT_TRANSACTION : "paid_via"
+    ORDER ||--o| SHIPMENT : "shipped_via"
+    ORDER ||--o{ RETURN_REQUEST : "has"
 
-    %% Defining attributes for 22 tables
+    RETURN_REQUEST ||--|{ RETURN_ITEM : "contains"
+    ORDER_ITEM ||--o| RETURN_ITEM : "refers_to"
+
+    %% Attributes
+
     MEMBERSHIP_TIER { int tier_id PK string name }
     CUSTOMER { int customer_id PK int tier_id FK string full_name }
     ADDRESS { int address_id PK int customer_id FK string full_address }
@@ -131,4 +139,47 @@ erDiagram
     ORDER { int order_id PK int customer_id FK int address_id FK int promo_id FK decimal total_amount }
     ORDER_ITEM { int order_item_id PK int order_id FK int variant_id FK int quantity decimal price }
     PAYMENT_TRANSACTION { int transaction_id PK int order_id FK string payment_method string status }
+
+    %% New tables
+
+    RETURN_REQUEST {
+        int return_id PK
+        int order_id FK
+        date request_date
+        string reason
+        string status
+    }
+    RETURN_ITEM {
+        int return_item_id PK
+        int return_id FK
+        int order_item_id FK
+        int quantity
+        string condition
+        decimal refund_amount
+    }
+
+    SHIPMENT {
+        int shipment_id PK
+        int order_id FK
+        string carrier
+        string tracking_number
+        date shipped_date
+        date delivered_date
+        string status
+    }
+
+    SIZE_CHART {
+        int size_chart_id PK
+        int category_id FK
+        string size_label
+        string measurements
+    }
+
+    LOYALTY_TRANSACTION {
+        int transaction_id PK
+        int customer_id FK
+        date txn_date
+        int points_change
+        string reason
+    }
 ```
