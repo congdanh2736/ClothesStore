@@ -45,6 +45,17 @@ namespace ClothesStore.Api.Data
             base.OnModelCreating(builder); // Identity tables (AspNetUsers, AspNetRoles, ...)
 
             // ============ MEMBERSHIP / CUSTOMER ============
+            builder.Entity<LoyaltyTransaction>(e =>
+            {
+                e.HasKey(x => x.Id);
+
+                e.HasOne(x => x.Customer)
+                    .WithMany(c => c.LoyaltyTransactions)
+                    .HasForeignKey(x => x.CustomerId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            });
+
             builder.Entity<MembershipTier>(e =>
             {
                 e.HasKey(x => x.Id);
