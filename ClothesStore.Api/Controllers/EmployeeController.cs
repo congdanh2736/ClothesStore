@@ -7,7 +7,7 @@ namespace ClothesStore.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin, Manager")] // Chỉ cho phép Admin truy cập
+    [Authorize(Roles = "Admin")] // Chỉ cho phép Admin truy cập
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _service;
