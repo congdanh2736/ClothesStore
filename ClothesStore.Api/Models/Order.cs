@@ -14,11 +14,11 @@ namespace ClothesStore.Api.Models
 
         //Navigation
         [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; }
+        public Customer? Customer { get; set; }
         [ForeignKey("AddressId")]
-        public Address Address { get; set; }
+        public Address? Address { get; set; }
         [ForeignKey("PromotionId")]
-        public Promotion Promotion { get; set; }
+        public Promotion? Promotion { get; set; }
         public ICollection<OrderItem> OrderItems = new List<OrderItem>();
         public PaymentTransaction PaymentTransaction { get; set; } = new PaymentTransaction();
 

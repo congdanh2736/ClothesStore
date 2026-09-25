@@ -8,11 +8,11 @@ namespace ClothesStore.Api.Models
         [Key]
         public int Id { get; set; }
         public int OrderId { get; set; }
-        public string PaymentMethod { get; set; }
-        public string Status { get; set; }
+        public string? PaymentMethod { get; set; }
+        public string? Status { get; set; }
 
         //Navigation
         [ForeignKey("OrderId")]
-        public Order Order { get; set ;}
+        public Order? Order { get; set ;}
     }
 }

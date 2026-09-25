@@ -251,10 +251,11 @@ namespace ClothesStore.Api.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MembershipTierId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MembershipTierId = table.Column<int>(type: "int", nullable: true),
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -267,8 +268,8 @@ namespace ClothesStore.Api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Customers_MembershipTiers_Id",
-                        column: x => x.Id,
+                        name: "FK_Customers_MembershipTiers_MembershipTierId",
+                        column: x => x.MembershipTierId,
                         principalTable: "MembershipTiers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -724,6 +725,11 @@ namespace ClothesStore.Api.Migrations
                 column: "ApplicationUserId",
                 unique: true,
                 filter: "[ApplicationUserId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_MembershipTierId",
+                table: "Customers",
+                column: "MembershipTierId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_ApplicationUserId",
