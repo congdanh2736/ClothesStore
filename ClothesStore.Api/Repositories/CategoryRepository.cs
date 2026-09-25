@@ -20,6 +20,7 @@ namespace ClothesStore.Api.Repositories
                 .Include(c => c.ParentCategory)
                 .Include(c => c.ChildrenCategories)
                 .Include(c => c.Products)
+                .Include(c => c.SizeCharts)
                 .ToListAsync();
 
         // tìm danh mục tương ứng với Id
@@ -33,6 +34,7 @@ namespace ClothesStore.Api.Repositories
                 .Include(c => c.ParentCategory)
                 .Include(c => c.ChildrenCategories)
                 .Include(c => c.Products)
+                .Include(c => c.SizeCharts)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
         // thêm 1 danh mục mới
