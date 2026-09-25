@@ -20,6 +20,7 @@ namespace ClothesStore.Api.Models
         public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<LoyaltyTransaction> LoyaltyTransactions { get; set; } = new List<LoyaltyTransaction>();
 
         // Link to account
         public string? ApplicationUserId { get; set; }
