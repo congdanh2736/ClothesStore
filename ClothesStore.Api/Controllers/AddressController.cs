@@ -1,35 +1,37 @@
-﻿using ClothesStore.Api.DTOs.MembershipTier;
+﻿using ClothesStore.Api.DTOs.Address;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClothesStore.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] 
-    public class MembershipTierController : ControllerBase
+    [Route("api/[controller]")]
+    public class AddressController : ControllerBase
     {
-        private readonly IMembershipTierService _service;
+        private readonly IAddressService _service;
 
-        public MembershipTierController(IMembershipTierService service) => _service = service;
+        public AddressController(IAddressService service)
+        {
+            _service = service;
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var membershipTiers = await _service.GetAllAsync();
-            return Ok(membershipTiers);
+            var addresses = await _service.GetAllAsync();
+            return Ok(addresses);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var membershipTier = await _service.GetByIdAsync(id);
-            if (membershipTier == null)
-                return NotFound();
-            return Ok(membershipTier);
+            var address = await _service.GetByIdAsync(id);
+            if (address is null) return NotFound();
+            return Ok(address);
         }
 
-        [HttpPost]  
-        public async Task<IActionResult> Create([FromBody] CreateMembershipTierDto dto)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateAddressDto dto)
         {
             var (success, error, data) = await _service.CreateAsync(dto);
             if (!success) return BadRequest(new { message = error });
@@ -37,7 +39,7 @@ namespace ClothesStore.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateMembershipTierDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateAddressDto dto)
         {
             var (success, error) = await _service.UpdateAsync(id, dto);
             if (!success) return BadRequest(new { message = error });
@@ -48,7 +50,8 @@ namespace ClothesStore.Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _service.DeleteAsync(id);
-            return deleted ? NoContent() : NotFound(new { message = "Hạng thành viên không tồn tại" });
+            if (!deleted) return NotFound(new { message = "Địa chỉ không tồn tại" });
+            return NoContent();
         }
     }
 }
