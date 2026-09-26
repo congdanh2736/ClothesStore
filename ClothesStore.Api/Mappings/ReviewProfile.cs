@@ -14,9 +14,14 @@ namespace ClothesStore.Api.Mappings
                         ? $"{src.Customer.FirstName} {src.Customer.LastName}"
                         : null))
                 .ForMember(dest => dest.ProductName,
-                    opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : null));
+                    opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : null))
+                .ForMember(dest => dest.ImageUrls,
+                    opt => opt.MapFrom(src => src.Images != null
+                        ? src.Images.Select(i => i.ImageUrl).ToList()
+                        : new List<string>()));
 
-            CreateMap<CreateReviewDto, Review>();
+            CreateMap<CreateReviewDto, Review>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
         }
     }
 }

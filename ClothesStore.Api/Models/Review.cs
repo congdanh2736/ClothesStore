@@ -18,5 +18,7 @@ namespace ClothesStore.Api.Models
         public int Rating { get; set; } // 1-5 sao
         public string? Comment { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<ReviewImage> Images { get; set; } = new List<ReviewImage>();
     }
 }

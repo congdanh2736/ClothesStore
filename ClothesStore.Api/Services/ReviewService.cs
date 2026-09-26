@@ -57,6 +57,13 @@ namespace ClothesStore.Api.Services
                 return (false, "Khách hàng đã đánh giá sản phẩm này rồi.", null);
 
             var review = _mapper.Map<Review>(dto);
+            if (dto.ImageUrls != null && dto.ImageUrls.Count > 0)
+            {
+                review.Images = dto.ImageUrls
+                    .Take(3)
+                    .Select(url => new ReviewImage { ImageUrl = url })
+                    .ToList();
+            }
             await _repository.AddAsync(review);
 
             // Lấy lại entity với navigation properties để map đầy đủ
@@ -66,11 +73,20 @@ namespace ClothesStore.Api.Services
 
         public async Task<(bool Success, string? Error)> UpdateAsync(int id, UpdateReviewDto dto)
         {
-            var review = await _repository.GetByIdAsync(id);
+            var review = await _repository.GetByIdWithDetailsAsync(id);
             if (review is null) return (false, "Không tìm thấy đánh giá.");
 
             review.Rating = dto.Rating;
             review.Comment = dto.Comment;
+
+            if (dto.ImageUrls != null)
+            {
+                review.Images.Clear();
+                foreach (var url in dto.ImageUrls.Take(3))
+                {
+                    review.Images.Add(new ReviewImage { ImageUrl = url, ReviewId = review.Id });
+                }
+            }
 
             await _repository.UpdateAsync(review);
             return (true, null);

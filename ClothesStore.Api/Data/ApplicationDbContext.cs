@@ -1,4 +1,4 @@
-﻿using ClothesStore.Api.Models;
+using ClothesStore.Api.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +18,7 @@ namespace ClothesStore.Api.Data
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<Wishlist> Wishlists => Set<Wishlist>();
         public DbSet<Review> Reviews => Set<Review>();
+        public DbSet<ReviewImage> ReviewImages => Set<ReviewImage>();
 
         // Store domain
         public DbSet<Store> Stores => Set<Store>();
@@ -138,6 +139,17 @@ namespace ClothesStore.Api.Data
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(x => x.ProductId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<ReviewImage>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.ImageUrl).IsRequired().HasMaxLength(500);
+
+                e.HasOne(x => x.Review)
+                    .WithMany(r => r.Images)
+                    .HasForeignKey(x => x.ReviewId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // ============ STORE ============

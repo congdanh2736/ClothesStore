@@ -18,6 +18,14 @@ namespace ClothesStore.Api.Validators.Review
 
             RuleFor(x => x.Comment)
                 .MaximumLength(1000).WithMessage("Bình luận không được vượt quá 1000 ký tự.");
+
+            RuleFor(x => x.ImageUrls)
+                .Must(x => x == null || x.Count <= 3)
+                .WithMessage("Đánh giá chỉ được đính kèm tối đa 3 hình ảnh.");
+
+            RuleForEach(x => x.ImageUrls)
+                .NotEmpty().WithMessage("Đường dẫn ảnh không được để trống.")
+                .MaximumLength(500).WithMessage("Đường dẫn ảnh không được vượt quá 500 ký tự.");
         }
     }
 }

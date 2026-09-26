@@ -35,16 +35,6 @@ namespace ClothesStore.Api.Repositories
                 .Include(c => c.Products)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-        public async Task<IEnumerable<Category>> GetRootCategoriesAsync()
-            => await _context.Categories
-                .Where(c => c.ParentCategoryId == null)
-                .Include(c => c.ChildrenCategories)
-                .Include(c => c.Products)
-                .ToListAsync();
-
-        public async Task<bool> CategoryExistsAsync(int categoryId)
-            => await _context.Categories.AnyAsync(c => c.Id == categoryId);
-
         // thêm 1 danh mục mới
         public async Task AddAsync(Category entity)
         {

@@ -15,6 +15,7 @@ namespace ClothesStore.Api.Repositories
             => await _context.Reviews
                 .Include(r => r.Customer)
                 .Include(r => r.Product)
+                .Include(r => r.Images)
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
 
@@ -25,11 +26,13 @@ namespace ClothesStore.Api.Repositories
             => await _context.Reviews
                 .Include(r => r.Customer)
                 .Include(r => r.Product)
+                .Include(r => r.Images)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
         public async Task<IEnumerable<Review>> GetByProductIdAsync(int productId)
             => await _context.Reviews
                 .Include(r => r.Customer)
+                .Include(r => r.Images)
                 .Where(r => r.ProductId == productId)
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
@@ -37,12 +40,14 @@ namespace ClothesStore.Api.Repositories
         public async Task<IEnumerable<Review>> GetByCustomerIdAsync(int customerId)
             => await _context.Reviews
                 .Include(r => r.Product)
+                .Include(r => r.Images)
                 .Where(r => r.CustomerId == customerId)
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
 
         public async Task<Review?> GetByCustomerAndProductAsync(int customerId, int productId)
             => await _context.Reviews
+                .Include(r => r.Images)
                 .FirstOrDefaultAsync(r => r.CustomerId == customerId && r.ProductId == productId);
 
         public async Task<bool> CustomerExistsAsync(int customerId)

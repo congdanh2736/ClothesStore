@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClothesStore.Api.Repositories
 {
-    public class CollectionTechRepository : ICollectionTechRepository
+    public class CollectionTechRepository : ICollectionTech
     {
         public readonly ApplicationDbContext _context;
         public CollectionTechRepository (ApplicationDbContext context) => _context = context;
@@ -14,11 +14,6 @@ namespace ClothesStore.Api.Repositories
                 .Include(c => c.ProductCollections)
                 .ToListAsync();
 
-        public async Task<IEnumerable<CollectionTech>> GetByTypeAsync(string type)
-            => await _context.CollectionTechs
-                .Where(c => c.Type == type)
-                .Include(c => c.ProductCollections)
-                .ToListAsync();
 
         public async Task<CollectionTech?> GetByIdAsync(int id)
             => await _context.CollectionTechs.FindAsync(id);

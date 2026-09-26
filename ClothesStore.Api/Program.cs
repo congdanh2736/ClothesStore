@@ -127,15 +127,6 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IJwtService, JwtService>();
 // Auth
 builder.Services.AddScoped<IAuthService, AuthService>();
-// Address
-builder.Services.AddScoped<IAddressRepository, AddressRepository>();
-builder.Services.AddScoped<IAddressService, AddressService>();
-// Category
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-// CollectionTech
-builder.Services.AddScoped<ICollectionTechRepository, CollectionTechRepository>();
-builder.Services.AddScoped<ICollectionTechService, CollectionTechService>();
 // Customer
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
