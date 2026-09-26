@@ -12,7 +12,7 @@ namespace ClothesStore.Api.Models
         public string? City { get; set; }
         public string? Country { get; set; }
 
-        public int CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         [ForeignKey("CustomerId")]
         public Customer? Customer { get; set; }
 
