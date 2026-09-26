@@ -16,5 +16,6 @@ namespace ClothesStore.Api.Models
         
         public ICollection<Category>? ChildrenCategories { get; set; } = new List<Category>();
         public ICollection<Product>? Products {get; set;} = new List<Product>();
+        public ICollection<SizeChart>? SizeCharts {get;set;} = new List<SizeChart>();
     }
 }

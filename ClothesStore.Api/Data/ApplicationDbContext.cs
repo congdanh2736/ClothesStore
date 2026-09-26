@@ -25,6 +25,7 @@ namespace ClothesStore.Api.Data
         public DbSet<StoreStock> StoreStocks => Set<StoreStock>();
         public DbSet<StoreDailyStat> StoreDailyStats => Set<StoreDailyStat>();
         public DbSet<StoreItemStat> StoreItemStats => Set<StoreItemStat>();
+        public DbSet<SizeChart> sizeCharts => Set<SizeChart>();
 
         // Catalog domain
         public DbSet<Category> Categories => Set<Category>();
@@ -261,6 +262,18 @@ namespace ClothesStore.Api.Data
                 e.HasOne(x => x.Product)
                     .WithMany(p => p.ProductImages)
                     .HasForeignKey(x => x.CollectionId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<SizeChart>( e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.SizeLabel).IsRequired().HasMaxLength(200);
+                e.Property(x => x.Measurements).IsRequired().HasMaxLength(200);
+
+                e.HasOne(x => x.Category)
+                    .WithMany(p => p.SizeCharts)
+                    .HasForeignKey(x => x.Id)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
