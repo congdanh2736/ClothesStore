@@ -48,7 +48,7 @@ namespace ClothesStore.Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _service.DeleteAsync(id);
-            return deleted ? NoContent() : NotFound();
+            return deleted ? NoContent() : NotFound(new { message = "Hạng thành viên không tồn tại" });
         }
     }
 }
