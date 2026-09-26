@@ -1,6 +1,6 @@
-using ClothesStore.Models;
+using ClothesStore.Api.Models;
 
-namespace ClothesStore.Repositories
+namespace ClothesStore.Api.Interface.Repositories
 {
     public interface ICartRepository
     {

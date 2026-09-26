@@ -1,13 +1,15 @@
-using ClothesStore.Models;
+using ClothesStore.Api.Data;
+using ClothesStore.Api.Interface.Repositories;
+using ClothesStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClothesStore.Repositories
+namespace ClothesStore.Api.Repositories
 {
     public class CartRepository : ICartRepository
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public CartRepository(AppDbContext context)
+        public CartRepository(ApplicationDbContext context)
         {
             _context = context;
         }

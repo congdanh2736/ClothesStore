@@ -1,4 +1,4 @@
-namespace ClothesStore.DTOs.Cart
+namespace ClothesStore.Api.DTOs.Cart
 {
     public class AddToCartRequestDto
     {

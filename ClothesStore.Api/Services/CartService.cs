@@ -1,8 +1,9 @@
-using ClothesStore.DTOs.Cart;
-using ClothesStore.Models;
-using ClothesStore.Repositories;
+using ClothesStore.Api.DTOs.Cart;
+using ClothesStore.Api.Interface.Repositories;
+using ClothesStore.Api.Interface.Services;
+using ClothesStore.Api.Models;
 
-namespace ClothesStore.Services
+namespace ClothesStore.Api.Services
 {
     public class CartService : ICartService
     {
@@ -31,12 +32,12 @@ namespace ClothesStore.Services
                 await _cartRepository.SaveChangesAsync();
             }
 
-            var cartItem = await _cartRepository.GetCartItemByVariantAsync(cart.CartId, request.VariantId);
+            var cartItem = await _cartRepository.GetCartItemByVariantAsync(cart.Id, request.VariantId);
             if (cartItem == null)
             {
                 cartItem = new CartItem
                 {
-                    CartId = cart.CartId,
+                    CartId = cart.Id,
                     VariantId = request.VariantId,
                     Quantity = request.Quantity
                 };
@@ -67,13 +68,8 @@ namespace ClothesStore.Services
 
             await _cartRepository.SaveChangesAsync();
 
-            var parentCart = await _cartRepository.GetCartByCustomerIdAsync(
-                (await _cartRepository.GetCartItemByIdAsync(request.CartItemId))?.CartId ?? 0
-            );
-
-            // Lấy lại theo CustomerId của cart cha
-            var fullCart = await _cartRepository.GetCartByCustomerIdAsync(parentCart?.CustomerId ?? 0);
-            return fullCart != null ? MapToCartResponseDto(fullCart) : null;
+            var cart = await _cartRepository.GetCartByCustomerIdAsync(cartItem.Cart?.CustomerId ?? 0);
+            return MapToCartResponseDto(cart);
         }
 
         public async Task<bool> RemoveItemFromCartAsync(int cartItemId)
@@ -90,11 +86,11 @@ namespace ClothesStore.Services
         {
             return new CartResponseDto
             {
-                CartId = cart.CartId,
+                CartId = cart.Id,
                 CustomerId = cart.CustomerId,
                 Items = cart.CartItems.Select(ci => new CartItemResponseDto
                 {
-                    CartItemId = ci.CartItemId,
+                    CartItemId = ci.Id,
                     VariantId = ci.VariantId,
                     Quantity = ci.Quantity
                 }).ToList()

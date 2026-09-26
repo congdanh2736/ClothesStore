@@ -15,5 +15,8 @@ namespace ClothesStore.Api.Models
         [ForeignKey("ProductId")]
         public Product? Product { get; set; } = null;
 
+        public int Rating { get; set; } // 1-5 sao
+        public string? Comment { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

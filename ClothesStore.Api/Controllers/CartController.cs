@@ -1,8 +1,8 @@
-using ClothesStore.DTOs.Cart;
-using ClothesStore.Services;
+using ClothesStore.Api.DTOs.Cart;
+using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ClothesStore.Controllers
+namespace ClothesStore.Api.Controllers
 {
     [ApiController]
     [Route("api/carts")]

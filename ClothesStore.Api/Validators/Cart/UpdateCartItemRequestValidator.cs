@@ -1,7 +1,7 @@
 using FluentValidation;
-using ClothesStore.DTOs.Cart;
+using ClothesStore.Api.DTOs.Cart;
 
-namespace ClothesStore.Validators.Cart
+namespace ClothesStore.Api.Validators.Cart
 {
     public class UpdateCartItemRequestValidator : AbstractValidator<UpdateCartItemRequestDto>
     {

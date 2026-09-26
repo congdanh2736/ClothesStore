@@ -1,6 +1,6 @@
-using ClothesStore.DTOs.Cart;
+using ClothesStore.Api.DTOs.Cart;
 
-namespace ClothesStore.Services
+namespace ClothesStore.Api.Interface.Services
 {
     public interface ICartService
     {
