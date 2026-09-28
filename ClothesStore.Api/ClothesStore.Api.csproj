@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\LoyaltyTransaction\" />
     <Folder Include="Helpers\" />
     <Folder Include="Extensions\" />
     <Folder Include="Migrations\" />
