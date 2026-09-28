@@ -8,20 +8,20 @@ namespace ClothesStore.Api.Validators.Customer
         public CreateCustomerValidator()
         {
             RuleFor(x => x.FirstName)
-                .NotEmpty().WithMessage("FirstName is required")
+                .NotEmpty().WithMessage("FirstName là bắt buộc")
                 .MaximumLength(100);
 
             RuleFor(x => x.LastName)
-                .NotEmpty().WithMessage("LastName is required")
+                .NotEmpty().WithMessage("LastName là bắt buộc")
                 .MaximumLength(100);
 
             RuleFor(x => x.ApplicationUserId)
-                .NotEmpty().WithMessage("Customer has to link to an ApplicationUser");
+                .NotEmpty().WithMessage("Customer phải liên kết với một ApplicationUser");
 
             RuleFor(x => x.MembershipTierId)
                 .GreaterThan(0)
                 .When(x => x.MembershipTierId.HasValue)
-                .WithMessage("Tier is invalid");
+                .WithMessage("Tier là không hợp lệ");
         }
     }
 }
