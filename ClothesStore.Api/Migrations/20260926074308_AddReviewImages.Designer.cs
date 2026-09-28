@@ -4,6 +4,7 @@ using ClothesStore.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClothesStore.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260926074308_AddReviewImages")]
+    partial class AddReviewImages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -277,33 +280,6 @@ namespace ClothesStore.Api.Migrations
                     b.HasIndex("StoreId");
 
                     b.ToTable("Employees");
-                });
-
-            modelBuilder.Entity("ClothesStore.Api.Models.LoyaltyTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PointsChange")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("TxnDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("LoyaltyTransaction");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.MembershipTier", b =>
@@ -947,17 +923,6 @@ namespace ClothesStore.Api.Migrations
                     b.Navigation("Store");
                 });
 
-            modelBuilder.Entity("ClothesStore.Api.Models.LoyaltyTransaction", b =>
-                {
-                    b.HasOne("ClothesStore.Api.Models.Customer", "Customer")
-                        .WithMany("LoyaltyTransactions")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("ClothesStore.Api.Models.Order", b =>
                 {
                     b.HasOne("ClothesStore.Api.Models.Address", "Address")
@@ -1251,8 +1216,6 @@ namespace ClothesStore.Api.Migrations
 
                     b.Navigation("Cart")
                         .IsRequired();
-
-                    b.Navigation("LoyaltyTransactions");
 
                     b.Navigation("Orders");
 
