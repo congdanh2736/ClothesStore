@@ -4,6 +4,7 @@ using ClothesStore.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClothesStore.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260925062634_UpdateRelationBetweenCustomerAndLoyaltyTransaction")]
+    partial class UpdateRelationBetweenCustomerAndLoyaltyTransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,9 +157,6 @@ namespace ClothesStore.Api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CartId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<int>("VariantId")
@@ -532,19 +532,10 @@ namespace ClothesStore.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rating")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -554,29 +545,6 @@ namespace ClothesStore.Api.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Reviews");
-                });
-
-            modelBuilder.Entity("ClothesStore.Api.Models.ReviewImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("ReviewId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReviewId");
-
-                    b.ToTable("ReviewImages");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.Store", b =>
@@ -709,9 +677,6 @@ namespace ClothesStore.Api.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
@@ -1086,17 +1051,6 @@ namespace ClothesStore.Api.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ClothesStore.Api.Models.ReviewImage", b =>
-                {
-                    b.HasOne("ClothesStore.Api.Models.Review", "Review")
-                        .WithMany("Images")
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Review");
-                });
-
             modelBuilder.Entity("ClothesStore.Api.Models.StoreDailyStat", b =>
                 {
                     b.HasOne("ClothesStore.Api.Models.Store", "Store")
@@ -1301,11 +1255,6 @@ namespace ClothesStore.Api.Migrations
             modelBuilder.Entity("ClothesStore.Api.Models.Promotion", b =>
                 {
                     b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("ClothesStore.Api.Models.Review", b =>
-                {
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.Store", b =>

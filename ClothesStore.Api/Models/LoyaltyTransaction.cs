@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.Api.Models
 {
-    public class Wishlist
+    public class LoyaltyTransaction
     {
         [Key]
         public int Id { get; set; }
@@ -12,10 +12,8 @@ namespace ClothesStore.Api.Models
         [ForeignKey("CustomerId")]
         public Customer? Customer { get; set; }
 
-        public int ProductId { get; set; }
-        [ForeignKey("ProductId")]
-        public Product? Product { get; set; } = null;
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime TxnDate { get; set; }
+        public int PointsChange { get; set; }
+        public string? Reason { get; set; }
     }
 }
