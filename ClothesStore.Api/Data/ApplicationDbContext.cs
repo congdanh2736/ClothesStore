@@ -14,6 +14,7 @@ namespace ClothesStore.Api.Data
         public DbSet<MembershipTier> MembershipTiers => Set<MembershipTier>();
         public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<Address> Addresses => Set<Address>();
+        public DbSet<LoyaltyTransaction> LoyaltyTransactions => Set<LoyaltyTransaction>();
         public DbSet<Cart> Carts => Set<Cart>();
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<Wishlist> Wishlists => Set<Wishlist>();
