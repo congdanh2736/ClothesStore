@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClothesStore.Api.Repositories
 {
-    public class CollectionTechRepository : ICollectionTech
+    public class CollectionTechRepository : ICollectionTechRepository
     {
         public readonly ApplicationDbContext _context;
         public CollectionTechRepository (ApplicationDbContext context) => _context = context;

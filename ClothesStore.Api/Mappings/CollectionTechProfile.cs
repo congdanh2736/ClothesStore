@@ -8,7 +8,7 @@ namespace ClothesStore
         public CollectionTechProfile()
         {
             CreateMap<CollectionTech,CollectionTechDto>();
-            CreateMap<CreateCollectionTech,CollectionTech>();
+            CreateMap<CreateCollectionTechDto,CollectionTech>();
         }
     }
 }

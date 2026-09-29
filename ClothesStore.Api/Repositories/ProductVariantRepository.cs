@@ -11,20 +11,14 @@ namespace ClothesStore.Api.Repositories
         public ProductVariantRepository(ApplicationDbContext context) => _context = context;
         public async Task<IEnumerable<ProductVariant>> GetAllAsync()
             => await _context.ProductVariants
-                .Include(c => c.CartItems)
-                .Include(c => c.StoreItemStats)
-                .Include(c => c.StoreStocks)
-                .Include(c => c.OrderItems)
+                .Include(c => c.Product)
                 .ToListAsync();
         public async Task<ProductVariant?> GetByIdAsync(int id)
             => await _context.ProductVariants
                 .FindAsync(id);
         public async Task<ProductVariant?> GetByIdWithDetailsAsync(int id)
             => await _context.ProductVariants
-                .Include(c => c.CartItems)
-                .Include(c => c.StoreItemStats)
-                .Include(c => c.StoreStocks)
-                .Include(c => c.OrderItems)
+                .Include(c => c.Product)
                 .FirstOrDefaultAsync(c => c.VariantId == id);
         public async Task AddAsync(ProductVariant entity)
         {

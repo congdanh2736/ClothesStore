@@ -19,7 +19,7 @@ namespace ClothesStore.Api.Repositories
         public async Task<SizeChart?> GetByIdWithDetailsAsync(int id)
             => await _context.sizeCharts
                 .Include(x => x.Category)
-                .FirstAsync(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
         public async Task AddAsync(SizeChart entity)
         {
             await _context.sizeCharts.AddAsync(entity);
