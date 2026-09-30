@@ -20,7 +20,7 @@ namespace ClothesStore.Api.Repositories
         public async Task<ProductImage?> GetByIdWithDetailsAsync(int id)
             => await _context.ProductImages
                 .Include(c => c.Product)
-                .FirstOrDefaultAsync(c => c.CollectionId == id);
+                .FirstOrDefaultAsync(c => c.ImageId == id);
         public async Task AddAsync(ProductImage entity)
         {
             await _context.ProductImages.AddAsync(entity);

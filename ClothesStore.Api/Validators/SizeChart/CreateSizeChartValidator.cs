@@ -14,6 +14,9 @@ namespace ClothesStore.Api.Validators.SizeChart
             RuleFor(x => x.Measurements)
                 .NotEmpty().WithMessage("Thông số kích cỡ không được để trống")
                 .MaximumLength(200).WithMessage("Thông số kích cỡ không được vượt quá 200 ký tự");
+
+            RuleFor(x => x.CategoryId)
+                .GreaterThan(0).WithMessage("CategoryId phải lớn hơn 0");
         }
     }
 }

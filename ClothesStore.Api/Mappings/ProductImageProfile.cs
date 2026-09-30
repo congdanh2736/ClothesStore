@@ -9,6 +9,7 @@ namespace ClothesStore.Api.Mappings
         {
             CreateMap<ProductImage, ProductImageDto>();
             CreateMap<CreateProductImageDto, ProductImage>();
+            CreateMap<UpdateProductImageDto, ProductImage>();
         }
     }
 }

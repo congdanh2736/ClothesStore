@@ -3,7 +3,7 @@ using ClothesStore.Api.Models;
 
 namespace ClothesStore.Api.Interface.Repositories
 {
-    public interface ICollectionTech : IRepository<CollectionTech>
+    public interface ICollectionTechRepository : IRepository<CollectionTech>
     {
         
     }

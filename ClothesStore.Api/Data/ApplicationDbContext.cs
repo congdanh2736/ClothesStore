@@ -285,7 +285,7 @@ namespace ClothesStore.Api.Data
 
                 e.HasOne(x => x.Product)
                     .WithMany(p => p.ProductImages)
-                    .HasForeignKey(x => x.CollectionId)
+                    .HasForeignKey(x => x.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

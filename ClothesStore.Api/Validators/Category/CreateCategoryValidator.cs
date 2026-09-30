@@ -7,8 +7,8 @@ namespace ClothesStore.Api.Validators
         public CreateCategoryValidator()
         {
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Không được để trống ký tự")
-                .MaximumLength(150).WithMessage("không được quá 150 ký tự");
+                .NotEmpty().WithMessage("Tên danh mục Không được để trống ký tự")
+                .MaximumLength(150).WithMessage("Tên danh mục không được quá 150 ký tự");
         }
     }
 }
