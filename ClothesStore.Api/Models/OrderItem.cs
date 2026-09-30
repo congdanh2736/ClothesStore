@@ -13,9 +13,9 @@ namespace ClothesStore.Api.Models
 
         //Navigation
         [ForeignKey("OrderId")]
-        public Order Order { get; set; }
+        public Order? Order { get; set; }
         [ForeignKey("VariantId")]
-        public ProductVariant ProductVariant { get; set;}
+        public ProductVariant? ProductVariant { get; set;}
         
     }
 }

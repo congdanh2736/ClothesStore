@@ -306,7 +306,7 @@ namespace ClothesStore.Api.Data
 
                 e.HasOne(x => x.Promotion)
                     .WithMany(p => p.Orders)
-                    .HasForeignKey(x => x.Id)
+                    .HasForeignKey(x => x.PromotionId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
