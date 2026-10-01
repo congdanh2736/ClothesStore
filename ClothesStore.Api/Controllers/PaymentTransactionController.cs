@@ -1,10 +1,6 @@
-using AutoMapper;
-using ClothesStore.Api.Data;
 using ClothesStore.Api.DTOs.PaymentTransaction;
-using ClothesStore.Api.Interface.Repositories;
-using ClothesStore.Api.Models;
+using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ClothesStore.Api.Controllers;
 
@@ -12,71 +8,52 @@ namespace ClothesStore.Api.Controllers;
 [Route("api/[controller]")]
 public class PaymentTransactionController : ControllerBase
 {
-    private readonly IPaymentMethodRepository _repository;
-    private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
+    private readonly IPaymentTransactionService _service;
 
-    public PaymentTransactionController(IPaymentMethodRepository repository, ApplicationDbContext context, IMapper mapper)
+    public PaymentTransactionController(IPaymentTransactionService service)
     {
-        _repository = repository;
-        _context = context;
-        _mapper = mapper;
+        _service = service;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PaymentTransactionDto>>> GetAll()
-        => Ok(_mapper.Map<IEnumerable<PaymentTransactionDto>>(await _repository.GetAllAsync()));
+        => Ok(await _service.GetAllAsync());
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<PaymentTransactionDto>> GetById(int id)
     {
-        var transaction = await _repository.GetByIdAsync(id);
-        return transaction is null ? NotFound() : Ok(_mapper.Map<PaymentTransactionDto>(transaction));
+        var transaction = await _service.GetByIdAsync(id);
+        return transaction is null ? NotFound() : Ok(transaction);
     }
 
-    [HttpPost("orders/{orderId:int}")]
-    public async Task<ActionResult<PaymentTransactionDto>> Create(int orderId, CreatePaymentTransactionRequest request)
+    [HttpPost]
+    public async Task<ActionResult<PaymentTransactionDto>> Create(CreatePaymentTransactionRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.PaymentMethod))
-            return BadRequest(new { message = "Phương thức thanh toán là bắt buộc." });
+        var (success, error, data) = await _service.CreateAsync(request);
+        if (!success)
+            return error == "Không tìm thấy đơn hàng."
+                ? NotFound(new { message = error })
+                : BadRequest(new { message = error });
 
-        if (!await _context.Orders.AnyAsync(order => order.Id == orderId))
-            return NotFound(new { message = "Không tìm thấy đơn hàng." });
-
-        if (await _context.PaymentTransactions.AnyAsync(transaction => transaction.OrderId == orderId))
-            return Conflict(new { message = "Đơn hàng đã có giao dịch thanh toán." });
-
-        var transaction = _mapper.Map<PaymentTransaction>(request);
-        transaction.OrderId = orderId;
-        transaction.Status = "Pending";
-        await _repository.AddAsync(transaction);
-
-        return CreatedAtAction(nameof(GetById), new { id = transaction.Id }, _mapper.Map<PaymentTransactionDto>(transaction));
+        return CreatedAtAction(nameof(GetById), new { id = data!.Id }, data);
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, UpdatePaymentTransactionRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.PaymentMethod))
-            return BadRequest(new { message = "Phương thức thanh toán là bắt buộc." });
+        var (success, error) = await _service.UpdateAsync(id, request);
+        if (!success)
+            return error == "Không tìm thấy giao dịch thanh toán."
+                ? NotFound(new { message = error })
+                : BadRequest(new { message = error });
 
-        var transaction = await _repository.GetByIdAsync(id);
-        if (transaction is null)
-            return NotFound();
-
-        _mapper.Map(request, transaction);
-        await _repository.UpdateAsync(transaction);
         return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var transaction = await _repository.GetByIdAsync(id);
-        if (transaction is null)
-            return NotFound();
-
-        await _repository.DeleteAsync(transaction);
-        return NoContent();
+        var deleted = await _service.DeleteAsync(id);
+        return deleted ? NoContent() : NotFound();
     }
 }

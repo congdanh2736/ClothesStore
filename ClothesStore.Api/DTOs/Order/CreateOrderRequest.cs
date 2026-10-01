@@ -9,6 +9,7 @@ namespace ClothesStore.Api.DTOs.Order
 {
     public class CreateOrderRequest
     {
+        public int CustomerId { get; set; }
         public int AddressId { get; set; }
         public int PromotionId { get; set; }
         public string? PaymentMethod { get; set; }

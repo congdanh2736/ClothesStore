@@ -23,6 +23,10 @@ namespace ClothesStore.Api.Mappings
                             .Where(part => !string.IsNullOrWhiteSpace(part)))) )
                 .ForMember(dest => dest.PaymentMethod,
                     opt => opt.MapFrom(src => src.PaymentTransaction == null ? null : src.PaymentTransaction.PaymentMethod));
+
+            CreateMap<CreateOrderRequest, Order>()
+                .ForMember(dest => dest.OrderItems, opt => opt.Ignore())
+                .ForMember(dest => dest.PaymentTransaction, opt => opt.Ignore());
         }
         
     }
