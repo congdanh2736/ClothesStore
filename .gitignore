@@ -363,4 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Agent project pattern reference (local only)
-ProjectPattern.md
+ProjectPattern.md
+
+copilot-instructions.md
