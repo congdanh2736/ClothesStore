@@ -974,7 +974,7 @@ namespace ClothesStore.Api.Migrations
 
                     b.HasOne("ClothesStore.Api.Models.Promotion", "Promotion")
                         .WithMany("Orders")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("PromotionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

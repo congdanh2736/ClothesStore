@@ -8,7 +8,7 @@ namespace ClothesStore.Api.Models
         [Key]
         public int Id { get; set; }
         public int OrderId { get; set; }
-        public string? PaymentMethod { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty;
         public string? Status { get; set; }
 
         //Navigation

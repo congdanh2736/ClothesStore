@@ -571,8 +571,8 @@ namespace ClothesStore.Api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Orders_Promotions_Id",
-                        column: x => x.Id,
+                        name: "FK_Orders_Promotions_PromotionId",
+                        column: x => x.PromotionId,
                         principalTable: "Promotions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);

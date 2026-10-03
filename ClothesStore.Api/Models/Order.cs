@@ -11,6 +11,7 @@ namespace ClothesStore.Api.Models
         public int AddressId { get; set; }
         public int PromotionId { get; set; }
         public decimal TotalAmount { get; set;}
+        public string Status { get; set; } = string.Empty;
 
         //Navigation
         [ForeignKey("CustomerId")]

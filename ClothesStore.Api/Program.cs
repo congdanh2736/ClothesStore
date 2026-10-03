@@ -177,6 +177,15 @@ builder.Services.AddScoped<ISizeChartService, SizeChartService>();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------//
 
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+builder.Services.AddScoped<IPaymentMethodRepository, PaymentTransactionRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
+
 
 
 //----------------------------------------------------[CẤU HÌNH AUTO MAPPER VÀ FLUENT VALIDATION]-------------------------------------------------//
