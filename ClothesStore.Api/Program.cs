@@ -155,6 +155,26 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 // Review
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+// Category
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService,CategoryService>();
+// Collection_Tech
+builder.Services.AddScoped<ICollectionTechRepository,CollectionTechRepository>();
+builder.Services.AddScoped<ICollectionTechService,CollectionTechService>();
+// Product
+builder.Services.AddScoped<IProductRepository,ProductRepository>();
+builder.Services.AddScoped<IProductService,ProductService>();
+// Product_Variant
+builder.Services.AddScoped<IProductVariantRepository, ProductVariantRepository>();
+builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
+// Product_Image
+builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
+builder.Services.AddScoped<IProductImageService, ProductImageService>();
+
+// Size_Chart
+builder.Services.AddScoped<ISizeChartRepository, SizeChartRepository>();
+builder.Services.AddScoped<ISizeChartService, SizeChartService>();
+
 //--------------------------------------------------------------------------------------------------------------------------------------------------//
 
 
