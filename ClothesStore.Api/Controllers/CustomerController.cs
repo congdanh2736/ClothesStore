@@ -27,14 +27,14 @@ namespace ClothesStore.Api.Controllers
             return customer is null ? NotFound() : Ok(customer);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<CustomerDto>> Create(CreateCustomerDto dto)
-        {
-            var (success, error, data) = await _service.CreateAsync(dto);
-            if (!success) return BadRequest(new { message = error });
+        //[HttpPost]
+        //public async Task<ActionResult<CustomerDto>> Create(CreateCustomerDto dto)
+        //{
+        //    var (success, error, data) = await _service.CreateAsync(dto);
+        //    if (!success) return BadRequest(new { message = error });
 
-            return CreatedAtAction(nameof(GetById), new { id = data!.Id }, data);
-        }
+        //    return CreatedAtAction(nameof(GetById), new { id = data!.Id }, data);
+        //}
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCustomerDto dto)

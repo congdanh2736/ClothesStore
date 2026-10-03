@@ -13,5 +13,7 @@ namespace ClothesStore.Api.Models
         public int VariantId { get; set; }
         [ForeignKey("VariantId")]
         public ProductVariant? ProductVariant { get; set; }
+
+        public int Quantity { get; set; }
     }
 }

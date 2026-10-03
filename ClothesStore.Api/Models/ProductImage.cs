@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.Api.Models
@@ -8,8 +8,8 @@ namespace ClothesStore.Api.Models
         [Key]
         public int ImageId {get; set;}
         public string? ImageUrl {get; set;}
-        public int CollectionId {get;set;}
-        [ForeignKey("CollectionId")]
-        public Product? Product {get; set;}
+        public int ProductId { get; set; }
+        [ForeignKey("ProductId")]
+        public Product? Product { get; set; }
     }
 }

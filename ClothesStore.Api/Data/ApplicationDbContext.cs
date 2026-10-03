@@ -1,4 +1,4 @@
-﻿using ClothesStore.Api.Models;
+using ClothesStore.Api.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,10 +14,12 @@ namespace ClothesStore.Api.Data
         public DbSet<MembershipTier> MembershipTiers => Set<MembershipTier>();
         public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<Address> Addresses => Set<Address>();
+        public DbSet<LoyaltyTransaction> LoyaltyTransactions => Set<LoyaltyTransaction>();
         public DbSet<Cart> Carts => Set<Cart>();
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<Wishlist> Wishlists => Set<Wishlist>();
         public DbSet<Review> Reviews => Set<Review>();
+        public DbSet<ReviewImage> ReviewImages => Set<ReviewImage>();
 
         // Store domain
         public DbSet<Store> Stores => Set<Store>();
@@ -25,6 +27,7 @@ namespace ClothesStore.Api.Data
         public DbSet<StoreStock> StoreStocks => Set<StoreStock>();
         public DbSet<StoreDailyStat> StoreDailyStats => Set<StoreDailyStat>();
         public DbSet<StoreItemStat> StoreItemStats => Set<StoreItemStat>();
+        public DbSet<SizeChart> sizeCharts => Set<SizeChart>();
 
         // Catalog domain
         public DbSet<Category> Categories => Set<Category>();
@@ -45,6 +48,17 @@ namespace ClothesStore.Api.Data
             base.OnModelCreating(builder); // Identity tables (AspNetUsers, AspNetRoles, ...)
 
             // ============ MEMBERSHIP / CUSTOMER ============
+            builder.Entity<LoyaltyTransaction>(e =>
+            {
+                e.HasKey(x => x.Id);
+
+                e.HasOne(x => x.Customer)
+                    .WithMany(c => c.LoyaltyTransactions)
+                    .HasForeignKey(x => x.CustomerId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            });
+
             builder.Entity<MembershipTier>(e =>
             {
                 e.HasKey(x => x.Id);
@@ -57,7 +71,7 @@ namespace ClothesStore.Api.Data
 
                 e.HasOne(x => x.MembershipTier)
                     .WithMany(t => t.Customers)
-                    .HasForeignKey(x => x.Id)
+                    .HasForeignKey(x => x.MembershipTierId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 // Optional 1-1 link to an Identity login account
@@ -140,6 +154,17 @@ namespace ClothesStore.Api.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            builder.Entity<ReviewImage>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.ImageUrl).IsRequired().HasMaxLength(500);
+
+                e.HasOne(x => x.Review)
+                    .WithMany(r => r.Images)
+                    .HasForeignKey(x => x.ReviewId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
             // ============ STORE ============
             builder.Entity<Store>(e =>
             {
@@ -220,7 +245,7 @@ namespace ClothesStore.Api.Data
                 // self-referencing parent/child; Restrict to avoid multiple cascade paths
                 e.HasOne(x => x.ParentCategory)
                     .WithMany(x => x.ChildrenCategories)
-                    .HasForeignKey(x => x.Id)
+                    .HasForeignKey(x => x.ParentCategoryId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -260,7 +285,19 @@ namespace ClothesStore.Api.Data
 
                 e.HasOne(x => x.Product)
                     .WithMany(p => p.ProductImages)
-                    .HasForeignKey(x => x.CollectionId)
+                    .HasForeignKey(x => x.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<SizeChart>( e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.SizeLabel).IsRequired().HasMaxLength(200);
+                e.Property(x => x.Measurements).IsRequired().HasMaxLength(200);
+
+                e.HasOne(x => x.Category)
+                    .WithMany(p => p.SizeCharts)
+                    .HasForeignKey(x => x.Id)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

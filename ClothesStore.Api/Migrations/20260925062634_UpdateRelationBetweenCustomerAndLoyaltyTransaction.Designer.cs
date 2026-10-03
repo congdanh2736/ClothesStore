@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClothesStore.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260915065046_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260925062634_UpdateRelationBetweenCustomerAndLoyaltyTransaction")]
+    partial class UpdateRelationBetweenCustomerAndLoyaltyTransaction
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -189,6 +189,8 @@ namespace ClothesStore.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ParentCategoryId");
+
                     b.ToTable("Categories");
                 });
 
@@ -218,7 +220,10 @@ namespace ClothesStore.Api.Migrations
             modelBuilder.Entity("ClothesStore.Api.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
@@ -229,14 +234,16 @@ namespace ClothesStore.Api.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MembershipTierId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("MembershipTierId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId")
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
+
+                    b.HasIndex("MembershipTierId");
 
                     b.ToTable("Customers");
                 });
@@ -258,7 +265,7 @@ namespace ClothesStore.Api.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StoreId")
+                    b.Property<int?>("StoreId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -270,6 +277,33 @@ namespace ClothesStore.Api.Migrations
                     b.HasIndex("StoreId");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("ClothesStore.Api.Models.LoyaltyTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PointsChange")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TxnDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("LoyaltyTransaction");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.MembershipTier", b =>
@@ -838,9 +872,8 @@ namespace ClothesStore.Api.Migrations
                 {
                     b.HasOne("ClothesStore.Api.Models.Category", "ParentCategory")
                         .WithMany("ChildrenCategories")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentCategory");
                 });
@@ -854,9 +887,8 @@ namespace ClothesStore.Api.Migrations
 
                     b.HasOne("ClothesStore.Api.Models.MembershipTier", "MembershipTier")
                         .WithMany("Customers")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("MembershipTierId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ApplicationUser");
 
@@ -873,12 +905,22 @@ namespace ClothesStore.Api.Migrations
                     b.HasOne("ClothesStore.Api.Models.Store", "Store")
                         .WithMany("Employees")
                         .HasForeignKey("StoreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Store");
+                });
+
+            modelBuilder.Entity("ClothesStore.Api.Models.LoyaltyTransaction", b =>
+                {
+                    b.HasOne("ClothesStore.Api.Models.Customer", "Customer")
+                        .WithMany("LoyaltyTransactions")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.Order", b =>
@@ -1163,6 +1205,8 @@ namespace ClothesStore.Api.Migrations
 
                     b.Navigation("Cart")
                         .IsRequired();
+
+                    b.Navigation("LoyaltyTransactions");
 
                     b.Navigation("Orders");
 

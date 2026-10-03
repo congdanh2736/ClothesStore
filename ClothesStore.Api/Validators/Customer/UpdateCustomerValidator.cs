@@ -8,10 +8,11 @@ namespace ClothesStore.Api.Validators.Customer
         public UpdateCustomerValidator()
         {
             RuleFor(x => x.FirstName)
-                .NotEmpty()
+                .NotEmpty().WithMessage("FirstName is required")
                 .MaximumLength(100);
+
             RuleFor(x => x.LastName)
-                .NotEmpty()
+                .NotEmpty().WithMessage("LastName is required")
                 .MaximumLength(100);
         }
     }
