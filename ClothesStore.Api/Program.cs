@@ -130,6 +130,15 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // Customer
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+// Employee
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+// Address
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+// LoyaltyTransaction
+builder.Services.AddScoped<ILoyaltyTransactionRepository, LoyaltyTransactionRepository>();
+builder.Services.AddScoped<ILoyaltyTransactionService, LoyaltyTransactionService>();
 // Membership Tier
 builder.Services.AddScoped<IMembershipTierRepository, MembershipTierRepository>();
 builder.Services.AddScoped<IMembershipTierService, MembershipTierService>();
@@ -143,9 +152,7 @@ builder.Services.AddScoped<IStoreDailyStatService, StoreDailyStatService>();
 builder.Services.AddScoped<IStoreItemStatRepository, StoreItemStatRepository>();
 builder.Services.AddScoped<IStoreItemStatService, StoreItemStatService>();
 
-// Employee
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 // Cart
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
