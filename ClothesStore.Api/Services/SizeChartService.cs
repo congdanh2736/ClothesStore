@@ -16,14 +16,14 @@ namespace ClothesStore.Api.Services
             _repository = repository;
         }
 
-        // Lấy toàn bộ danh sách bộ sư tập và công nghệ
+        // Lấy toàn bộ danh sách Bảng size
         public async Task<IEnumerable<SizeChartDto>> GetAllAsync()
         {
             var sizeCharts = await _repository.GetAllAsync();
             return _mapper.Map<IEnumerable<SizeChartDto>>(sizeCharts);
         }
 
-        // Lấy chi tiết 1 bộ sư tập và công nghệ theo Id
+        // Lấy chi tiết 1 Bảng size theo Id
         public async Task<SizeChartDto?> GetByIdAsync(int id)
         {
             var sizeCharts = await _repository.GetByIdWithDetailsAsync(id);
@@ -34,7 +34,7 @@ namespace ClothesStore.Api.Services
             return _mapper.Map<SizeChartDto>(sizeCharts);
         }
 
-        // Tạo mới bộ sư tập và công nghệ
+        // Tạo mới Bảng size
         public async Task<(bool Success, string? Error, SizeChartDto? Data)> CreateAsync(CreateSizeChartDto dto)
         {
             // Chuyển DTO sang Model để lưu vào database
@@ -44,7 +44,7 @@ namespace ClothesStore.Api.Services
             return (true, null, _mapper.Map<SizeChartDto>(sizeCharts));
         }
 
-        //Chỉnh sửa bộ sư tập và công nghệ
+        //Chỉnh sửa Bảng size
         public async Task<(bool Success, string? Error)> UpdateAsync(int id, UpdateSizeChartDto dto)
         {
             var sizeCharts = await _repository.GetByIdAsync(id);

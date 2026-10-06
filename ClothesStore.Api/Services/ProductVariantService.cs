@@ -16,14 +16,14 @@ namespace ClothesStore.Api.Services
             _repository = repository;
         }
 
-        // Lấy toàn bộ danh sách bộ sư tập và công nghệ
+        // Lấy toàn bộ danh sách Phiên bản
         public async Task<IEnumerable<ProductVariantDto>> GetAllAsync()
         {
             var ProductVariant = await _repository.GetAllAsync();
             return _mapper.Map<IEnumerable<ProductVariantDto>>(ProductVariant);
         }
 
-        // Lấy chi tiết 1 bộ sư tập và công nghệ theo Id
+        // Lấy chi tiết 1 Phiên bản theo Id
         public async Task<ProductVariantDto?> GetByIdAsync(int id)
         {
             var ProductVariant = await _repository.GetByIdWithDetailsAsync(id);
@@ -34,7 +34,7 @@ namespace ClothesStore.Api.Services
             return _mapper.Map<ProductVariantDto>(ProductVariant);
         }
 
-        // Tạo mới bộ sư tập và công nghệ
+        // Tạo mới Phiên bản
         public async Task<(bool Success, string? Error, ProductVariantDto? Data)> CreateAsync(CreateProductVariantDto dto)
         {
             // Chuyển DTO sang Model để lưu vào database
@@ -44,7 +44,7 @@ namespace ClothesStore.Api.Services
             return (true, null, _mapper.Map<ProductVariantDto>(ProductVariant));
         }
 
-        //Chỉnh sửa bộ sư tập và công nghệ
+        //Chỉnh sửa Phiên bản
         public async Task<(bool Success, string? Error)> UpdateAsync(int id, UpdateProductVariantDto dto)
         {
             var ProductVariant = await _repository.GetByIdAsync(id);
