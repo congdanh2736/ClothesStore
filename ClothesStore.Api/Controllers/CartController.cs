@@ -64,5 +64,16 @@ namespace ClothesStore.Api.Controllers
             }
             return Ok(new { Message = "Đã xóa sản phẩm khỏi giỏ hàng." });
         }
+
+        [HttpDelete("{customerId}/clear")]
+        public async Task<IActionResult> ClearCart(int customerId)
+        {
+            var success = await _cartService.ClearCartAsync(customerId);
+            if (!success)
+            {
+                return NotFound(new { Message = "Không tìm thấy giỏ hàng của khách hàng." });
+            }
+            return Ok(new { Message = "Đã xóa toàn bộ sản phẩm khỏi giỏ hàng." });
+        }
     }
 }

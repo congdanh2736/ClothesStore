@@ -14,7 +14,7 @@ namespace ClothesStore.Api.Services
             _cartRepository = cartRepository;
         }
 
-        public async Task<CartResponseDto> GetCartByCustomerAsync(int customerId)
+        public async Task<CartResponseDto?> GetCartByCustomerAsync(int customerId)
         {
             var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId);
             if (cart == null) return null;
@@ -24,6 +24,11 @@ namespace ClothesStore.Api.Services
 
         public async Task<CartResponseDto> AddItemToCartAsync(AddToCartRequestDto request)
         {
+            if (!await _cartRepository.VariantExistsAsync(request.VariantId))
+            {
+                throw new Exception("Biến thể sản phẩm không tồn tại.");
+            }
+
             var cart = await _cartRepository.GetCartByCustomerIdAsync(request.CustomerId);
             if (cart == null)
             {
@@ -49,13 +54,16 @@ namespace ClothesStore.Api.Services
             }
 
             await _cartRepository.SaveChangesAsync();
-            return await GetCartByCustomerAsync(request.CustomerId);
+            var updatedCart = await GetCartByCustomerAsync(request.CustomerId);
+            return updatedCart!;
         }
 
         public async Task<CartResponseDto> UpdateCartItemQuantityAsync(UpdateCartItemRequestDto request)
         {
             var cartItem = await _cartRepository.GetCartItemByIdAsync(request.CartItemId);
             if (cartItem == null) throw new Exception("Không tìm thấy sản phẩm trong giỏ hàng.");
+
+            var customerId = cartItem.Cart?.CustomerId ?? 0;
 
             if (request.Quantity <= 0)
             {
@@ -68,7 +76,9 @@ namespace ClothesStore.Api.Services
 
             await _cartRepository.SaveChangesAsync();
 
-            var cart = await _cartRepository.GetCartByCustomerIdAsync(cartItem.Cart?.CustomerId ?? 0);
+            var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId);
+            if (cart == null) throw new Exception("Không tìm thấy giỏ hàng sau khi cập nhật.");
+
             return MapToCartResponseDto(cart);
         }
 
@@ -82,18 +92,33 @@ namespace ClothesStore.Api.Services
             return true;
         }
 
+        public async Task<bool> ClearCartAsync(int customerId)
+        {
+            var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId);
+            if (cart == null) return false;
+
+            await _cartRepository.ClearCartAsync(cart.Id);
+            return true;
+        }
+
         private CartResponseDto MapToCartResponseDto(Cart cart)
         {
             return new CartResponseDto
             {
                 CartId = cart.Id,
                 CustomerId = cart.CustomerId,
-                Items = cart.CartItems.Select(ci => new CartItemResponseDto
+                Items = cart.CartItems?.Select(ci => new CartItemResponseDto
                 {
                     CartItemId = ci.Id,
                     VariantId = ci.VariantId,
+                    ProductId = ci.ProductVariant?.ProductId ?? 0,
+                    ProductName = ci.ProductVariant?.Product?.Name,
+                    ProductImageUrl = ci.ProductVariant?.Product?.ProductImages?.FirstOrDefault()?.ImageUrl,
+                    Color = ci.ProductVariant?.Color,
+                    Size = ci.ProductVariant?.Size,
+                    Price = ci.ProductVariant?.Price ?? 0,
                     Quantity = ci.Quantity
-                }).ToList()
+                }).ToList() ?? new List<CartItemResponseDto>()
             };
         }
     }

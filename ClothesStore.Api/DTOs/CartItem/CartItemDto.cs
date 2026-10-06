@@ -1,16 +1,17 @@
-namespace ClothesStore.Api.DTOs.Cart
+namespace ClothesStore.Api.DTOs.CartItem
 {
-    public class CartItemResponseDto
+    public class CartItemDto
     {
-        public int CartItemId { get; set; }
+        public int Id { get; set; }
+        public int CartId { get; set; }
         public int VariantId { get; set; }
-        public int ProductId { get; set; }
+        public int Quantity { get; set; }
+
+        // Thông tin chi tiết từ ProductVariant & Product
         public string? ProductName { get; set; }
-        public string? ProductImageUrl { get; set; }
         public string? Color { get; set; }
         public string? Size { get; set; }
         public double Price { get; set; }
-        public int Quantity { get; set; }
         public double TotalPrice => Price * Quantity;
     }
 }
