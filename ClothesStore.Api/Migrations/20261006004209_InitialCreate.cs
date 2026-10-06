@@ -64,6 +64,12 @@ namespace ClothesStore.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Categories_Categories_ParentCategoryId",
+                        column: x => x.ParentCategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -100,7 +106,9 @@ namespace ClothesStore.Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    DiscountValue = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
+                    DiscountValue = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -248,6 +256,26 @@ namespace ClothesStore.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "sizeCharts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    SizeLabel = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Measurements = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_sizeCharts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_sizeCharts_Categories_Id",
+                        column: x => x.Id,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
                 {
@@ -283,7 +311,7 @@ namespace ClothesStore.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StoreId = table.Column<int>(type: "int", nullable: false),
+                    StoreId = table.Column<int>(type: "int", nullable: true),
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -359,14 +387,14 @@ namespace ClothesStore.Api.Migrations
                     ImageId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    CollectionId = table.Column<int>(type: "int", nullable: false)
+                    ProductId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductImages", x => x.ImageId);
                     table.ForeignKey(
-                        name: "FK_ProductImages_Products_CollectionId",
-                        column: x => x.CollectionId,
+                        name: "FK_ProductImages_Products_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -404,7 +432,7 @@ namespace ClothesStore.Api.Migrations
                     District = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CustomerId = table.Column<int>(type: "int", nullable: false)
+                    CustomerId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -437,13 +465,38 @@ namespace ClothesStore.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LoyaltyTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    TxnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PointsChange = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoyaltyTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LoyaltyTransactions_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Reviews",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false)
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -469,7 +522,8 @@ namespace ClothesStore.Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false)
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -549,11 +603,13 @@ namespace ClothesStore.Api.Migrations
                 name: "Orders",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     AddressId = table.Column<int>(type: "int", nullable: false),
                     PromotionId = table.Column<int>(type: "int", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -585,7 +641,8 @@ namespace ClothesStore.Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CartId = table.Column<int>(type: "int", nullable: false),
-                    VariantId = table.Column<int>(type: "int", nullable: false)
+                    VariantId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -602,6 +659,26 @@ namespace ClothesStore.Api.Migrations
                         principalTable: "ProductVariants",
                         principalColumn: "VariantId",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReviewImages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    ReviewId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReviewImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReviewImages_Reviews_ReviewId",
+                        column: x => x.ReviewId,
+                        principalTable: "Reviews",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -720,6 +797,11 @@ namespace ClothesStore.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Categories_ParentCategoryId",
+                table: "Categories",
+                column: "ParentCategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Customers_ApplicationUserId",
                 table: "Customers",
                 column: "ApplicationUserId",
@@ -744,6 +826,11 @@ namespace ClothesStore.Api.Migrations
                 column: "StoreId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LoyaltyTransactions_CustomerId",
+                table: "LoyaltyTransactions",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
                 table: "OrderItems",
                 column: "OrderId");
@@ -764,6 +851,11 @@ namespace ClothesStore.Api.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_PromotionId",
+                table: "Orders",
+                column: "PromotionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PaymentTransactions_OrderId",
                 table: "PaymentTransactions",
                 column: "OrderId",
@@ -775,9 +867,9 @@ namespace ClothesStore.Api.Migrations
                 column: "CollectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImages_CollectionId",
+                name: "IX_ProductImages_ProductId",
                 table: "ProductImages",
-                column: "CollectionId");
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
@@ -794,6 +886,11 @@ namespace ClothesStore.Api.Migrations
                 table: "Promotions",
                 column: "Code",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReviewImages_ReviewId",
+                table: "ReviewImages",
+                column: "ReviewId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_CustomerId",
@@ -870,6 +967,9 @@ namespace ClothesStore.Api.Migrations
                 name: "Employees");
 
             migrationBuilder.DropTable(
+                name: "LoyaltyTransactions");
+
+            migrationBuilder.DropTable(
                 name: "OrderItems");
 
             migrationBuilder.DropTable(
@@ -882,7 +982,10 @@ namespace ClothesStore.Api.Migrations
                 name: "ProductImages");
 
             migrationBuilder.DropTable(
-                name: "Reviews");
+                name: "ReviewImages");
+
+            migrationBuilder.DropTable(
+                name: "sizeCharts");
 
             migrationBuilder.DropTable(
                 name: "StoreDailyStats");
@@ -907,6 +1010,9 @@ namespace ClothesStore.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "CollectionTechs");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "ProductVariants");

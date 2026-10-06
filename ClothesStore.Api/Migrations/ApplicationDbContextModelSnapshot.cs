@@ -36,7 +36,7 @@ namespace ClothesStore.Api.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CustomerId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<string>("District")
@@ -303,7 +303,7 @@ namespace ClothesStore.Api.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("LoyaltyTransaction");
+                    b.ToTable("LoyaltyTransactions");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.MembershipTier", b =>
@@ -327,7 +327,10 @@ namespace ClothesStore.Api.Migrations
             modelBuilder.Entity("ClothesStore.Api.Models.Order", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AddressId")
                         .HasColumnType("int");
@@ -338,6 +341,10 @@ namespace ClothesStore.Api.Migrations
                     b.Property<int>("PromotionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("TotalAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -347,6 +354,8 @@ namespace ClothesStore.Api.Migrations
                     b.HasIndex("AddressId");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("PromotionId");
 
                     b.ToTable("Orders");
                 });
@@ -456,17 +465,17 @@ namespace ClothesStore.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"));
 
-                    b.Property<int>("CollectionId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
                     b.HasKey("ImageId");
 
-                    b.HasIndex("CollectionId");
+                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductImages");
                 });
@@ -515,6 +524,12 @@ namespace ClothesStore.Api.Migrations
                     b.Property<decimal>("DiscountValue")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -577,6 +592,29 @@ namespace ClothesStore.Api.Migrations
                     b.HasIndex("ReviewId");
 
                     b.ToTable("ReviewImages");
+                });
+
+            modelBuilder.Entity("ClothesStore.Api.Models.SizeChart", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Measurements")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("SizeLabel")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("sizeCharts");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.Store", b =>
@@ -867,8 +905,7 @@ namespace ClothesStore.Api.Migrations
                     b.HasOne("ClothesStore.Api.Models.Customer", "Customer")
                         .WithMany("Addresses")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Customer");
                 });
@@ -1049,7 +1086,7 @@ namespace ClothesStore.Api.Migrations
                 {
                     b.HasOne("ClothesStore.Api.Models.Product", "Product")
                         .WithMany("ProductImages")
-                        .HasForeignKey("CollectionId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1095,6 +1132,17 @@ namespace ClothesStore.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Review");
+                });
+
+            modelBuilder.Entity("ClothesStore.Api.Models.SizeChart", b =>
+                {
+                    b.HasOne("ClothesStore.Api.Models.Category", "Category")
+                        .WithMany("SizeCharts")
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.StoreDailyStat", b =>
@@ -1238,6 +1286,8 @@ namespace ClothesStore.Api.Migrations
                     b.Navigation("ChildrenCategories");
 
                     b.Navigation("Products");
+
+                    b.Navigation("SizeCharts");
                 });
 
             modelBuilder.Entity("ClothesStore.Api.Models.CollectionTech", b =>
