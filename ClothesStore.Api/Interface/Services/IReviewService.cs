@@ -7,5 +7,7 @@ namespace ClothesStore.Api.Interface.Services
     {
         Task<IEnumerable<ReviewDto>> GetByProductIdAsync(int productId);
         Task<IEnumerable<ReviewDto>> GetByCustomerIdAsync(int customerId);
+        Task<ReviewSummaryDto> GetProductReviewSummaryAsync(int productId);
+        Task<bool> CanCustomerReviewProductAsync(int customerId, int productId);
     }
 }

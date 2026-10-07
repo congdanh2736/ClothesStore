@@ -9,5 +9,6 @@ namespace ClothesStore.Api.Interface.Repositories
         Task<Wishlist?> GetByCustomerAndProductAsync(int customerId, int productId);
         Task<bool> CustomerExistsAsync(int customerId);
         Task<bool> ProductExistsAsync(int productId);
+        Task<bool> IsWishlistedAsync(int customerId, int productId);
     }
 }

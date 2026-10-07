@@ -155,6 +155,7 @@ builder.Services.AddScoped<IStoreItemStatService, StoreItemStatService>();
 
 // Cart
 builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 // Wishlist
 builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();

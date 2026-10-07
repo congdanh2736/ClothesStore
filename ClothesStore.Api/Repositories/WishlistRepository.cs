@@ -15,6 +15,9 @@ namespace ClothesStore.Api.Repositories
             => await _context.Wishlists
                 .Include(w => w.Customer)
                 .Include(w => w.Product)
+                    .ThenInclude(p => p!.ProductImages)
+                .Include(w => w.Product)
+                    .ThenInclude(p => p!.ProductVariants)
                 .ToListAsync();
 
         public async Task<Wishlist?> GetByIdAsync(int id)
@@ -24,17 +27,27 @@ namespace ClothesStore.Api.Repositories
             => await _context.Wishlists
                 .Include(w => w.Customer)
                 .Include(w => w.Product)
+                    .ThenInclude(p => p!.ProductImages)
+                .Include(w => w.Product)
+                    .ThenInclude(p => p!.ProductVariants)
                 .FirstOrDefaultAsync(w => w.Id == id);
 
         public async Task<IEnumerable<Wishlist>> GetByCustomerIdAsync(int customerId)
             => await _context.Wishlists
                 .Include(w => w.Product)
+                    .ThenInclude(p => p!.ProductImages)
+                .Include(w => w.Product)
+                    .ThenInclude(p => p!.ProductVariants)
                 .Where(w => w.CustomerId == customerId)
                 .OrderByDescending(w => w.CreatedAt)
                 .ToListAsync();
 
         public async Task<Wishlist?> GetByCustomerAndProductAsync(int customerId, int productId)
             => await _context.Wishlists
+                .Include(w => w.Product)
+                    .ThenInclude(p => p!.ProductImages)
+                .Include(w => w.Product)
+                    .ThenInclude(p => p!.ProductVariants)
                 .FirstOrDefaultAsync(w => w.CustomerId == customerId && w.ProductId == productId);
 
         public async Task<bool> CustomerExistsAsync(int customerId)
@@ -42,6 +55,9 @@ namespace ClothesStore.Api.Repositories
 
         public async Task<bool> ProductExistsAsync(int productId)
             => await _context.Products.AnyAsync(p => p.Id == productId);
+
+        public async Task<bool> IsWishlistedAsync(int customerId, int productId)
+            => await _context.Wishlists.AnyAsync(w => w.CustomerId == customerId && w.ProductId == productId);
 
         public async Task AddAsync(Wishlist entity)
         {
