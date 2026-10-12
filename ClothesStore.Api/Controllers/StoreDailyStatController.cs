@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.StoreDailyStat;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +9,8 @@ namespace ClothesStore.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+    [Authorize(Roles = RoleGroups.Staff)]
     public class StoreDailyStatController : ControllerBase
     {
         private readonly IStoreDailyStatService _service;
