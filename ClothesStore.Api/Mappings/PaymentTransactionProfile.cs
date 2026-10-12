@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+// [XÓA] using không còn dùng: System; System.Collections.Generic; System.Linq; System.Threading.Tasks;
 using AutoMapper;
 using ClothesStore.Api.DTOs.PaymentTransaction;
 using ClothesStore.Api.Models;
@@ -12,10 +9,13 @@ namespace ClothesStore.Api.Mappings
     {
         public PaymentTransactionProfile()
         {
-            CreateMap<PaymentTransaction, PaymentTransactionDto>();
+            // [SỬA] Map tổng tiền đơn hàng (trước đây: CreateMap<PaymentTransaction, PaymentTransactionDto>();)
+            CreateMap<PaymentTransaction, PaymentTransactionDto>()
+                .ForMember(dest => dest.OrderTotal,
+                    opt => opt.MapFrom(src => src.Order != null ? src.Order.TotalAmount : 0m));
+
             CreateMap<CreatePaymentTransactionRequest, PaymentTransaction>();
-            CreateMap<UpdatePaymentTransactionRequest, PaymentTransaction>();
-            
+            // [XÓA] Service tự gán PaymentMethod nên bỏ map này CreateMap<UpdatePaymentTransactionRequest, PaymentTransaction>();
         }
     }
 }

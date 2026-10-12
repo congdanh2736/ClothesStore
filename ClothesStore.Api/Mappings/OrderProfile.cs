@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+// [XÓA] using không còn dùng: System; System.Collections.Generic; System.Linq; System.Threading.Tasks;
 using AutoMapper;
 using ClothesStore.Api.DTOs.Order;
 using ClothesStore.Api.Models;
@@ -12,22 +9,36 @@ namespace ClothesStore.Api.Mappings
     {
         public OrderProfile()
         {
-             CreateMap<Order, OrderDetailDTO>()
+            CreateMap<Order, OrderDetailDTO>()
                 .ForMember(dest => dest.CustomerName,
-                    opt => opt.MapFrom(src => src.Customer != null  ? $"{src.Customer.FirstName} {src.Customer.LastName}"
+                    opt => opt.MapFrom(src => src.Customer != null ? $"{src.Customer.FirstName} {src.Customer.LastName}"
                         : string.Empty))
                 .ForMember(dest => dest.Address,
                     opt => opt.MapFrom(src => src.Address == null
                         ? string.Empty
                         : string.Join(", ", new[] { src.Address.Street, src.Address.District, src.Address.City, src.Address.Country }
-                            .Where(part => !string.IsNullOrWhiteSpace(part)))) )
+                            .Where(part => !string.IsNullOrWhiteSpace(part)))))
+                // [THÊM] ===== BẮT ĐẦU: map các trường mới của OrderDetailDTO =====
+                .ForMember(dest => dest.PromotionCode,
+                    opt => opt.MapFrom(src => src.Promotion != null ? src.Promotion.Code : null))
+                .ForMember(dest => dest.StoreName,
+                    opt => opt.MapFrom(src => src.Store != null ? src.Store.Name : null))
+                // [THÊM] ===== KẾT THÚC =====
                 .ForMember(dest => dest.PaymentMethod,
-                    opt => opt.MapFrom(src => src.PaymentTransaction == null ? null : src.PaymentTransaction.PaymentMethod));
+                    opt => opt.MapFrom(src => src.PaymentTransaction == null ? null : src.PaymentTransaction.PaymentMethod))
+                // [THÊM] ===== BẮT ĐẦU =====
+                .ForMember(dest => dest.PaymentStatus,
+                    opt => opt.MapFrom(src => src.PaymentTransaction == null ? null : src.PaymentTransaction.Status))
+                .ForMember(dest => dest.ShipmentStatus,
+                    opt => opt.MapFrom(src => src.Shipment == null ? null : src.Shipment.Status))
+                .ForMember(dest => dest.TrackingNumber,
+                    opt => opt.MapFrom(src => src.Shipment == null ? null : src.Shipment.TrackingNumber))
+                .ForMember(dest => dest.Subtotal,
+                    opt => opt.MapFrom(src => src.TotalAmount + src.DiscountAmount));
+                // [THÊM] ===== KẾT THÚC =====
 
-            CreateMap<CreateOrderRequest, Order>()
-                .ForMember(dest => dest.OrderItems, opt => opt.Ignore())
-                .ForMember(dest => dest.PaymentTransaction, opt => opt.Ignore());
+            // [XÓA] CreateMap<CreateOrderRequest, Order>() (+ Ignore OrderItems, PaymentTransaction):
+            //       OrderService giờ tạo Order trực tiếp (tính giá, khuyến mãi, cửa hàng) nên không cần map này
         }
-        
     }
 }
