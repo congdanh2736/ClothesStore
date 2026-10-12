@@ -1,9 +1,10 @@
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
+// [XÓA] using không còn dùng: System.Reflection.Metadata.Ecma335; System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization; // [THÊM] dùng cho [Authorize] (phân quyền)
+using ClothesStore.Api.Common;           // [THÊM] dùng RoleGroups
 using ClothesStore.Api.DTOs.Category;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client.NativeInterop;
+// [XÓA] using không còn dùng: Microsoft.Identity.Client.NativeInterop;
 
 namespace ClothesStore.Api.Controllers
 {
@@ -30,6 +31,8 @@ namespace ClothesStore.Api.Controllers
             return Ok(Category);
         }
 
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
         {
@@ -40,6 +43,8 @@ namespace ClothesStore.Api.Controllers
             return CreatedAtAction(nameof(GetById),new {id = data!.Id}, data);
         }
 
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
         {
@@ -50,6 +55,8 @@ namespace ClothesStore.Api.Controllers
             return NoContent();
         }
 
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Detele(int id)
         {
