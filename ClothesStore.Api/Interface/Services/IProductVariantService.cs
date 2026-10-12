@@ -5,6 +5,7 @@ namespace ClothesStore.Api.Interface.Services
 {
     public interface IProductVariantService : IService<ProductVariantDto, CreateProductVariantDto, UpdateProductVariantDto>
     {
-        
+        // [THÊM] Danh sách biến thể của 1 sản phẩm
+        Task<IEnumerable<ProductVariantDto>> GetByProductAsync(int productId);
     }
 }
