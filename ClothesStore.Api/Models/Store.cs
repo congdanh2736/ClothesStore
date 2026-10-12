@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ClothesStore.Api.Models
 {
@@ -14,6 +14,7 @@ namespace ClothesStore.Api.Models
         public ICollection<StoreDailyStat> StoreDailyStats { get; set; } = new List<StoreDailyStat>();
         public ICollection<StoreItemStat> StoreItemStats { get; set; } = new List<StoreItemStat>();
         public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
         
     }
 }

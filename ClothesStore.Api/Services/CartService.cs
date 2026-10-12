@@ -1,3 +1,4 @@
+using ClothesStore.Api.Common; // [THÊM] dùng BusinessException / NotFoundException
 using ClothesStore.Api.DTOs.Cart;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Interface.Services;
@@ -8,10 +9,13 @@ namespace ClothesStore.Api.Services
     public class CartService : ICartService
     {
         private readonly ICartRepository _cartRepository;
+        private readonly IInventoryService _inventory; // [THÊM] để kiểm tra tồn kho khi thêm vào giỏ
 
-        public CartService(ICartRepository cartRepository)
+        // [SỬA] thêm tham số IInventoryService
+        public CartService(ICartRepository cartRepository, IInventoryService inventory)
         {
             _cartRepository = cartRepository;
+            _inventory = inventory; // [THÊM]
         }
 
         public async Task<CartResponseDto?> GetCartByCustomerAsync(int customerId)
@@ -24,10 +28,11 @@ namespace ClothesStore.Api.Services
 
         public async Task<CartResponseDto> AddItemToCartAsync(AddToCartRequestDto request)
         {
+            if (!await _cartRepository.CustomerExistsAsync(request.CustomerId))
+                throw new NotFoundException("Khách hàng không tồn tại.");
+
             if (!await _cartRepository.VariantExistsAsync(request.VariantId))
-            {
-                throw new Exception("Biến thể sản phẩm không tồn tại.");
-            }
+                throw new NotFoundException("Biến thể sản phẩm không tồn tại.");
 
             var cart = await _cartRepository.GetCartByCustomerIdAsync(request.CustomerId);
             if (cart == null)
@@ -38,6 +43,12 @@ namespace ClothesStore.Api.Services
             }
 
             var cartItem = await _cartRepository.GetCartItemByVariantAsync(cart.Id, request.VariantId);
+            // [THÊM] Tính số lượng sau khi cộng dồn
+            var newQuantity = (cartItem?.Quantity ?? 0) + request.Quantity;
+
+            // [THÊM] Không cho thêm quá tổng tồn kho của tất cả cửa hàng
+            await EnsureStockAsync(request.VariantId, newQuantity);
+
             if (cartItem == null)
             {
                 cartItem = new CartItem
@@ -50,7 +61,7 @@ namespace ClothesStore.Api.Services
             }
             else
             {
-                cartItem.Quantity += request.Quantity;
+                cartItem.Quantity = newQuantity; // [SỬA] dùng số lượng đã tính sẵn ở trên (cùng giá trị += cũ)
             }
 
             await _cartRepository.SaveChangesAsync();
@@ -61,7 +72,8 @@ namespace ClothesStore.Api.Services
         public async Task<CartResponseDto> UpdateCartItemQuantityAsync(UpdateCartItemRequestDto request)
         {
             var cartItem = await _cartRepository.GetCartItemByIdAsync(request.CartItemId);
-            if (cartItem == null) throw new Exception("Không tìm thấy sản phẩm trong giỏ hàng.");
+            // [SỬA] Exception -> NotFoundException
+            if (cartItem == null) throw new NotFoundException("Không tìm thấy sản phẩm trong giỏ hàng.");
 
             var customerId = cartItem.Cart?.CustomerId ?? 0;
 
@@ -71,13 +83,14 @@ namespace ClothesStore.Api.Services
             }
             else
             {
+                await EnsureStockAsync(cartItem.VariantId, request.Quantity); // [THÊM] kiểm tra tồn kho
                 cartItem.Quantity = request.Quantity;
             }
 
             await _cartRepository.SaveChangesAsync();
 
             var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId);
-            if (cart == null) throw new Exception("Không tìm thấy giỏ hàng sau khi cập nhật.");
+            if (cart == null) throw new NotFoundException("Không tìm thấy giỏ hàng sau khi cập nhật.");
 
             return MapToCartResponseDto(cart);
         }
@@ -99,6 +112,13 @@ namespace ClothesStore.Api.Services
 
             await _cartRepository.ClearCartAsync(cart.Id);
             return true;
+        }
+
+        private async Task EnsureStockAsync(int variantId, int quantity)
+        {
+            var totalStock = await _inventory.GetTotalStockAsync(variantId);
+            if (quantity > totalStock)
+                throw new BusinessException($"Sản phẩm chỉ còn {totalStock} chiếc trong kho.");
         }
 
         private CartResponseDto MapToCartResponseDto(Cart cart)

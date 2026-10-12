@@ -1,4 +1,4 @@
-﻿using ClothesStore.Api.Data;
+using ClothesStore.Api.Data;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +36,15 @@ namespace ClothesStore.Api.Repositories
          */
         public async Task<bool> CustomerExistsAsync(int? customerId)
             => await _context.Customers.AnyAsync(c => c.Id == customerId);
+
+        public async Task<IEnumerable<Address>> GetByCustomerIdAsync(int customerId)
+            => await _context.Addresses
+                .Include(a => a.Orders)
+                .Where(a => a.CustomerId == customerId)
+                .ToListAsync();
+
+        public async Task<bool> HasOrdersAsync(int addressId)
+            => await _context.Orders.AnyAsync(o => o.AddressId == addressId);
 
 
         public async Task AddAsync(Address address)

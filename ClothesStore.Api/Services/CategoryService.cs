@@ -1,4 +1,5 @@
 using AutoMapper;
+using ClothesStore.Api.Common; // [THÊM] dùng BusinessException khi chặn xóa danh mục
 using ClothesStore.Api.DTOs.Category;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Interface.Services;
@@ -44,7 +45,8 @@ namespace ClothesStore.Api.Services
             {
                 var ExitParentCategory = await _repository.GetByIdAsync(dto.ParentCategoryId.Value);
                 if (ExitParentCategory == null)
-                    return (false, "Danh mục cha có giá trị (hasValue) nhưng không tồn tại (không tìm thấy Id)", null);
+                    // [SỬA] rút gọn thông báo lỗi cho dễ hiểu với người dùng
+                    return (false, "Danh mục cha không tồn tại.", null);
             }
 
             // Chuyển DTO sang Model để lưu vào database
@@ -64,6 +66,27 @@ namespace ClothesStore.Api.Services
             if (category == null)
                 return (false, "id danh mục không tìm thấy.");
 
+            // [THÊM] Kiểm tra danh mục cha khi cập nhật (trước đây không kiểm tra -> lỗi khóa ngoại 500,
+            //        hoặc tạo vòng lặp cây danh mục: A là cha của B, B lại là cha của A)
+            if (dto.ParentCategoryId.HasValue)
+            {
+                // [THÊM] Không cho danh mục tự làm cha của chính nó
+                if (dto.ParentCategoryId.Value == id)
+                    return (false, "Danh mục không thể là danh mục cha của chính nó.");
+
+                // [THÊM] Đi ngược lên các cấp cha, nếu gặp lại chính danh mục này -> tạo vòng lặp
+                var currentId = dto.ParentCategoryId;
+                while (currentId.HasValue)
+                {
+                    var current = await _repository.GetByIdAsync(currentId.Value);
+                    if (current == null)
+                        return (false, "Danh mục cha không tồn tại.");
+                    if (current.ParentCategoryId == id)
+                        return (false, "Không thể chọn danh mục con làm danh mục cha (tạo vòng lặp).");
+                    currentId = current.ParentCategoryId;
+                }
+            }
+
             //Cập nhật thông tin 
             category.Name = dto.Name;
             category.ParentCategoryId = dto.ParentCategoryId;
@@ -75,8 +98,16 @@ namespace ClothesStore.Api.Services
         // xóa danh mục
         public async Task<bool> DeleteAsync(int id)
         {
-            var category = await _repository.GetByIdAsync(id);
+            // [SỬA] GetByIdAsync -> GetByIdWithDetailsAsync để lấy kèm danh mục con và sản phẩm
+            var category = await _repository.GetByIdWithDetailsAsync(id);
             if (category == null) return false;
+
+            // [THÊM] Chặn xóa danh mục đang có danh mục con / sản phẩm
+            //        (khóa ngoại để Restrict nên trước đây xóa sẽ bị lỗi 500)
+            if (category.ChildrenCategories != null && category.ChildrenCategories.Any())
+                throw new BusinessException("Danh mục đang có danh mục con, hãy xóa hoặc chuyển danh mục con trước.");
+            if (category.Products != null && category.Products.Any())
+                throw new BusinessException("Danh mục đang có sản phẩm, không thể xóa.");
 
             await _repository.DeleteAsync(category);
             return true;

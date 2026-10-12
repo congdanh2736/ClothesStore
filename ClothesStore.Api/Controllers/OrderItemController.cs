@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.OrderItem;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +9,8 @@ namespace ClothesStore.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// [THÊM] Phân quyền: bắt buộc đăng nhập (trước đây không cần token)
+[Authorize]
 public class OrderItemController : ControllerBase
 {
     private readonly IOrderItemService _service;
@@ -15,6 +20,8 @@ public class OrderItemController : ControllerBase
         _service = service;
     }
 
+    // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+    [Authorize(Roles = RoleGroups.Staff)]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<OrderItemDTO>>> GetAll()
         => Ok(await _service.GetAllAsync());

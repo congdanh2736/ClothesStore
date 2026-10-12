@@ -1,4 +1,4 @@
-﻿using ClothesStore.Api.DTOs.MembershipTier;
+using ClothesStore.Api.DTOs.MembershipTier;
 using FluentValidation;
 
 namespace ClothesStore.Api.Validators.MembershipTier
@@ -10,6 +10,10 @@ namespace ClothesStore.Api.Validators.MembershipTier
             RuleFor(x => x.TierName)
                 .NotEmpty().WithMessage("Tier name is required.")
                 .MaximumLength(50).WithMessage("Tier name must not exceed 50 characters.");
+
+            // [THÊM] Mốc điểm không được âm
+            RuleFor(x => x.MinPoints)
+                .GreaterThanOrEqualTo(0).WithMessage("Điểm tối thiểu của hạng không được âm.");
         }
     }
 }

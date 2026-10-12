@@ -1,4 +1,4 @@
-﻿using ClothesStore.Api.Data;
+using ClothesStore.Api.Data;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +26,9 @@ namespace ClothesStore.Api.Repositories
 
         public async Task<bool> StoreExistsAsync(int? storeId)
             => await _context.Stores.AnyAsync(s => s.Id == storeId);
+
+        public async Task<Employee?> GetByApplicationUserIdAsync(string applicationUserId)
+            => await _context.Employees.FirstOrDefaultAsync(e => e.ApplicationUserId == applicationUserId);
 
         public async Task AddAsync(Employee employee)
         {

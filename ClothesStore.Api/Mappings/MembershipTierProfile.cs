@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using ClothesStore.Api.DTOs.MembershipTier;
 using ClothesStore.Api.Models;
 
@@ -11,7 +11,10 @@ namespace ClothesStore.Api.Mappings
             CreateMap<MembershipTier, MembershipTierDto>()
                 .ForMember(dest => dest.CustomerCount, 
                     opt => opt.MapFrom(src => src.Customers.Count));
+
             CreateMap<CreateMembershipTierDto, MembershipTier>();
+            // [THÊM] Thêm map cho DTO cập nhật
+            CreateMap<UpdateMembershipTierDto, MembershipTier>();
         }
     }
 }

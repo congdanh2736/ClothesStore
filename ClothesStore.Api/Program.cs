@@ -185,6 +185,7 @@ builder.Services.AddScoped<ISizeChartService, SizeChartService>();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------//
 
+// Order - Payment - Promotion
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
@@ -193,6 +194,13 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderItemService, OrderItemService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
+
+// Return_Request + Return_Item (bảng 17, 18)
+builder.Services.AddScoped<IReturnRequestRepository, ReturnRequestRepository>();
+builder.Services.AddScoped<IReturnRequestService, ReturnRequestService>();
+// Nghiệp vụ dùng chung: tồn kho & thống kê cửa hàng tự động
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IStoreStatisticsService, StoreStatisticsService>();
 
 
 
@@ -212,6 +220,7 @@ using (var scope = app.Services.CreateScope())
 {
     await RoleSeeder.SeedRolesAsync(scope.ServiceProvider);
     await AdminSeeder.SeedAdminAsync(scope.ServiceProvider);
+    await MembershipTierSeeder.SeedTiersAsync(scope.ServiceProvider); // Đồng / Bạc / Vàng / VIP
 }
 
 // Configure the HTTP request pipeline.
@@ -223,19 +232,18 @@ if (app.Environment.IsDevelopment())
 // Dùng middleware để xử lý ngoại lệ toàn cục trong ứng dụng
 app.UseMiddleware<ExceptionMiddleware>();
 
-/*
- * Xác thực và cấp quyền cho các yêu cầu HTTP
- */
-app.UseAuthentication();   // xác thực token trước
-app.UseAuthorization();    // rồi mới check quyền (Role)
-
 // Dùng swagger để hiển thị các api khi chạy chương trình trên host
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+/*
+ * Xác thực và cấp quyền cho các yêu cầu HTTP
+ * (trước đây gọi UseAuthorization 2 lần và UseHttpsRedirection nằm sau xác thực)
+ */
+app.UseAuthentication();   // xác thực token trước
+app.UseAuthorization();    // rồi mới check quyền (Role)
 
 app.MapControllers();
 

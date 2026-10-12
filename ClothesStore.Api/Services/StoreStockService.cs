@@ -1,4 +1,5 @@
 using AutoMapper;
+using ClothesStore.Api.Common; // [THÊM] dùng BusinessException / NotFoundException
 using ClothesStore.Api.DTOs.StoreStock;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Interface.Services;
@@ -58,6 +59,53 @@ namespace ClothesStore.Api.Services
 
             await _repository.DeleteAsync(storeStock);
             return true;
+        }
+
+        // [THÊM] Tồn kho của 1 cửa hàng
+        public async Task<IEnumerable<StoreStockDto>> GetByStoreAsync(int storeId)
+        {
+            var storeStocks = await _repository.GetByStoreIdAsync(storeId);
+            return _mapper.Map<IEnumerable<StoreStockDto>>(storeStocks);
+        }
+
+        // [THÊM] Tồn kho của 1 biến thể tại tất cả cửa hàng (Click & Collect)
+        public async Task<IEnumerable<StoreStockDto>> GetByVariantAsync(int variantId)
+        {
+            var storeStocks = await _repository.GetByVariantIdsAsync(new[] { variantId });
+            return _mapper.Map<IEnumerable<StoreStockDto>>(storeStocks);
+        }
+
+        // [THÊM] Nhập kho (QuantityChange > 0) / xuất kho thủ công (QuantityChange < 0)
+        public async Task<StoreStockDto> AdjustAsync(AdjustStockDto dto)
+        {
+            if (!await _repository.StoreExistsAsync(dto.StoreId))
+                throw new NotFoundException("Cửa hàng không tồn tại.");
+            if (!await _repository.ProductVariantExistsAsync(dto.VariantId))
+                throw new NotFoundException("Biến thể sản phẩm không tồn tại.");
+
+            var storeStock = await _repository.GetByStoreAndVariantAsync(dto.StoreId, dto.VariantId);
+            var current = storeStock?.Quantity ?? 0;
+            if (current + dto.QuantityChange < 0)
+                throw new BusinessException($"Không đủ hàng để xuất (tồn hiện tại: {current}).");
+
+            if (storeStock is null)
+            {
+                storeStock = new StoreStock
+                {
+                    StoreId = dto.StoreId,
+                    VariantId = dto.VariantId,
+                    Quantity = dto.QuantityChange
+                };
+                await _repository.AddAsync(storeStock);
+            }
+            else
+            {
+                storeStock.Quantity += dto.QuantityChange;
+                await _repository.UpdateAsync(storeStock);
+            }
+
+            var result = await _repository.GetByIdWithDetailsAsync(storeStock.Id);
+            return _mapper.Map<StoreStockDto>(result);
         }
     }
 }

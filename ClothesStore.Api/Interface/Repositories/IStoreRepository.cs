@@ -5,5 +5,6 @@ namespace ClothesStore.Api.Interface.Repositories
 {
     public interface IStoreRepository : IRepository<Store>
     {
+        Task<bool> HasOrdersAsync(int storeId);
     }
 }

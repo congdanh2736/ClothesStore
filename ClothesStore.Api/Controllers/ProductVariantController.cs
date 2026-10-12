@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.ProductVariant;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +32,15 @@ namespace ClothesStore.Api.Controllers
             return Ok(ProductVariant);
         }
 
+        // [THÊM] Danh sách biến thể của 1 sản phẩm ===== BẮT ĐẦU =====
+        // [THÊM] Danh sách biến thể (màu/size/giá) của 1 sản phẩm
+        [HttpGet("product/{productId}")]
+        public async Task<ActionResult<List<ProductVariantDto>>> GetByProduct(int productId)
+            => Ok(await _service.GetByProductAsync(productId));
+        // [THÊM] ===== KẾT THÚC =====
+
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateProductVariantDto dto)
         {
@@ -38,6 +50,10 @@ namespace ClothesStore.Api.Controllers
 
             return CreatedAtAction(nameof(GetById), new {id = data!.Id}, data);
         }
+
+
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
 
 
         [HttpPut("{id}")]
@@ -50,6 +66,8 @@ namespace ClothesStore.Api.Controllers
             return NoContent();
         }
 
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

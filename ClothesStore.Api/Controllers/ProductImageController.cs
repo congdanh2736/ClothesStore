@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.ProductImage;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +33,8 @@ namespace ClothesStore.Api.Controllers
             return Ok(ProductImage);
         }
 
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateProductImageDto dto)
         {
@@ -39,6 +44,10 @@ namespace ClothesStore.Api.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = data!.ImageId }, data);
         }
+
+
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
 
 
         [HttpPut("{id}")]
@@ -51,6 +60,8 @@ namespace ClothesStore.Api.Controllers
             return NoContent();
         }
 
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using ClothesStore.Api.Common;
 using ClothesStore.Api.Data;
 using ClothesStore.Api.DTOs.Employee;
@@ -36,13 +36,15 @@ namespace ClothesStore.Api.Services
 
         public async Task<EmployeeDto?> GetByIdAsync(int id)
         { 
-            var employee = await _repository.GetByIdAsync(id);
+            // [SỬA] Lấy kèm Store để map StoreName (trước đây dùng GetByIdAsync nên StoreName luôn rỗng)
+            var employee = await _repository.GetByIdWithDetailsAsync(id);
             return employee is null ? null : _mapper.Map<EmployeeDto>(employee);
         }
         public async Task<(bool Success, string? Error, EmployeeDto? Data)> CreateAsync(CreateEmployeeDto dto)
         {
             // Kiểm tra xem cửa hàng có tồn tại không dựa vào StoreId trong dto
-            if (!await _repository.StoreExistsAsync(dto.StoreId))
+            // [SỬA] StoreId không bắt buộc (nhân viên quản trị website) nhưng nếu có thì cửa hàng phải tồn tại
+            if (dto.StoreId.HasValue && !await _repository.StoreExistsAsync(dto.StoreId))
                 return (false, "Cửa hàng không tồn tại.", null);
 
             /* 
@@ -91,7 +93,8 @@ namespace ClothesStore.Api.Services
                 await transaction.CommitAsync();
 
                 // Lấy employee vừa tạo để trả về
-                var created = await _repository.GetByIdAsync(employee.Id);
+                // [SỬA] GetByIdAsync -> GetByIdWithDetailsAsync để DTO trả về có StoreName
+                var created = await _repository.GetByIdWithDetailsAsync(employee.Id);
 
                 /* 
                  * Trả về kết quả thành công cùng với dữ liệu employee vừa tạo 
@@ -110,11 +113,12 @@ namespace ClothesStore.Api.Services
         public async Task<(bool Success, string? Error)> UpdateAsync(int id, UpdateEmployeeDto dto)
         {
             var employee = await _repository.GetByIdAsync(id);
-            if (employee == null) return (false, "Employee is not exist!");
+            // [SỬA] đổi thông báo cho khớp với EmployeeController (trước đây không khớp nên trả 400 thay vì 404)
+            if (employee == null) return (false, "Không tìm thấy nhân viên.");
 
             if (dto.StoreId.HasValue && !await _repository.StoreExistsAsync(dto.StoreId.Value))
             {
-                return (false, "Store is not exist!");
+                return (false, "Cửa hàng không tồn tại."); // [SỬA] thông báo tiếng Việt
             }
 
             employee.FirstName = dto.FirstName;
@@ -129,7 +133,33 @@ namespace ClothesStore.Api.Services
         {
             var employee = await _repository.GetByIdAsync(id);
             if (employee == null) return false;
-            await _repository.DeleteAsync(employee);
+
+            /*
+             * [THÊM] Xóa luôn tài khoản đăng nhập của nhân viên.
+             * Trước đây chỉ xóa Employee nên tài khoản (role Employee) vẫn đăng nhập và gọi được API dành cho nhân viên.
+             */
+            await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var applicationUserId = employee.ApplicationUserId; // [THÊM] nhớ Id tài khoản trước khi xóa
+                await _repository.DeleteAsync(employee);
+
+                // [THÊM] xóa tài khoản đăng nhập (AspNetUsers) của nhân viên
+                if (!string.IsNullOrEmpty(applicationUserId))
+                {
+                    var user = await _userManager.FindByIdAsync(applicationUserId);
+                    if (user is not null)
+                        await _userManager.DeleteAsync(user);
+                }
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+
             return true;
         }
     }

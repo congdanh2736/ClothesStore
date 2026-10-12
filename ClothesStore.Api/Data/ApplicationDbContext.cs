@@ -20,6 +20,8 @@ namespace ClothesStore.Api.Data
         public DbSet<Wishlist> Wishlists => Set<Wishlist>();
         public DbSet<Review> Reviews => Set<Review>();
         public DbSet<ReviewImage> ReviewImages => Set<ReviewImage>();
+        public DbSet<ReturnRequest> ReturnRequests => Set<ReturnRequest>();
+        public DbSet<ReturnItem> ReturnItems => Set<ReturnItem>();
 
         // Store domain
         public DbSet<Store> Stores => Set<Store>();
@@ -27,7 +29,7 @@ namespace ClothesStore.Api.Data
         public DbSet<StoreStock> StoreStocks => Set<StoreStock>();
         public DbSet<StoreDailyStat> StoreDailyStats => Set<StoreDailyStat>();
         public DbSet<StoreItemStat> StoreItemStats => Set<StoreItemStat>();
-        public DbSet<SizeChart> sizeCharts => Set<SizeChart>();
+        public DbSet<SizeChart> SizeCharts => Set<SizeChart>();
 
         // Catalog domain
         public DbSet<Category> Categories => Set<Category>();
@@ -63,6 +65,7 @@ namespace ClothesStore.Api.Data
             {
                 e.HasKey(x => x.Id);
                 e.Property(x => x.TierName).IsRequired().HasMaxLength(100);
+                e.HasIndex(x => x.MinPoints).IsUnique();
             });
 
             builder.Entity<Customer>(e =>
@@ -102,7 +105,8 @@ namespace ClothesStore.Api.Data
                     .HasForeignKey<Cart>(x => x.CustomerId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasIndex(x => x.Id).IsUnique();
+                // Mỗi khách hàng chỉ có 1 giỏ hàng (trước đây đặt unique trên Id là vô nghĩa)
+                e.HasIndex(x => x.CustomerId).IsUnique();
             });
 
             builder.Entity<CartItem>(e =>
@@ -118,6 +122,9 @@ namespace ClothesStore.Api.Data
                     .WithMany(v => v.CartItems)
                     .HasForeignKey(x => x.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                // 1 variant chỉ xuất hiện 1 dòng trong 1 giỏ (cộng dồn số lượng)
+                e.HasIndex(x => new { x.CartId, x.VariantId }).IsUnique();
             });
 
             // ============ WISHLIST / REVIEW ============
@@ -176,10 +183,11 @@ namespace ClothesStore.Api.Data
             {
                 e.HasKey(x => x.Id);
 
+                // Xóa cửa hàng không được xóa luôn nhân viên -> chỉ gỡ liên kết (StoreId = null)
                 e.HasOne(x => x.Store)
                     .WithMany(s => s.Employees)
                     .HasForeignKey(x => x.StoreId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 e.HasOne(x => x.ApplicationUser)
                     .WithOne(u => u.Employee)
@@ -271,6 +279,11 @@ namespace ClothesStore.Api.Data
             {
                 e.HasKey(x => x.VariantId);
                 e.Property(x => x.Price).HasPrecision(18, 2);
+                e.Property(x => x.Color).HasMaxLength(50);
+                e.Property(x => x.Size).HasMaxLength(20);
+
+                // Không cho trùng (sản phẩm, màu, size)
+                e.HasIndex(x => new { x.ProductId, x.Color, x.Size }).IsUnique();
 
                 e.HasOne(x => x.Product)
                     .WithMany(p => p.ProductVariants)
@@ -295,9 +308,11 @@ namespace ClothesStore.Api.Data
                 e.Property(x => x.SizeLabel).IsRequired().HasMaxLength(200);
                 e.Property(x => x.Measurements).IsRequired().HasMaxLength(200);
 
+                // SỬA LỖI: trước đây HasForeignKey(x => x.Id) làm khóa chính bị dùng làm khóa ngoại
+                // -> Id không tự tăng và mỗi Category chỉ có tối đa 1 size
                 e.HasOne(x => x.Category)
                     .WithMany(p => p.SizeCharts)
-                    .HasForeignKey(x => x.Id)
+                    .HasForeignKey(x => x.CategoryId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -330,6 +345,8 @@ namespace ClothesStore.Api.Data
             {
                 e.HasKey(x => x.Id);
                 e.Property(x => x.TotalAmount).HasPrecision(18, 2);
+                e.Property(x => x.DiscountAmount).HasPrecision(18, 2);
+                e.Property(x => x.Status).IsRequired().HasMaxLength(30);
 
                 e.HasOne(x => x.Customer)
                     .WithMany(c => c.Orders)
@@ -344,7 +361,16 @@ namespace ClothesStore.Api.Data
                 e.HasOne(x => x.Promotion)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(x => x.PromotionId)
+                    .IsRequired(false)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Store)
+                    .WithMany(s => s.Orders)
+                    .HasForeignKey(x => x.StoreId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasIndex(x => x.Status);
             });
 
             builder.Entity<OrderItem>(e =>
@@ -375,8 +401,12 @@ namespace ClothesStore.Api.Data
                     .HasForeignKey<PaymentTransaction>(x => x.OrderId)
                     .OnDelete(DeleteBehavior.Cascade);
 
+                e.Property(x => x.TransactionCode).HasMaxLength(100);
+
                 e.HasIndex(x => x.OrderId).IsUnique();
             });
+
+            
         }
 
     }

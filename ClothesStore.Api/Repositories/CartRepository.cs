@@ -61,6 +61,11 @@ namespace ClothesStore.Api.Repositories
             return await _context.ProductVariants.AnyAsync(pv => pv.VariantId == variantId);
         }
 
+        public async Task<bool> CustomerExistsAsync(int customerId)
+        {
+            return await _context.Customers.AnyAsync(c => c.Id == customerId);
+        }
+
         public async Task ClearCartAsync(int cartId)
         {
             var items = await _context.CartItems.Where(ci => ci.CartId == cartId).ToListAsync();

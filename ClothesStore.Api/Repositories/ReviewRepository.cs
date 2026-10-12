@@ -1,3 +1,4 @@
+using ClothesStore.Api.Common;
 using ClothesStore.Api.Data;
 using ClothesStore.Api.DTOs.Review;
 using ClothesStore.Api.Interface.Repositories;
@@ -60,7 +61,8 @@ namespace ClothesStore.Api.Repositories
         public async Task<bool> HasCustomerPurchasedProductAsync(int customerId, int productId)
         {
             return await _context.Orders
-                .Where(o => o.CustomerId == customerId)
+                .Where(o => o.CustomerId == customerId
+                    && (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Returned))
                 .AnyAsync(o => o.OrderItems.Any(oi => oi.ProductVariant != null && oi.ProductVariant.ProductId == productId));
         }
 

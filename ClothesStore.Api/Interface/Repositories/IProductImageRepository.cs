@@ -5,6 +5,6 @@ namespace ClothesStore.Api.Interface.Repositories
 {
     public interface IProductImageRepository : IRepository<ProductImage>
     {
-
+        Task<bool> ProductExistsAsync(int productId);
     }
 }

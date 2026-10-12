@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+// [XÓA] using không còn dùng: System; System.Collections.Generic; System.Linq; System.Threading.Tasks;
 using ClothesStore.Api.DTOs.OrderItem;
-using ClothesStore.Api.Models;
+// [XÓA] using không còn dùng: ClothesStore.Api.Models;
 
 namespace ClothesStore.Api.DTOs.Order
 {
@@ -11,9 +8,10 @@ namespace ClothesStore.Api.DTOs.Order
     {
         public int CustomerId { get; set; }
         public int AddressId { get; set; }
-        public int PromotionId { get; set; }
+        // [SỬA] PromotionId không còn bắt buộc (int -> int?) (trước đây: public int PromotionId { get; set; })
+        public int? PromotionId { get; set; }      // không bắt buộc
+        public int? StoreId { get; set; }          // cửa hàng xuất kho, null = hệ thống tự chọn cửa hàng còn đủ hàng
         public string? PaymentMethod { get; set; }
         public List<CreateOrderItemRequest>? Items { get; set; }
-        
     }
 }

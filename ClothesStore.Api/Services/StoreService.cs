@@ -1,4 +1,5 @@
 using AutoMapper;
+using ClothesStore.Api.Common; // [THÊM] dùng BusinessException
 using ClothesStore.Api.DTOs.Store;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Interface.Services;
@@ -50,6 +51,10 @@ namespace ClothesStore.Api.Services
         {
             var store = await _repository.GetByIdAsync(id);
             if (store is null) return false;
+
+            // [THÊM] Cửa hàng đã xuất kho cho đơn hàng thì không xóa (giữ lịch sử đơn và thống kê)
+            if (await _repository.HasOrdersAsync(id))
+                throw new BusinessException("Cửa hàng đã có đơn hàng, không thể xóa.");
 
             await _repository.DeleteAsync(store);
             return true;

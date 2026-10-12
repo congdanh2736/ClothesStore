@@ -8,5 +8,7 @@ namespace ClothesStore.Api.Interface.Repositories
         Task<bool> StoreExistsAsync(int storeId);
         Task<bool> ProductVariantExistsAsync(int variantId);
         Task<StoreStock?> GetByStoreAndVariantAsync(int storeId, int variantId);
+        Task<IEnumerable<StoreStock>> GetByStoreIdAsync(int storeId);
+        Task<IEnumerable<StoreStock>> GetByVariantIdsAsync(IEnumerable<int> variantIds);
     }
 }

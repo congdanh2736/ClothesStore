@@ -16,6 +16,7 @@ namespace ClothesStore.Api.Repositories
         public async Task<Store?> GetByIdWithDetailsAsync(int id) => await _context.Stores
             .Include(s => s.StoreStocks).Include(s => s.StoreDailyStats).Include(s => s.StoreItemStats)
             .FirstOrDefaultAsync(s => s.Id == id);
+        public async Task<bool> HasOrdersAsync(int storeId) => await _context.Orders.AnyAsync(o => o.StoreId == storeId);
         public async Task AddAsync(Store entity) { await _context.Stores.AddAsync(entity); await _context.SaveChangesAsync(); }
         public async Task UpdateAsync(Store entity) { _context.Stores.Update(entity); await _context.SaveChangesAsync(); }
         public async Task DeleteAsync(Store entity) { _context.Stores.Remove(entity); await _context.SaveChangesAsync(); }

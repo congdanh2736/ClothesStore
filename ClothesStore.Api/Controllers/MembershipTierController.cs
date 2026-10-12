@@ -1,4 +1,7 @@
-﻿using ClothesStore.Api.DTOs.MembershipTier;
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
+using ClothesStore.Api.DTOs.MembershipTier;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +31,8 @@ namespace ClothesStore.Api.Controllers
             return Ok(membershipTier);
         }
 
+        // [THÊM] Phân quyền: chỉ Admin
+        [Authorize(Roles = RoleGroups.Admin)]
         [HttpPost]  
         public async Task<IActionResult> Create([FromBody] CreateMembershipTierDto dto)
         {
@@ -36,6 +41,8 @@ namespace ClothesStore.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = data!.Id }, data);
         }
 
+        // [THÊM] Phân quyền: chỉ Admin
+        [Authorize(Roles = RoleGroups.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateMembershipTierDto dto)
         {
@@ -44,6 +51,8 @@ namespace ClothesStore.Api.Controllers
             return NoContent();
         }
 
+        // [THÊM] Phân quyền: chỉ Admin
+        [Authorize(Roles = RoleGroups.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

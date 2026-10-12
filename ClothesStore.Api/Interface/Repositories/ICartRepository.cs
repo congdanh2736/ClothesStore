@@ -11,6 +11,7 @@ namespace ClothesStore.Api.Interface.Repositories
         Task AddCartItemAsync(CartItem cartItem);
         void RemoveCartItem(CartItem cartItem);
         Task<bool> VariantExistsAsync(int variantId);
+        Task<bool> CustomerExistsAsync(int customerId);
         Task ClearCartAsync(int cartId);
         Task<int> SaveChangesAsync();
     }
