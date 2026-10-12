@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.SizeChart;
 using ClothesStore.Api.Interface.Services;
 using ClothesStore.Api.Models;
@@ -30,6 +33,15 @@ namespace ClothesStore.Api.Controllers
             return Ok(SizeChart);
         }
 
+        // [THÊM] Tra cứu bảng size theo danh mục ===== BẮT ĐẦU =====
+        // [THÊM] Tra cứu bảng size theo danh mục
+        [HttpGet("category/{categoryId}")]
+        public async Task<ActionResult<List<SizeChartDto>>> GetByCategory(int categoryId)
+            => Ok(await _service.GetByCategoryAsync(categoryId));
+        // [THÊM] ===== KẾT THÚC =====
+
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSizeChartDto dto)
         {
@@ -39,6 +51,10 @@ namespace ClothesStore.Api.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = data!.Id }, data);
         }
+
+
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
 
 
         [HttpPut("{id}")]
@@ -51,6 +67,8 @@ namespace ClothesStore.Api.Controllers
             return NoContent();
         }
 
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
