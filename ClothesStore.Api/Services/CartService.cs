@@ -28,12 +28,10 @@ namespace ClothesStore.Api.Services
 
         public async Task<CartResponseDto> AddItemToCartAsync(AddToCartRequestDto request)
         {
-            // [THÊM] Khách hàng phải tồn tại (trước đây tạo Cart cho CustomerId không tồn tại -> lỗi khóa ngoại 500)
             if (!await _cartRepository.CustomerExistsAsync(request.CustomerId))
                 throw new NotFoundException("Khách hàng không tồn tại.");
 
             if (!await _cartRepository.VariantExistsAsync(request.VariantId))
-                // [SỬA] throw new Exception -> NotFoundException (middleware trả 404 kèm message thay vì 500)
                 throw new NotFoundException("Biến thể sản phẩm không tồn tại.");
 
             var cart = await _cartRepository.GetCartByCustomerIdAsync(request.CustomerId);
@@ -67,7 +65,6 @@ namespace ClothesStore.Api.Services
             }
 
             await _cartRepository.SaveChangesAsync();
-
             var updatedCart = await GetCartByCustomerAsync(request.CustomerId);
             return updatedCart!;
         }
@@ -80,7 +77,6 @@ namespace ClothesStore.Api.Services
 
             var customerId = cartItem.Cart?.CustomerId ?? 0;
 
-            // [THÊM comment] Số lượng = 0 nghĩa là xóa khỏi giỏ
             if (request.Quantity <= 0)
             {
                 _cartRepository.RemoveCartItem(cartItem);
@@ -94,7 +90,6 @@ namespace ClothesStore.Api.Services
             await _cartRepository.SaveChangesAsync();
 
             var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId);
-            // [SỬA] Exception -> NotFoundException
             if (cart == null) throw new NotFoundException("Không tìm thấy giỏ hàng sau khi cập nhật.");
 
             return MapToCartResponseDto(cart);
@@ -119,7 +114,6 @@ namespace ClothesStore.Api.Services
             return true;
         }
 
-        // [THÊM] Số lượng trong giỏ không được vượt tổng tồn kho của tất cả cửa hàng
         private async Task EnsureStockAsync(int variantId, int quantity)
         {
             var totalStock = await _inventory.GetTotalStockAsync(variantId);

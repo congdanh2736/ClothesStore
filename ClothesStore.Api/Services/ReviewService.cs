@@ -41,15 +41,34 @@ namespace ClothesStore.Api.Services
             return _mapper.Map<IEnumerable<ReviewDto>>(reviews);
         }
 
+        public async Task<ReviewSummaryDto> GetProductReviewSummaryAsync(int productId)
+        {
+            return await _repository.GetReviewSummaryByProductIdAsync(productId);
+        }
+
+        public async Task<bool> CanCustomerReviewProductAsync(int customerId, int productId)
+        {
+            if (!await _repository.CustomerExistsAsync(customerId) || !await _repository.ProductExistsAsync(productId))
+                return false;
+
+            var hasPurchased = await _repository.HasCustomerPurchasedProductAsync(customerId, productId);
+            if (!hasPurchased) return false;
+
+            var hasReviewed = await _repository.GetByCustomerAndProductAsync(customerId, productId) != null;
+            return !hasReviewed;
+        }
+
         public async Task<(bool Success, string? Error, ReviewDto? Data)> CreateAsync(CreateReviewDto dto)
         {
-            // Kiểm tra khách hàng có tồn tại không
             if (!await _repository.CustomerExistsAsync(dto.CustomerId))
                 return (false, "Khách hàng không tồn tại.", null);
 
-            // Kiểm tra sản phẩm có tồn tại không
             if (!await _repository.ProductExistsAsync(dto.ProductId))
                 return (false, "Sản phẩm không tồn tại.", null);
+
+            // Kiểm tra khách hàng đã mua sản phẩm chưa
+            if (!await _repository.HasCustomerPurchasedProductAsync(dto.CustomerId, dto.ProductId))
+                return (false, "Khách hàng chỉ có thể đánh giá sản phẩm sau khi đã mua hàng thành công.", null);
 
             // Kiểm tra xem khách hàng đã đánh giá sản phẩm này chưa
             var existing = await _repository.GetByCustomerAndProductAsync(dto.CustomerId, dto.ProductId);
@@ -66,7 +85,6 @@ namespace ClothesStore.Api.Services
             }
             await _repository.AddAsync(review);
 
-            // Lấy lại entity với navigation properties để map đầy đủ
             var created = await _repository.GetByIdWithDetailsAsync(review.Id);
             return (true, null, _mapper.Map<ReviewDto>(created));
         }

@@ -1,3 +1,4 @@
+using ClothesStore.Api.DTOs.Review;
 using ClothesStore.Api.Interface.Repositories.Base;
 using ClothesStore.Api.Models;
 
@@ -10,5 +11,7 @@ namespace ClothesStore.Api.Interface.Repositories
         Task<Review?> GetByCustomerAndProductAsync(int customerId, int productId);
         Task<bool> CustomerExistsAsync(int customerId);
         Task<bool> ProductExistsAsync(int productId);
+        Task<bool> HasCustomerPurchasedProductAsync(int customerId, int productId);
+        Task<ReviewSummaryDto> GetReviewSummaryByProductIdAsync(int productId);
     }
 }
