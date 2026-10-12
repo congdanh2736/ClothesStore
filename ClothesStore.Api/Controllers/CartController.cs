@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.Cart;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +9,8 @@ namespace ClothesStore.Api.Controllers
 {
     [ApiController]
     [Route("api/carts")]
+    // [THÊM] Phân quyền: bắt buộc đăng nhập (trước đây không cần token)
+    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
@@ -63,6 +68,17 @@ namespace ClothesStore.Api.Controllers
                 return NotFound(new { Message = "Không tìm thấy sản phẩm cần xóa." });
             }
             return Ok(new { Message = "Đã xóa sản phẩm khỏi giỏ hàng." });
+        }
+
+        [HttpDelete("{customerId}/clear")]
+        public async Task<IActionResult> ClearCart(int customerId)
+        {
+            var success = await _cartService.ClearCartAsync(customerId);
+            if (!success)
+            {
+                return NotFound(new { Message = "Không tìm thấy giỏ hàng của khách hàng." });
+            }
+            return Ok(new { Message = "Đã xóa toàn bộ sản phẩm khỏi giỏ hàng." });
         }
     }
 }
