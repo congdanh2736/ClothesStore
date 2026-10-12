@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.Review;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -30,12 +33,27 @@ namespace ClothesStore.Api.Controllers
         public async Task<IActionResult> GetByProductId(int productId)
             => Ok(await _service.GetByProductIdAsync(productId));
 
+        // Lấy tóm tắt thống kê đánh giá của sản phẩm (sao TB, tổng đánh giá, phân bố sao)
+        [HttpGet("product/{productId}/summary")]
+        public async Task<IActionResult> GetProductReviewSummary(int productId)
+            => Ok(await _service.GetProductReviewSummaryAsync(productId));
+
         // Lấy danh sách đánh giá theo CustomerId
         [HttpGet("customer/{customerId}")]
         public async Task<IActionResult> GetByCustomerId(int customerId)
             => Ok(await _service.GetByCustomerIdAsync(customerId));
 
-        // Tạo đánh giá mới
+        // Kiểm tra khách hàng có đủ điều kiện đánh giá sản phẩm hay không (đã mua & chưa review)
+        [HttpGet("can-review")]
+        public async Task<IActionResult> CanReview([FromQuery] int customerId, [FromQuery] int productId)
+        {
+            var canReview = await _service.CanCustomerReviewProductAsync(customerId, productId);
+            return Ok(new { CanReview = canReview });
+        }
+
+        // Tạo đánh giá mới (yêu cầu đã từng mua sản phẩm)
+        // [THÊM] Phân quyền: phải đăng nhập (Customer/Admin/Employee) mới viết/sửa/xóa đánh giá
+        [Authorize(Roles = RoleGroups.Customer + "," + RoleGroups.Staff)]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateReviewDto dto)
         {
@@ -45,6 +63,8 @@ namespace ClothesStore.Api.Controllers
         }
 
         // Cập nhật đánh giá
+        // [THÊM] Phân quyền: phải đăng nhập (Customer/Admin/Employee) mới viết/sửa/xóa đánh giá
+        [Authorize(Roles = RoleGroups.Customer + "," + RoleGroups.Staff)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateReviewDto dto)
         {
@@ -56,6 +76,8 @@ namespace ClothesStore.Api.Controllers
         }
 
         // Xóa đánh giá
+        // [THÊM] Phân quyền: phải đăng nhập (Customer/Admin/Employee) mới viết/sửa/xóa đánh giá
+        [Authorize(Roles = RoleGroups.Customer + "," + RoleGroups.Staff)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
             => await _service.DeleteAsync(id) ? NoContent() : NotFound();
