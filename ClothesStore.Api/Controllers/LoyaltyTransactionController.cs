@@ -1,4 +1,7 @@
-﻿using ClothesStore.Api.DTOs.LoyaltyTransaction;
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
+using ClothesStore.Api.DTOs.LoyaltyTransaction;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +9,8 @@ namespace ClothesStore.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // [THÊM] Phân quyền: bắt buộc đăng nhập (trước đây không cần token)
+    [Authorize]
     public class LoyaltyTransactionController : ControllerBase
     {
         private readonly ILoyaltyTransactionService _service;
@@ -15,6 +20,8 @@ namespace ClothesStore.Api.Controllers
         }
 
         // Phương thức lấy tất cả các giao dịch điểm thưởng
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LoyaltyTransactionDto>>> GetAll()
             // Trả về Ok nghĩa là HTTP 200 kèm dữ liệu danh sách giao dịch điểm thưởng
@@ -28,7 +35,24 @@ namespace ClothesStore.Api.Controllers
             return transaction is null ? NotFound() : Ok(transaction);
         }
 
+        // [THÊM] Lịch sử điểm và tổng điểm/hạng của khách ===== BẮT ĐẦU =====
+        // [THÊM] Lịch sử cộng / trừ điểm của 1 khách
+        [HttpGet("customer/{customerId}")]
+        public async Task<ActionResult<IEnumerable<LoyaltyTransactionDto>>> GetByCustomer(int customerId)
+            => Ok(await _service.GetByCustomerIdAsync(customerId));
+
+        // [THÊM] Tổng điểm hiện tại và hạng thành viên của khách
+        [HttpGet("customer/{customerId}/points")]
+        public async Task<ActionResult<CustomerPointsDto>> GetPoints(int customerId)
+        {
+            var points = await _service.GetCustomerPointsAsync(customerId);
+            return points is null ? NotFound(new { message = "Khách hàng không tồn tại." }) : Ok(points);
+        }
+        // [THÊM] ===== KẾT THÚC =====
+
         // Phương thức tạo mới một giao dịch điểm thưởng
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpPost]
         public async Task<ActionResult<LoyaltyTransactionDto>> Create(CreateLoyaltyTransactionDto dto)
         {
@@ -38,6 +62,8 @@ namespace ClothesStore.Api.Controllers
         }
 
         // Phương thức cập nhật một giao dịch điểm thưởng
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateLoyaltyTransactionDto dto)
         {
@@ -48,6 +74,8 @@ namespace ClothesStore.Api.Controllers
         }
 
         // Phương thức xóa một giao dịch điểm thưởng
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
