@@ -1,4 +1,7 @@
-﻿using ClothesStore.Api.DTOs.Address;
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
+using ClothesStore.Api.DTOs.Address;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +9,8 @@ namespace ClothesStore.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // [THÊM] Phân quyền: bắt buộc đăng nhập (trước đây không cần token)
+    [Authorize]
     public class AddressController : ControllerBase
     {
         private readonly IAddressService _service;
@@ -15,6 +20,8 @@ namespace ClothesStore.Api.Controllers
             _service = service;
         }
 
+        // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+        [Authorize(Roles = RoleGroups.Staff)]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -29,6 +36,12 @@ namespace ClothesStore.Api.Controllers
             if (address is null) return NotFound();
             return Ok(address);
         }
+
+        // [THÊM] Sổ địa chỉ của 1 khách
+        // [THÊM] Sổ địa chỉ của 1 khách hàng
+        [HttpGet("customer/{customerId}")]
+        public async Task<IActionResult> GetByCustomer(int customerId)
+            => Ok(await _service.GetByCustomerAsync(customerId));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAddressDto dto)
