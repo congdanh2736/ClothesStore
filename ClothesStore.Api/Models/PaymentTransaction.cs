@@ -11,6 +11,10 @@ namespace ClothesStore.Api.Models
         public string PaymentMethod { get; set; } = string.Empty;
         public string? Status { get; set; }
 
+        // Mã giao dịch từ cổng thanh toán (Momo, VNPay...) dùng để đối soát
+        public string? TransactionCode { get; set; }
+        public DateTime? PaidAt { get; set; }
+
         //Navigation
         [ForeignKey("OrderId")]
         public Order? Order { get; set ;}

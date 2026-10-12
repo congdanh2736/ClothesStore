@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.Api.Models
@@ -9,7 +9,8 @@ namespace ClothesStore.Api.Models
         public int VariantId {get; set;}
         public string? Color {get;set;}
         public string? Size {get; set;}
-        public double Price {get;set;}
+        // Tiền tệ dùng decimal (đồng bộ với OrderItem.Price, Order.TotalAmount)
+        public decimal Price {get;set;}
 
         public int ProductId {get;set;}
         [ForeignKey("ProductId")]

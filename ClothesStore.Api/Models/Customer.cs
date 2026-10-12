@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClothesStore.Api.Models
@@ -16,7 +16,8 @@ namespace ClothesStore.Api.Models
 
         //Relashionships
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
-        public Cart Cart { get; set; } = new Cart();
+        // Không khởi tạo sẵn navigation 1-1 (new Cart()) vì EF sẽ hiểu là Cart mới và INSERT trùng khi Update Customer
+        public Cart? Cart { get; set; }
         public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();

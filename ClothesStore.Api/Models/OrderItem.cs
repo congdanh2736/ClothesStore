@@ -16,6 +16,7 @@ namespace ClothesStore.Api.Models
         public Order? Order { get; set; }
         [ForeignKey("VariantId")]
         public ProductVariant? ProductVariant { get; set;}
+        public ICollection<ReturnItem> ReturnItems { get; set; } = new List<ReturnItem>();
         
     }
 }
