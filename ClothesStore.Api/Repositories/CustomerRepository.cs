@@ -1,4 +1,4 @@
-﻿    using ClothesStore.Api.Data;
+    using ClothesStore.Api.Data;
     using ClothesStore.Api.Models;
     using Microsoft.EntityFrameworkCore;
     using ClothesStore.Api.Interface.Repositories;
@@ -15,6 +15,8 @@
                     .Include(c => c.MembershipTier)
                     .Include(c => c.Addresses)
                     .Include(c => c.Wishlists)
+                    .Include(c => c.LoyaltyTransactions)
+                    .AsSplitQuery()
                     .ToListAsync();
 
             public async Task<Customer?> GetByIdAsync(int id)
@@ -25,6 +27,7 @@
                     .Include(c => c.MembershipTier)
                     .Include(c => c.Addresses)
                     .Include(c => c.Wishlists)
+                    .Include(c => c.LoyaltyTransactions)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
             public async Task<bool> ApplicationUserExistsAsync(string applicationUserId)
@@ -32,6 +35,12 @@
 
             public async Task<bool> MembershipTierExistsAsync(int tierId)
                 => await _context.MembershipTiers.AnyAsync(t => t.Id == tierId);
+
+            public async Task<Customer?> GetByApplicationUserIdAsync(string applicationUserId)
+                => await _context.Customers.FirstOrDefaultAsync(c => c.ApplicationUserId == applicationUserId);
+
+            public async Task<bool> HasOrdersAsync(int customerId)
+                => await _context.Orders.AnyAsync(o => o.CustomerId == customerId);
 
             public async Task AddAsync(Customer customer)
             {

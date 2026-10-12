@@ -1,4 +1,6 @@
+using ClothesStore.Api.Common;
 using ClothesStore.Api.Data;
+using ClothesStore.Api.DTOs.Review;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +57,40 @@ namespace ClothesStore.Api.Repositories
 
         public async Task<bool> ProductExistsAsync(int productId)
             => await _context.Products.AnyAsync(p => p.Id == productId);
+
+        public async Task<bool> HasCustomerPurchasedProductAsync(int customerId, int productId)
+        {
+            // Chỉ tính các đơn đã giao thành công (Completed) hoặc đã trả hàng sau khi nhận (Returned)
+            return await _context.Orders
+                .Where(o => o.CustomerId == customerId
+                    && (o.Status == OrderStatus.Completed || o.Status == OrderStatus.Returned))
+                .AnyAsync(o => o.OrderItems.Any(oi => oi.ProductVariant != null && oi.ProductVariant.ProductId == productId));
+        }
+
+        public async Task<ReviewSummaryDto> GetReviewSummaryByProductIdAsync(int productId)
+        {
+            var reviews = await _context.Reviews
+                .Where(r => r.ProductId == productId)
+                .Select(r => r.Rating)
+                .ToListAsync();
+
+            var summary = new ReviewSummaryDto
+            {
+                ProductId = productId,
+                TotalReviews = reviews.Count,
+                AverageRating = reviews.Any() ? Math.Round(reviews.Average(), 1) : 0
+            };
+
+            foreach (var rating in reviews)
+            {
+                if (summary.RatingDistribution.ContainsKey(rating))
+                {
+                    summary.RatingDistribution[rating]++;
+                }
+            }
+
+            return summary;
+        }
 
         public async Task AddAsync(Review entity)
         {
