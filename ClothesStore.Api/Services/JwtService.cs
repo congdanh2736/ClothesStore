@@ -1,4 +1,4 @@
-﻿using ClothesStore.Api.Interface.Services;
+using ClothesStore.Api.Interface.Services;
 using ClothesStore.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -56,6 +56,9 @@ namespace ClothesStore.Api.Services
              */
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            // [THÊM] Thời gian sống của token (phút), mặc định 60 nếu chưa cấu hình
+            var expiresInMinutes = _config.GetValue<double?>("Jwt:ExpiresInMinutes") ?? 60;
+
             /* Tạo token JWT với các thông tin đã chuẩn bị
              * Token sẽ chứa thông tin về issuer (người phát hành), audience (người nhận), các claim, thời gian hết hạn, và thông tin ký
              * Token này giúp xác thực người dùng và phân quyền truy cập trong ứng dụng
@@ -64,7 +67,12 @@ namespace ClothesStore.Api.Services
                 issuer: _config["Jwt:Issuer"], // Thông tin về người phát hành token, thường là tên hoặc địa chỉ của ứng dụng
                 audience: _config["Jwt:Audience"], // Thông tin về người nhận token, thường là tên hoặc địa chỉ của ứng dụng hoặc dịch vụ mà token được gửi đến
                 claims: claims, // Danh sách các claim chứa thông tin về người dùng và quyền hạn của họ
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_config["Jwt:ExpireMinutes"])), // Thời gian hết hạn của token, sau thời gian này token sẽ không còn hợp lệ
+                /*
+                 * [SỬA] trước đây đọc key "Jwt:ExpireMinutes" nhưng appsettings.json khai báo "Jwt:ExpiresInMinutes"
+                 * -> giá trị null -> Convert.ToDouble(null) = 0 -> token hết hạn ngay khi vừa tạo (mọi API [Authorize] đều 401).
+                 * Dùng UtcNow theo chuẩn JWT.
+                 */
+                expires: DateTime.UtcNow.AddMinutes(expiresInMinutes), // Thời gian hết hạn của token, sau thời gian này token sẽ không còn hợp lệ
                 signingCredentials: creds // Thông tin xác thực ký token, giúp đảm bảo rằng token không bị giả mạo và có thể được xác minh bởi người nhận
             );
 

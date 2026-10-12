@@ -1,4 +1,5 @@
 using AutoMapper;
+using ClothesStore.Api.Common; // [THÊM] dùng BusinessException
 using ClothesStore.Api.Data;
 using ClothesStore.Api.DTOs.Promotion;
 using ClothesStore.Api.Interface.Repositories;
@@ -73,8 +74,13 @@ public class PromotionService : IPromotionService
     public async Task<bool> DeleteAsync(int id)
     {
         var promotion = await _repository.GetByIdWithDetailsAsync(id);
-        if (promotion is null || promotion.Orders.Any())
+        // [SỬA] tách điều kiện: trước đây mã đã dùng cho đơn cũng trả false -> controller báo 404 "không tìm thấy" (sai)
+        if (promotion is null)
             return false;
+
+        // [THÊM] Mã đã được áp dụng cho đơn hàng thì không xóa (giữ lịch sử); có thể sửa EndDate để ngừng áp dụng
+        if (promotion.Orders.Any())
+            throw new BusinessException("Mã khuyến mãi đã được dùng cho đơn hàng, không thể xóa. Hãy cập nhật ngày kết thúc để ngừng áp dụng.");
 
         await _repository.DeleteAsync(promotion);
         return true;

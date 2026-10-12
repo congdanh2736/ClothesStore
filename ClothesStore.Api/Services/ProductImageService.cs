@@ -36,7 +36,9 @@ namespace ClothesStore.Api.Services
         // Tạo mới Ảnh sản phẩm
         public async Task<(bool Success, string? Error, ProductImageDto? Data)> CreateAsync(CreateProductImageDto dto)
         {
-            
+            // [THÊM] Sản phẩm phải tồn tại (trước đây ProductId sai -> lỗi khóa ngoại 500)
+            if (!await _repository.ProductExistsAsync(dto.ProductId))
+                return (false, "Sản phẩm không tồn tại.", null);
 
             // Chuyển DTO sang Model để lưu vào database
             var ProductImage = _mapper.Map<ProductImage>(dto);
@@ -52,6 +54,10 @@ namespace ClothesStore.Api.Services
             //kiểm tra danh mục có tồn tại hay không
             if (ProductImage == null)
                 return (false, "id của 'Ảnh sản phẩm' không tìm thấy");
+
+            // [THÊM] Kiểm tra sản phẩm mới có tồn tại không
+            if (!await _repository.ProductExistsAsync(dto.ProductId))
+                return (false, "Sản phẩm không tồn tại.");
 
             //Cập nhật thông tin 
             ProductImage.ImageUrl = dto.ImageUrl;

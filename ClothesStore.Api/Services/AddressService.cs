@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using AutoMapper;
+using ClothesStore.Api.Common; // [THÊM] dùng BusinessException khi chặn xóa địa chỉ
 using ClothesStore.Api.DTOs.Address;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Interface.Services;
@@ -24,6 +25,13 @@ namespace ClothesStore.Api.Services
         public async Task<IEnumerable<AddressDto>> GetAllAsync()
         {
             var addresses = await _repository.GetAllAsync();
+            return _mapper.Map<List<AddressDto>>(addresses);
+        }
+
+        // [THÊM] Lấy sổ địa chỉ của 1 khách hàng
+        public async Task<IEnumerable<AddressDto>> GetByCustomerAsync(int customerId)
+        {
+            var addresses = await _repository.GetByCustomerIdAsync(customerId);
             return _mapper.Map<List<AddressDto>>(addresses);
         }
 
@@ -76,6 +84,10 @@ namespace ClothesStore.Api.Services
             // Kiểm tra xem địa chỉ có tồn tại không
             var address = await _repository.GetByIdAsync(id);
             if (address is null) return false;
+
+            // [THÊM] Địa chỉ đã dùng để giao đơn hàng thì không xóa (Order -> Address để Restrict, trước đây lỗi 500)
+            if (await _repository.HasOrdersAsync(id))
+                throw new BusinessException("Địa chỉ đã được dùng cho đơn hàng, không thể xóa.");
 
             // Xóa địa chỉ khỏi cơ sở dữ liệu
             await _repository.DeleteAsync(address);
