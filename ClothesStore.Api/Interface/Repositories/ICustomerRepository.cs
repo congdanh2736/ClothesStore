@@ -1,4 +1,4 @@
-﻿using ClothesStore.Api.Interface.Repositories.Base;
+using ClothesStore.Api.Interface.Repositories.Base;
 using ClothesStore.Api.Models;
 
 namespace ClothesStore.Api.Interface.Repositories
@@ -7,5 +7,7 @@ namespace ClothesStore.Api.Interface.Repositories
     {
         Task<bool> ApplicationUserExistsAsync(string applicationUserId);
         Task<bool> MembershipTierExistsAsync(int tierId);
+        Task<Customer?> GetByApplicationUserIdAsync(string applicationUserId);
+        Task<bool> HasOrdersAsync(int customerId);
     }
 }
