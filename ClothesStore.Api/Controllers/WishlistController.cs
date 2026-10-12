@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.Wishlist;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +9,8 @@ namespace ClothesStore.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // [THÊM] Phân quyền: bắt buộc đăng nhập (trước đây không cần token)
+    [Authorize]
     public class WishlistController : ControllerBase
     {
         private readonly IWishlistService _service;
