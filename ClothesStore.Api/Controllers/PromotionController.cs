@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.Promotion;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +29,8 @@ public class PromotionController : ControllerBase
         return promotion is null ? NotFound() : Ok(promotion);
     }
 
+    // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+    [Authorize(Roles = RoleGroups.Staff)]
     [HttpPost]
     public async Task<ActionResult<PromotionDto>> Create(CreatePromotionRequest request)
     {
@@ -36,6 +41,8 @@ public class PromotionController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = data!.Id }, data);
     }
 
+    // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+    [Authorize(Roles = RoleGroups.Staff)]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, UpdatePromotionRequest request)
     {
@@ -48,6 +55,8 @@ public class PromotionController : ControllerBase
         return NoContent();
     }
 
+    // [THÊM] Phân quyền: chỉ Admin/Employee (trước đây ai cũng gọi được)
+    [Authorize(Roles = RoleGroups.Staff)]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
