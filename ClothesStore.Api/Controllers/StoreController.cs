@@ -1,3 +1,6 @@
+// [THÊM] dùng cho [Authorize] (phân quyền)
+using Microsoft.AspNetCore.Authorization;
+using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.Store;
 using ClothesStore.Api.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +25,8 @@ namespace ClothesStore.Api.Controllers
             return store is null ? NotFound() : Ok(store);
         }
 
+        // [THÊM] Phân quyền: chỉ Admin
+        [Authorize(Roles = RoleGroups.Admin)]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStoreDto dto)
         {
@@ -31,6 +36,8 @@ namespace ClothesStore.Api.Controllers
                 : BadRequest(new { message = error });
         }
 
+        // [THÊM] Phân quyền: chỉ Admin
+        [Authorize(Roles = RoleGroups.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateStoreDto dto)
         {
@@ -41,6 +48,8 @@ namespace ClothesStore.Api.Controllers
                 : BadRequest(new { message = error });
         }
 
+        // [THÊM] Phân quyền: chỉ Admin
+        [Authorize(Roles = RoleGroups.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
             => await _service.DeleteAsync(id) ? NoContent() : NotFound();
