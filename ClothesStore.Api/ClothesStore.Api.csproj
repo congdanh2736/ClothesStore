@@ -44,7 +44,6 @@
     <Folder Include="wwwroot\admin\partials\" />
     <Folder Include="wwwroot\assets\css\" />
     <Folder Include="wwwroot\assets\js\core\" />
-    <Folder Include="wwwroot\assets\js\components\" />
     <Folder Include="wwwroot\assets\images\" />
     <Folder Include="wwwroot\shop\account\" />
     <Folder Include="wwwroot\shop\js\account\" />
