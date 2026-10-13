@@ -31,7 +31,25 @@
   <ItemGroup>
     <Folder Include="Helpers\" />
     <Folder Include="Extensions\" />
-    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\admin\catalog\" />
+    <Folder Include="wwwroot\admin\customers\" />
+    <Folder Include="wwwroot\admin\employees\" />
+    <Folder Include="wwwroot\admin\js\catalog\" />
+    <Folder Include="wwwroot\admin\js\customers\" />
+    <Folder Include="wwwroot\admin\js\employees\" />
+    <Folder Include="wwwroot\admin\js\stores\" />
+    <Folder Include="wwwroot\admin\js\sales\" />
+    <Folder Include="wwwroot\admin\stores\" />
+    <Folder Include="wwwroot\admin\sales\" />
+    <Folder Include="wwwroot\admin\partials\" />
+    <Folder Include="wwwroot\assets\css\" />
+    <Folder Include="wwwroot\assets\js\core\" />
+    <Folder Include="wwwroot\assets\js\api\" />
+    <Folder Include="wwwroot\assets\js\components\" />
+    <Folder Include="wwwroot\assets\images\" />
+    <Folder Include="wwwroot\shop\account\" />
+    <Folder Include="wwwroot\shop\js\account\" />
+    <Folder Include="wwwroot\shop\partials\" />
   </ItemGroup>
 
 </Project>

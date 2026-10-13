@@ -238,6 +238,10 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+// Dùng middleware để xử lý CORS (Cross-Origin Resource Sharing) cho các yêu cầu từ các nguồn khác nhau
+app.UseDefaultFiles();   // mở / sẽ tự trả về wwwroot/index.html
+app.UseStaticFiles();
+
 /*
  * Xác thực và cấp quyền cho các yêu cầu HTTP
  * (trước đây gọi UseAuthorization 2 lần và UseHttpsRedirection nằm sau xác thực)
