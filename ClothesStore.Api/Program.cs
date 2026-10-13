@@ -238,8 +238,14 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-// Dùng middleware để xử lý CORS (Cross-Origin Resource Sharing) cho các yêu cầu từ các nguồn khác nhau
-app.UseDefaultFiles();   // mở / sẽ tự trả về wwwroot/index.html
+/*
+ * [THÊM] Phục vụ giao diện frontend (HTML/CSS/JS) nằm trong thư mục wwwroot
+ * - UseDefaultFiles: mở địa chỉ gốc "/" thì tự trả về wwwroot/index.html
+ * - UseStaticFiles : cho phép trình duyệt tải các file trong wwwroot (html, css, js, ảnh)
+ * Phải đặt UseDefaultFiles TRƯỚC UseStaticFiles.
+ * Frontend chạy chung địa chỉ với API nên không cần cấu hình CORS.
+ */
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
 /*
