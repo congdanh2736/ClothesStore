@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/_template.html  -  TRANG MẪU CHO MỌI TRANG QUẢN LÝ (THÊM / XÓA / SỬA / XEM)
+  ============================================================================
+
+   CÁCH DÙNG:
+     1. Copy file này, đổi tên và đặt đúng thư mục, ví dụ:
+            admin/customers/customers.html
+     2. Sửa phần <title> và tiêu đề <h1>.
+     3. ⚠️ SỬA ĐƯỜNG DẪN import trong <script> (file mẫu nằm ở admin/, còn trang
+        của bạn nằm sâu hơn 1 cấp ở admin/<thư-mục>/), đổi như sau:
+            "../assets/..."   ->  "../../assets/..."
+            "./js/layout.js"  ->  "../js/layout.js"
+        Mẹo: trong VS Code bấm Ctrl+H, thay "../assets/" bằng "../../assets/".
+        Gõ sai đường dẫn thì VS Code sẽ gạch đỏ báo "Cannot find module".
+     4. Trong <script> bên dưới, sửa những chỗ có đánh dấu  ✏️ SỬA :
+            - gọi API của nhóm bạn (file trong assets/js/api/)
+            - danh sách cột của bảng (columns)
+            - danh sách ô nhập của form (fields)
+     5. Thêm đường dẫn trang vào admin/partials/sidebar.html (nếu chưa có).
+
+   VÍ DỤ ĐANG DÙNG: quản lý DANH MỤC (API /api/Category) - chạy được ngay để
+   thử. Khi copy sang trang của bạn thì thay bằng API của bạn.
+
+   Trang này dùng sẵn:
+     - layout.js       : kiểm tra đăng nhập, menu, topbar
+     - table.js        : bảng có tìm kiếm + phân trang
+     - modal.js        : hộp thoại form Thêm/Sửa và hộp thoại xác nhận Xóa
+     - toast.js        : thông báo nhỏ góc màn hình
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ✏️ SỬA: tên trang (layout.js cũng sẽ tự đặt lại theo "title" trong script) -->
+    <title>Trang mẫu | ClothesStore Admin</title>
+
+    <!-- Thứ tự nạp CSS: base -> components -> admin. Dùng đường dẫn bắt đầu bằng "/"
+         để trang nằm ở thư mục nào cũng nạp đúng. -->
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <!-- Khung trang. "admin-shell" sẽ ẩn cho đến khi layout.js kiểm tra quyền xong. -->
+    <div class="admin-shell">
+
+        <!-- Menu bên trái: để TRỐNG, layout.js tự đổ sidebar.html vào -->
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <!-- Thanh trên cùng: để TRỐNG, layout.js tự đổ topbar.html vào -->
+            <header id="topbar" class="topbar"></header>
+
+            <!-- ================= NỘI DUNG RIÊNG CỦA TRANG ================= -->
+            <main class="admin-content">
+
+                <div class="page-header">
+                    <div>
+                        <!-- ✏️ SỬA: tiêu đề + mô tả ngắn -->
+                        <h1>Danh mục</h1>
+                        <p class="page-subtitle">Trang mẫu: thêm, sửa, xóa, xem danh sách.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Thêm mới</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <!-- Thanh công cụ: ô tìm kiếm (+ thêm bộ lọc nếu cần) -->
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput" placeholder="Tìm kiếm...">
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+
+                    <!-- Bảng và thanh phân trang: để TRỐNG, table.js tự vẽ vào -->
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!--
+      type="module" để dùng được import. Script module tự chạy SAU khi HTML
+      đã tải xong, nên các thẻ phía trên đều đã có sẵn.
+
+      ĐƯỜNG DẪN import là đường dẫn TƯƠNG ĐỐI tính từ vị trí file HTML:
+        "./"  = cùng thư mục với file này
+        "../" = lùi ra 1 thư mục
+      File mẫu ở  wwwroot/admin/_template.html  nên:
+        "../assets/..."  -> wwwroot/assets/...
+        "./js/layout.js" -> wwwroot/admin/js/layout.js
+      (Xem bước 3 ở đầu file khi copy sang thư mục khác.)
+    -->
+    <script type="module">
+        import { initAdminLayout } from "./js/layout.js";
+        import { get, post, put, del } from "../assets/js/core/http.js";
+        import { escapeHtml, formatNumber, debounce } from "../assets/js/core/utils.js";
+        import { createDataTable } from "../assets/js/components/table.js";
+        import { formModal, confirmDialog } from "../assets/js/components/modal.js";
+        import { toast } from "../assets/js/components/toast.js";
+
+        /*
+         * Lấy sẵn các thẻ HTML cần dùng.
+         * Chú thích  / ** @type {...} * /  phía trước để nói với VS Code: "thẻ này chắc chắn
+         * có trong HTML và thuộc loại ..." -> hết báo lỗi "possibly null".
+         * Chỉ là chú thích, không ảnh hưởng cách code chạy.
+         */
+        const tableContainer = /** @type {HTMLDivElement} */ (document.getElementById("tableContainer"));
+        const paginationContainer = /** @type {HTMLDivElement} */ (document.getElementById("paginationContainer"));
+        const searchInput = /** @type {HTMLInputElement} */ (document.getElementById("searchInput"));
+        const btnAdd = /** @type {HTMLButtonElement} */ (document.getElementById("btnAdd"));
+        const btnReload = /** @type {HTMLButtonElement} */ (document.getElementById("btnReload"));
+
+        /* =====================================================================
+         * ✏️ SỬA 1: CÁC HÀM GỌI API
+         * Trang thật: import từ file api của nhóm, ví dụ
+         *     import { catalogApi } from "/assets/js/api/catalogApi.js";
+         * Ở đây viết tạm ngay trong trang để file mẫu chạy được độc lập.
+         * =================================================================== */
+        const api = {
+            getAll: () => get("/Category"),
+            create: data => post("/Category", data),
+            update: (id, data) => put(`/Category/${id}`, data),
+            remove: id => del(`/Category/${id}`)
+        };
+
+        /* =====================================================================
+         * ✏️ SỬA 2: CÁC CỘT CỦA BẢNG
+         *   key    : tên thuộc tính trong dữ liệu API trả về (camelCase)
+         *   title  : chữ trên tiêu đề cột
+         *   render : (không bắt buộc) tự định dạng ô, ví dụ tiền, ngày, nhãn trạng thái
+         *   align  : "right" cho cột số / tiền
+         * =================================================================== */
+        const columns = [
+            { key: "id", title: "Mã", width: "80px" },
+            { key: "name", title: "Tên danh mục",
+              render: row => `<span class="fw-bold">${escapeHtml(row.name)}</span>` },
+            { key: "parentCategoryName", title: "Danh mục cha" },
+            { key: "childrenCategoriesCount", title: "Danh mục con", align: "right",
+              render: row => formatNumber(row.childrenCategoriesCount) },
+            { key: "productCount", title: "Số sản phẩm", align: "right",
+              render: row => formatNumber(row.productCount) }
+        ];
+
+        /* =====================================================================
+         * ✏️ SỬA 3: CÁC Ô NHẬP CỦA FORM THÊM / SỬA
+         * Viết thành HÀM (nhận dòng đang sửa) vì đôi khi các lựa chọn phụ thuộc
+         * dữ liệu, ví dụ danh mục cha không được chọn chính nó.
+         * name phải GIỐNG tên thuộc tính trong DTO Create/Update của backend (camelCase).
+         * Xem đầy đủ các loại ô trong modal.js.
+         * =================================================================== */
+        /** @param {any} [editingRow] - dòng đang sửa (bỏ trống khi thêm mới) */
+        function getFields(editingRow = null) {
+            const parentOptions = table.getRows()
+                .filter(c => c.id !== editingRow?.id)
+                .map(c => ({ value: c.id, label: c.name }));
+
+            return [
+                { name: "name", label: "Tên danh mục", required: true, placeholder: "Ví dụ: Áo thun" },
+                { name: "parentCategoryId", label: "Danh mục cha", type: "select", valueType: "number",
+                  emptyOption: "-- Không có (danh mục gốc) --", options: parentOptions }
+            ];
+        }
+
+        /* =====================================================================
+         * PHẦN DƯỚI ĐÂY THƯỜNG GIỮ NGUYÊN, chỉ đổi chữ thông báo cho hợp.
+         * =================================================================== */
+
+        // Bảng có tìm kiếm + phân trang
+        const table = createDataTable({
+            container: tableContainer,
+            paginationContainer: paginationContainer,
+            columns,
+            searchFields: ["name", "parentCategoryName"],   // ✏️ tìm theo cột nào
+            sortBy: (a, b) => b.id - a.id,                  // mới nhất lên đầu
+            emptyText: "Chưa có danh mục nào.",
+            actions: [
+                { label: "Sửa", onClick: row => openForm(row) },
+                { label: "Xóa", danger: true, onClick: row => removeRow(row) }
+                // Thêm nút "Xem" chuyển sang trang chi tiết:
+                // { label: "Xem", onClick: row => location.href = `detail.html?id=${row.id}` }
+            ]
+        });
+
+        /** Tải danh sách từ API và đổ vào bảng. */
+        async function loadData({ keepPage = false } = {}) {
+            table.setLoading();
+            try {
+                const rows = await api.getAll();
+                table.setRows(rows, { keepPage });
+            } catch (err) {
+                table.setError(err.message);
+            }
+        }
+
+        /**
+         * Mở form. row = null -> THÊM MỚI; row có giá trị -> SỬA dòng đó.
+         * formModal tự: vẽ form, điền sẵn dữ liệu cũ, gom dữ liệu, hiện lỗi từ server.
+         */
+        // "@param {any}" = row có thể là bất kỳ dữ liệu gì (VS Code khỏi đoán sai kiểu)
+        /** @param {any} [row] */
+        function openForm(row = null) {
+            const isEdit = row !== null;
+
+            formModal({
+                title: isEdit ? `Sửa danh mục #${row.id}` : "Thêm danh mục",
+                fields: getFields(row),
+                values: row ?? {},
+                submitText: isEdit ? "Lưu thay đổi" : "Thêm",
+                onSubmit: async data => {
+                    if (isEdit) {
+                        await api.update(row.id, data);
+                        toast.success("Đã cập nhật.");
+                    } else {
+                        await api.create(data);
+                        toast.success("Đã thêm mới.");
+                    }
+                    await loadData({ keepPage: isEdit }); // sửa thì ở nguyên trang hiện tại
+                }
+            });
+        }
+
+        /** Xóa một dòng: hỏi lại trước, rồi gọi API. */
+        async function removeRow(row) {
+            const ok = await confirmDialog({
+                title: "Xóa danh mục",
+                message: `Bạn có chắc muốn xóa "${row.name}"?\nThao tác này không thể hoàn tác.`,
+                confirmText: "Xóa",
+                danger: true
+            });
+            if (!ok) return;
+
+            try {
+                await api.remove(row.id);
+                toast.success("Đã xóa.");
+                await loadData({ keepPage: true });
+            } catch (err) {
+                // Ví dụ: danh mục còn sản phẩm -> server báo lỗi 409 hoặc 400
+                toast.error(err.message);
+            }
+        }
+
+        /* ========================== KHỞI ĐỘNG TRANG ========================== */
+
+        // ✏️ SỬA: title; trang chỉ Admin thì thêm  adminOnly: true
+        if (await initAdminLayout({ title: "Danh mục" })) {
+            btnAdd.addEventListener("click", () => openForm());
+            btnReload.addEventListener("click", () => loadData({ keepPage: true }));
+
+            // Gõ vào ô tìm kiếm -> chờ ngừng gõ 300ms rồi mới lọc
+            const onSearch = debounce(text => table.search(text), 300);
+            searchInput.addEventListener("input", () => onSearch(searchInput.value));
+
+            loadData();
+        }
+    </script>
+</body>
+</html>
