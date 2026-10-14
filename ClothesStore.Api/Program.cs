@@ -15,6 +15,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders; // [THÊM] PhysicalFileProvider: đọc file giao diện trực tiếp từ ổ đĩa
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
@@ -244,9 +245,29 @@ app.UseHttpsRedirection();
  * - UseStaticFiles : cho phép trình duyệt tải các file trong wwwroot (html, css, js, ảnh)
  * Phải đặt UseDefaultFiles TRƯỚC UseStaticFiles.
  * Frontend chạy chung địa chỉ với API nên không cần cấu hình CORS.
+ *
+ * [SỬA] Chỉ định RÕ thư mục wwwroot bằng PhysicalFileProvider (đọc thẳng file trên ổ đĩa).
+ * Lý do: ở chế độ Development, .NET 10 mặc định đọc danh sách file tĩnh từ một "bản ghi"
+ * tạo lúc build. Bản ghi cũ (thêm file vào wwwroot sau khi build) -> server báo 404
+ * dù file có thật. Đọc thẳng từ ổ đĩa thì thêm/sửa file là dùng được ngay, không phụ thuộc build.
  */
-app.UseDefaultFiles();
-app.UseStaticFiles();
+var webRootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+
+// In ra console đường dẫn wwwroot đang dùng, để dễ kiểm tra khi trang báo 404
+app.Logger.LogInformation("Thư mục giao diện (wwwroot): {Path} | Có admin/login.html: {Exists}",
+    webRootPath, File.Exists(Path.Combine(webRootPath, "admin", "login.html")));
+
+if (Directory.Exists(webRootPath))
+{
+    var webRootFiles = new PhysicalFileProvider(webRootPath);
+    app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = webRootFiles });
+    app.UseStaticFiles(new StaticFileOptions { FileProvider = webRootFiles });
+}
+else
+{
+    // Không có thư mục wwwroot (đặt sai chỗ) -> báo rõ trong console thay vì im lặng trả 404
+    app.Logger.LogWarning("Không tìm thấy thư mục wwwroot tại {Path}. Giao diện web sẽ không mở được.", webRootPath);
+}
 
 /*
  * Xác thực và cấp quyền cho các yêu cầu HTTP
