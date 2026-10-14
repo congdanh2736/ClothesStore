@@ -1,0 +1,31 @@
+<!--
+  ============================================================================
+   topbar.html  -  THANH NGANG TRÊN CÙNG CỦA TRANG ADMIN
+  ============================================================================
+
+   Cũng là một "mảnh" HTML giống sidebar.html. layout.js đọc file này rồi chèn
+   vào thẻ <header id="topbar"> của mỗi trang.
+
+   Các thuộc tính "data-..." là "móc" để layout.js tìm đúng chỗ mà điền dữ liệu:
+     data-sidebar-toggle  -> nút ☰ (chỉ hiện trên điện thoại) để mở/đóng menu
+     data-page-title      -> chỗ hiện tên trang (ví dụ "Khách hàng")
+     data-user-avatar     -> vòng tròn chữ cái đầu của tên
+     data-user-name       -> họ tên người đăng nhập
+     data-user-role       -> vai trò (Quản lý / Nhân viên)
+     data-logout          -> nút đăng xuất
+   Đổi giao diện thoải mái, nhưng nhớ GIỮ LẠI các data-... này.
+  ============================================================================
+-->
+
+<button type="button" class="btn btn-secondary btn-icon topbar-toggle" data-sidebar-toggle aria-label="Mở menu">☰</button>
+
+<div class="topbar-title" data-page-title></div>
+
+<div class="topbar-user">
+    <div class="user-avatar" data-user-avatar aria-hidden="true"></div>
+    <div class="user-info">
+        <span class="user-name" data-user-name></span>
+        <span class="user-role" data-user-role></span>
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm" data-logout>Đăng xuất</button>
+</div>

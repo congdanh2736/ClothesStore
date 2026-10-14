@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   wwwroot/index.html  -  TRANG GỐC (khi mở https://localhost:xxxx/)
+  ============================================================================
+
+   Trang này không có giao diện, chỉ làm "người chỉ đường":
+     - Đã đăng nhập bằng tài khoản Admin / Employee -> vào dashboard admin
+     - Còn lại                                       -> sang trang shop
+
+   Nhờ app.UseDefaultFiles() trong Program.cs, mở địa chỉ gốc "/" thì server
+   tự trả về file index.html này.
+
+   TẠM THỜI: nhóm đang làm phần admin trước, chưa có trang shop, nên
+   SHOP_READY = false -> mọi người được đưa tới trang đăng nhập admin.
+   Khi làm xong shop/index.html thì đổi thành true.
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothesStore</title>
+</head>
+<body>
+    <!-- Hiện tạm dòng này trong tích tắc trước khi chuyển trang (hoặc khi JS bị tắt) -->
+    <p style="font-family: system-ui, sans-serif; padding: 24px;">
+        Đang chuyển trang... Nếu không tự chuyển, hãy vào <a href="/admin/login.html">trang quản trị</a>.
+    </p>
+
+    <script type="module">
+        import { isStaff } from "/assets/js/core/auth.js";
+        import { PAGES } from "/assets/js/core/config.js";
+
+        const SHOP_READY = false; // ✏️ đổi thành true khi đã có trang shop
+
+        if (isStaff()) {
+            window.location.replace(PAGES.ADMIN_HOME);
+        } else {
+            window.location.replace(SHOP_READY ? PAGES.SHOP_HOME : PAGES.ADMIN_LOGIN);
+        }
+    </script>
+</body>
+</html>

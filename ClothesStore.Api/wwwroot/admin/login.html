@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/login.html  -  TRANG ĐĂNG NHẬP DÀNH CHO QUẢN LÝ / NHÂN VIÊN
+  ============================================================================
+
+   Luồng chạy:
+     1. Mở trang: nếu đã đăng nhập rồi -> chuyển thẳng vào trong (khỏi đăng nhập lại).
+     2. Người dùng nhập email + mật khẩu, bấm "Đăng nhập".
+     3. Gọi API POST /api/Auth/login (qua authApi.login).
+     4. Thành công:
+          - Là Admin / Employee -> cất thông tin, vào dashboard (hoặc trang đang dở).
+          - Là Customer         -> báo lỗi "không có quyền", KHÔNG cho vào admin.
+        Thất bại: hiện câu lỗi server trả về (ví dụ "Sai email hoặc mật khẩu").
+
+   Tài khoản Admin mặc định do AdminSeeder tạo: admin@clothesstore.com
+   (mật khẩu xem trong file Common/AdminSeeder.cs của backend).
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | ClothesStore Admin</title>
+
+    <!-- Thứ tự nạp CSS: base -> components -> admin -->
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <main class="login-page">
+        <div class="login-card">
+            <div class="login-brand">
+                <span class="sidebar-brand-mark">CS</span>
+                <span>ClothesStore</span>
+            </div>
+
+            <h1 class="login-title">Đăng nhập quản trị</h1>
+            <p class="login-subtitle">Dành cho quản lý và nhân viên cửa hàng.</p>
+
+            <!-- Hộp báo lỗi: trống thì tự ẩn (xem .alert:empty trong components.css) -->
+            <div class="alert alert-danger" id="loginError" role="alert"></div>
+
+            <!-- novalidate KHÔNG đặt -> trình duyệt tự kiểm tra ô trống / email sai định dạng -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input class="input" type="email" id="email" name="email"
+                           placeholder="admin@clothesstore.com" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Mật khẩu</label>
+                    <input class="input" type="password" id="password" name="password"
+                           autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="btnLogin">Đăng nhập</button>
+            </form>
+        </div>
+    </main>
+
+    <!--
+      ĐƯỜNG DẪN import: dùng đường dẫn TƯƠNG ĐỐI tính từ vị trí file HTML này.
+        file này ở  wwwroot/admin/login.html
+        "../"      = lùi ra 1 thư mục -> wwwroot/
+        => "../assets/js/core/auth.js" = wwwroot/assets/js/core/auth.js
+      (Viết "/assets/..." trình duyệt vẫn hiểu, nhưng VS Code báo "Cannot find module"
+       vì nó không biết dấu "/" ở đầu nghĩa là thư mục wwwroot.)
+    -->
+    <script type="module">
+        import { authApi } from "../assets/js/api/authApi.js";
+        import { saveLogin, clearLogin, isStaff, redirectAfterLogin, redirectIfLoggedIn } from "../assets/js/core/auth.js";
+        import { setLoading } from "../assets/js/core/utils.js";
+
+        // 1. Đã đăng nhập bằng tài khoản nhân sự rồi thì vào thẳng trong.
+        //    (Khách hàng đang đăng nhập thì vẫn ở lại trang này để đăng nhập tài khoản khác.)
+        if (isStaff()) {
+            redirectIfLoggedIn();
+        }
+
+        /*
+         * Lấy các thẻ HTML cần dùng.
+         *
+         * Dòng chú thích  / ** @type {HTMLInputElement} * /  đặt trước là để "nói" với
+         * VS Code: "thẻ này chắc chắn tồn tại và là ô <input>". Nhờ vậy VS Code:
+         *   - hết báo lỗi "possibly null" (có thể không tìm thấy thẻ),
+         *   - biết ô input có .value, form có .addEventListener...
+         * Nó CHỈ là chú thích, không làm thay đổi cách code chạy trên trình duyệt.
+         * (Chỉ dùng khi chắc chắn thẻ có trong HTML, ở đây các id đều nằm ngay phía trên.)
+         */
+        const form = /** @type {HTMLFormElement} */ (document.getElementById("loginForm"));
+        const emailInput = /** @type {HTMLInputElement} */ (document.getElementById("email"));
+        const passwordInput = /** @type {HTMLInputElement} */ (document.getElementById("password"));
+        const errorBox = /** @type {HTMLDivElement} */ (document.getElementById("loginError"));
+        const button = /** @type {HTMLButtonElement} */ (document.getElementById("btnLogin"));
+
+        // 2. Bấm "Đăng nhập"
+        form.addEventListener("submit", async event => {
+            event.preventDefault();            // chặn trình duyệt tự tải lại trang
+            errorBox.textContent = "";         // xóa lỗi cũ
+            setLoading(button, true, "Đang đăng nhập...");
+
+            try {
+                // 3. Gọi API
+                const result = await authApi.login(
+                    emailInput.value.trim(),
+                    passwordInput.value
+                );
+
+                // 4. Kiểm tra vai trò TRƯỚC khi cho vào
+                const roles = result.roles ?? [];
+                if (!roles.includes("Admin") && !roles.includes("Employee")) {
+                    clearLogin();
+                    errorBox.textContent = "Tài khoản này không có quyền vào trang quản trị.";
+                    return;
+                }
+
+                saveLogin(result);      // cất token + thông tin người dùng
+                redirectAfterLogin();   // vào dashboard (hoặc trang đang dở trước đó)
+            } catch (err) {
+                // Lỗi từ server (sai mật khẩu...) hoặc mất kết nối
+                errorBox.textContent = err.message;
+                passwordInput.value = "";
+                passwordInput.focus();
+            } finally {
+                setLoading(button, false);
+            }
+        });
+    </script>
+</body>
+</html>

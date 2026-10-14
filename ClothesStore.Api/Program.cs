@@ -239,6 +239,16 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 /*
+ * [THÊM] Phục vụ giao diện frontend (HTML/CSS/JS) nằm trong thư mục wwwroot
+ * - UseDefaultFiles: mở địa chỉ gốc "/" thì tự trả về wwwroot/index.html
+ * - UseStaticFiles : cho phép trình duyệt tải các file trong wwwroot (html, css, js, ảnh)
+ * Phải đặt UseDefaultFiles TRƯỚC UseStaticFiles.
+ * Frontend chạy chung địa chỉ với API nên không cần cấu hình CORS.
+ */
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+/*
  * Xác thực và cấp quyền cho các yêu cầu HTTP
  * (trước đây gọi UseAuthorization 2 lần và UseHttpsRedirection nằm sau xác thực)
  */
