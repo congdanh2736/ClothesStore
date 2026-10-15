@@ -44,6 +44,7 @@ namespace ClothesStore.Api.Data
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
+        public DbSet<Shipment> Shipments => Set<Shipment>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -406,7 +407,52 @@ namespace ClothesStore.Api.Data
                 e.HasIndex(x => x.OrderId).IsUnique();
             });
 
-            
+            // 1 order <-> 0..1 shipment
+            builder.Entity<Shipment>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Carrier).IsRequired().HasMaxLength(100);
+                e.Property(x => x.TrackingNumber).HasMaxLength(100);
+                e.Property(x => x.Status).IsRequired().HasMaxLength(30);
+
+                e.HasOne(x => x.Order)
+                    .WithOne(o => o.Shipment)
+                    .HasForeignKey<Shipment>(x => x.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasIndex(x => x.OrderId).IsUnique();
+            });
+
+            // ============ RETURN ============
+            builder.Entity<ReturnRequest>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Reason).IsRequired().HasMaxLength(500);
+                e.Property(x => x.Status).IsRequired().HasMaxLength(30);
+
+                e.HasOne(x => x.Order)
+                    .WithMany(o => o.ReturnRequests)
+                    .HasForeignKey(x => x.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<ReturnItem>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.RefundAmount).HasPrecision(18, 2);
+                e.Property(x => x.Condition).HasMaxLength(200);
+
+                e.HasOne(x => x.ReturnRequest)
+                    .WithMany(r => r.ReturnItems)
+                    .HasForeignKey(x => x.ReturnRequestId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Restrict để tránh nhiều đường cascade (Order -> OrderItem và Order -> ReturnRequest -> ReturnItem)
+                e.HasOne(x => x.OrderItem)
+                    .WithMany(oi => oi.ReturnItems)
+                    .HasForeignKey(x => x.OrderItemId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
 
     }
