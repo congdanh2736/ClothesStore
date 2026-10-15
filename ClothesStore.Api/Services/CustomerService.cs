@@ -4,6 +4,9 @@ using ClothesStore.Api.DTOs.Customer;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Interface.Services;
 using ClothesStore.Api.Models;
+using ClothesStore.Api.Data;                       // [THÊM] ApplicationDbContext (transaction khi xóa)
+using Microsoft.AspNetCore.Identity;               // [THÊM] UserManager (xóa tài khoản đăng nhập)
+using Microsoft.EntityFrameworkCore.Storage;       // [THÊM] IDbContextTransaction
 
 namespace ClothesStore.Api.Services
 {
@@ -12,13 +15,18 @@ namespace ClothesStore.Api.Services
         private readonly ICustomerRepository _repository;
         private readonly IMembershipTierRepository _tierRepository; // [THÊM] để gán hạng mặc định cho khách mới
         private readonly IMapper _mapper;
+        private readonly ApplicationDbContext _context;               // [THÊM]
+        private readonly UserManager<ApplicationUser> _userManager;   // [THÊM]
 
-        // [SỬA] thêm tham số IMembershipTierRepository
-        public CustomerService(ICustomerRepository repository, IMembershipTierRepository tierRepository, IMapper mapper)
+        // [SỬA] thêm tham số IMembershipTierRepository, ApplicationDbContext, UserManager
+        public CustomerService(ICustomerRepository repository, IMembershipTierRepository tierRepository, IMapper mapper,
+            ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _repository = repository;
             _tierRepository = tierRepository; // [THÊM]
             _mapper = mapper;
+            _context = context;               // [THÊM]
+            _userManager = userManager;       // [THÊM]
         }
 
         public async Task<IEnumerable<CustomerDto>> GetAllAsync()
@@ -88,7 +96,33 @@ namespace ClothesStore.Api.Services
             if (await _repository.HasOrdersAsync(id))
                 throw new BusinessException("Khách hàng đã có đơn hàng, không thể xóa.");
 
-            await _repository.DeleteAsync(customer);
+            /*
+             * [THÊM] Xóa luôn tài khoản đăng nhập của khách (giống EmployeeService.DeleteAsync).
+             * Trước đây chỉ xóa Customer nên tài khoản (role Customer) vẫn đăng nhập được
+             * nhưng không còn hồ sơ khách hàng -> gọi API giỏ hàng/đặt hàng bị lỗi.
+             * Địa chỉ, giỏ hàng, wishlist, lịch sử điểm, đánh giá tự xóa theo (Cascade trong DbContext).
+             */
+            await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var applicationUserId = customer.ApplicationUserId; // nhớ Id tài khoản trước khi xóa
+                await _repository.DeleteAsync(customer);
+
+                if (!string.IsNullOrEmpty(applicationUserId))
+                {
+                    var user = await _userManager.FindByIdAsync(applicationUserId);
+                    if (user is not null)
+                        await _userManager.DeleteAsync(user);
+                }
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+
             return true;
         }
     }
