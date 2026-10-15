@@ -19,7 +19,10 @@ namespace ClothesStore.Api.Mappings
                 .ForMember(dest => dest.AddressCount,
                     opt => opt.MapFrom(src => src.Addresses.Count))
                 .ForMember(dest => dest.WishlistCount,
-                    opt => opt.MapFrom(src => src.Wishlists.Count));
+                    opt => opt.MapFrom(src => src.Wishlists.Count))
+                // [THÊM] Email lấy từ tài khoản đăng nhập (FirstName, LastName tự map vì trùng tên)
+                .ForMember(dest => dest.Email,
+                    opt => opt.MapFrom(src => src.ApplicationUser != null ? src.ApplicationUser.Email : null));
 
             CreateMap<CreateCustomerDto, Customer>();
         }

@@ -13,6 +13,7 @@ namespace ClothesStore.Api.Repositories
 
         public async Task<IEnumerable<Employee>> GetAllAsync()
             => await _context.Employees
+                .Include(e => e.ApplicationUser) // [THÊM] lấy kèm tài khoản để có Email
                 .Include(e => e.Store)
                 .ToListAsync();
 
@@ -21,6 +22,7 @@ namespace ClothesStore.Api.Repositories
 
         public async Task<Employee?> GetByIdWithDetailsAsync(int id)
             => await _context.Employees
+                .Include(e => e.ApplicationUser) // [THÊM] lấy kèm tài khoản để có Email
                 .Include(e => e.Store)
                 .FirstOrDefaultAsync(e => e.Id == id);
 

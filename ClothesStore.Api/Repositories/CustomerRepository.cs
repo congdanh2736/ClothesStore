@@ -12,6 +12,7 @@
 
             public async Task<IEnumerable<Customer>> GetAllAsync()
                 => await _context.Customers
+                    .Include(c => c.ApplicationUser) // [THÊM] lấy kèm tài khoản để có Email
                     .Include(c => c.MembershipTier)
                     .Include(c => c.Addresses)
                     .Include(c => c.Wishlists)
@@ -24,6 +25,7 @@
 
             public async Task<Customer?> GetByIdWithDetailsAsync(int id)
                 => await _context.Customers
+                    .Include(c => c.ApplicationUser) // [THÊM] lấy kèm tài khoản để có Email
                     .Include(c => c.MembershipTier)
                     .Include(c => c.Addresses)
                     .Include(c => c.Wishlists)
