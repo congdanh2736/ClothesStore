@@ -3,11 +3,12 @@
  *  dashboard.js  -  XỬ LÝ CHO TRANG admin/dashboard.html (TỔNG QUAN)
  * ============================================================================
  *
- *  HIỆN TẠI: trang chỉ vẽ GIAO DIỆN từ DỮ LIỆU MẪU (biến SAMPLE ở PHẦN 1).
+ *  HIỆN TẠI: trang chỉ có GIAO DIỆN, CHƯA CÓ DỮ LIỆU. Mọi ô số liệu hiện 0,
+ *  biểu đồ và các bảng hiện thông báo "chưa có dữ liệu" (biến EMPTY_DATA ở PHẦN 1).
  *
  *  ĐỂ NỐI API THẬT SAU NÀY (việc của Nhóm 3), chỉ cần sửa hàm loadDashboardData()
- *  ở PHẦN 2: thay "return SAMPLE" bằng code gọi API rồi trả về object CÓ CÙNG
- *  HÌNH DẠNG với SAMPLE. Các hàm vẽ ở PHẦN 3 giữ nguyên, không phải sửa.
+ *  ở PHẦN 2: thay "return EMPTY_DATA" bằng code gọi API rồi trả về object CÓ CÙNG
+ *  HÌNH DẠNG với EMPTY_DATA. Các hàm vẽ ở PHẦN 3 giữ nguyên, không phải sửa.
  *
  *  Đường dẫn import: file này ở wwwroot/admin/js/ -> "../../" = wwwroot/
  * ============================================================================
@@ -31,12 +32,47 @@ import { toast } from "../../assets/js/components/toast.js";
 const $ = id => /** @type {HTMLElement} */ (document.getElementById(id));
 
 /* ===========================================================================
- *  PHẦN 1: DỮ LIỆU MẪU
- *  Hình dạng dữ liệu được đặt giống những gì API thật trả về, để sau này thay dễ.
+ *  PHẦN 1: "KHUÔN" DỮ LIỆU RỖNG
+ *  Chưa nối API nên mọi thứ đều trống (0 hoặc danh sách rỗng []).
+ *  Object này cũng là "khuôn mẫu": dữ liệu thật sau này phải có ĐÚNG các tên
+ *  thuộc tính như dưới đây thì các hàm vẽ mới hiểu được.
  * ========================================================================= */
 
+const EMPTY_DATA = {
+    // Ô số liệu: current = kỳ này, previous = kỳ trước (để tính tăng/giảm %)
+    revenue: { current: 0, previous: 0 },          // doanh thu (đồng)
+    orders: { current: 0, previous: 0 },           // số đơn hàng mới
+    pendingOrders: 0,                              // số đơn chờ xác nhận
+    newCustomers: { current: 0, previous: 0 },     // số khách hàng mới
+
+    // Doanh thu từng ngày, mỗi phần tử: { date, revenue, orders }
+    // (sau này lấy từ GET /api/StoreDailyStat, cộng các cửa hàng theo ngày)
+    revenueByDay: [],
+
+    // Số đơn theo trạng thái, ví dụ { Pending: 6, Completed: 61, ... }
+    // (sau này đếm từ GET /api/Order). Để trống = tất cả bằng 0.
+    ordersByStatus: {},
+
+    // Các đơn mới nhất, mỗi đơn: { id, orderDate, customerName, status, paymentStatus, totalAmount }
+    // (cùng tên thuộc tính với OrderDetailDTO của backend)
+    latestOrders: [],
+
+    // Việc cần xử lý
+    todos: {
+        pendingOrders: 0,       // đơn chờ xác nhận          (GET /api/Order, lọc Pending)
+        pendingReturns: 0,      // yêu cầu đổi/trả chờ duyệt (GET /api/ReturnRequest, lọc Pending)
+        failedShipments: 0,     // vận đơn giao thất bại     (GET /api/Shipment, lọc Failed)
+        lowStock: 0             // biến thể sắp hết hàng     (GET /api/StoreStock, số lượng thấp)
+    },
+
+    // Sản phẩm bán chạy, mỗi dòng: { productName, variant, sold, revenue }
+    // (sau này lấy từ GET /api/StoreItemStat)
+    topProducts: []
+};
+
 /**
- * Tạo ngày cách hôm nay "daysAgo" ngày (để biểu đồ luôn là 7 ngày gần nhất).
+ * Tạo ngày cách hôm nay "daysAgo" ngày.
+ * Dùng để vẽ sẵn trục 7 ngày gần nhất cho biểu đồ khi chưa có dữ liệu.
  * @param {number} daysAgo
  */
 function dayOffset(daysAgo) {
@@ -45,75 +81,24 @@ function dayOffset(daysAgo) {
     return d;
 }
 
-const SAMPLE = {
-    // Ô số liệu: giá trị kỳ này + kỳ trước (để tính tăng/giảm %)
-    revenue: { current: 48750000, previous: 41200000 },
-    orders: { current: 86, previous: 92 },
-    pendingOrders: 6,
-    newCustomers: { current: 23, previous: 17 },
-
-    // Doanh thu từng ngày (sau này lấy từ GET /api/StoreDailyStat, cộng các cửa hàng theo ngày)
-    revenueByDay: [
-        { date: dayOffset(6), revenue: 5200000, orders: 9 },
-        { date: dayOffset(5), revenue: 6850000, orders: 12 },
-        { date: dayOffset(4), revenue: 4300000, orders: 8 },
-        { date: dayOffset(3), revenue: 7900000, orders: 14 },
-        { date: dayOffset(2), revenue: 9450000, orders: 16 },
-        { date: dayOffset(1), revenue: 8100000, orders: 15 },
-        { date: dayOffset(0), revenue: 6950000, orders: 12 }
-    ],
-
-    // Số đơn theo trạng thái (sau này đếm từ GET /api/Order)
-    ordersByStatus: {
-        Pending: 6, Confirmed: 4, Shipping: 9, Completed: 61, Cancelled: 3, Returned: 1
-    },
-
-    // 5 đơn mới nhất (cùng tên thuộc tính với OrderDetailDTO của backend)
-    latestOrders: [
-        { id: 1086, orderDate: dayOffset(0), customerName: "Nguyễn Văn An",  status: "Pending",   paymentStatus: "Pending", totalAmount: 1250000 },
-        { id: 1085, orderDate: dayOffset(0), customerName: "Trần Thị Bình",  status: "Confirmed", paymentStatus: "Paid",    totalAmount: 890000 },
-        { id: 1084, orderDate: dayOffset(1), customerName: "Lê Hoàng Nam",   status: "Shipping",  paymentStatus: "Pending", totalAmount: 2140000 },
-        { id: 1083, orderDate: dayOffset(1), customerName: "Phạm Minh Châu", status: "Completed", paymentStatus: "Paid",    totalAmount: 560000 },
-        { id: 1082, orderDate: dayOffset(2), customerName: "Võ Thị Hoa",     status: "Cancelled", paymentStatus: "Cancelled", totalAmount: 1730000 }
-    ],
-
-    // Việc cần xử lý
-    todos: {
-        pendingOrders: 6,       // đơn chờ xác nhận          (GET /api/Order, lọc Pending)
-        pendingReturns: 2,      // yêu cầu đổi/trả chờ duyệt (GET /api/ReturnRequest, lọc Pending)
-        failedShipments: 1,     // vận đơn giao thất bại     (GET /api/Shipment, lọc Failed)
-        lowStock: 4             // biến thể sắp hết hàng     (GET /api/StoreStock, số lượng thấp)
-    },
-
-    // Top sản phẩm bán chạy (sau này lấy từ GET /api/StoreItemStat)
-    topProducts: [
-        { productName: "Áo thun basic cotton",  variant: "Trắng / M", sold: 128, revenue: 25600000 },
-        { productName: "Quần jean slim fit",    variant: "Xanh đậm / 30", sold: 74, revenue: 33300000 },
-        { productName: "Áo sơ mi oxford",       variant: "Xanh nhạt / L", sold: 61, revenue: 21350000 },
-        { productName: "Váy midi hoa nhí",      variant: "Be / S", sold: 45, revenue: 17550000 },
-        { productName: "Áo khoác bomber",       variant: "Đen / XL", sold: 32, revenue: 19200000 }
-    ]
-};
-
 /* ===========================================================================
  *  PHẦN 2: LẤY DỮ LIỆU   (CHỖ DUY NHẤT CẦN SỬA KHI NỐI API)
  * ========================================================================= */
 
 /**
  * Trả về dữ liệu cho cả trang.
- * Bây giờ: trả dữ liệu mẫu. Sau này: gọi API rồi tính ra object giống SAMPLE, ví dụ:
+ * Bây giờ: trả về dữ liệu rỗng. Sau này: gọi API rồi tính ra object giống EMPTY_DATA, ví dụ:
  *
  *     const orders = await get("/Order");
  *     const pending = orders.filter(o => o.status === "Pending").length;
  *     ...
  *     return { revenue: {...}, orders: {...}, pendingOrders: pending, ... };
  *
- * Nhớ xóa khối thông báo "DỮ LIỆU MẪU" (id="sampleNote") trong dashboard.html khi đó.
  *
  * @param {string} range - khoảng thời gian đang chọn: "today" | "7" | "30"
  */
 async function loadDashboardData(range) {
-    return SAMPLE;
+    return EMPTY_DATA;
 }
 
 /* ===========================================================================
@@ -140,7 +125,8 @@ function drawHeader() {
  * @param {number} previous - số kỳ trước
  */
 function trendHtml(current, previous) {
-    if (!previous) return "";
+    // Kỳ trước bằng 0 (chưa có dữ liệu) thì không chia được -> ghi chú thay vì phần trăm
+    if (!previous) return "Chưa có dữ liệu để so sánh";
     const percent = ((current - previous) / previous) * 100;
     const up = percent >= 0;
     const text = `${up ? "▲" : "▼"} ${Math.abs(percent).toLocaleString("vi-VN", { maximumFractionDigits: 1 })}%`;
@@ -202,6 +188,13 @@ function barPath(x, y, w, h) {
 function drawRevenueChart(days) {
     const box = $("revenueChart");
 
+    // Chưa có dữ liệu ngày nào -> tự tạo 7 ngày gần nhất với doanh thu 0, để vẫn vẽ được trục ngày
+    if (!days.length) {
+        days = [6, 5, 4, 3, 2, 1, 0].map(n => ({ date: dayOffset(n), revenue: 0, orders: 0 }));
+    }
+    const total = days.reduce((sum, d) => sum + d.revenue, 0);
+    const isEmpty = total === 0;     // tổng = 0 -> vẽ khung trống + dòng "Chưa có dữ liệu"
+
     // Kích thước khung vẽ = đúng độ rộng thật của thẻ chứa (để chữ luôn cỡ 12px, không bị
     // thu nhỏ trên điện thoại). Tối thiểu 300px. Màn hình hẹp thì biểu đồ thấp hơn một chút.
     const W = Math.max(300, Math.floor(box.clientWidth - 40));   // trừ khoảng đệm 2 bên của .chart-box
@@ -227,7 +220,10 @@ function drawRevenueChart(days) {
         const value = (max / gridCount) * i;
         const gy = y(value);
         grid += `<line class="chart-grid-line" x1="${pad.left}" x2="${W - pad.right}" y1="${gy}" y2="${gy}"/>`;
-        grid += `<text class="chart-axis-text" x="${pad.left - 8}" y="${gy + 4}" text-anchor="end">${shortMoney(value)}</text>`;
+        // Khi trống thì không ghi số ở trục dọc (số 0,25 - 0,5... không có ý nghĩa)
+        if (!isEmpty) {
+            grid += `<text class="chart-axis-text" x="${pad.left - 8}" y="${gy + 4}" text-anchor="end">${shortMoney(value)}</text>`;
+        }
     }
 
     // Các cột
@@ -244,14 +240,19 @@ function drawRevenueChart(days) {
         return `
             <g class="chart-col" data-index="${i}">
                 <rect class="chart-hit" x="${pad.left + slot * i}" y="${pad.top}" width="${slot}" height="${plotH}"/>
-                <path class="chart-bar ${i === lastIndex ? "is-today" : ""}" d="${barPath(bx, by, barW, bh)}"/>
-                ${i === maxIndex ? `<text class="chart-value" x="${cx}" y="${by - 8}" text-anchor="middle">${shortMoney(d.revenue)}</text>` : ""}
+                ${isEmpty ? "" : `<path class="chart-bar ${i === lastIndex ? "is-today" : ""}" d="${barPath(bx, by, barW, bh)}"/>`}
+                ${i === maxIndex && !isEmpty ? `<text class="chart-value" x="${cx}" y="${by - 8}" text-anchor="middle">${shortMoney(d.revenue)}</text>` : ""}
                 <text class="chart-axis-text" x="${cx}" y="${H - 8}" text-anchor="middle">${label}</text>
             </g>`;
     }).join("");
 
-    const total = days.reduce((sum, d) => sum + d.revenue, 0);
     $("chartTotal").textContent = `Tổng: ${formatMoney(total)}`;
+
+    // Dòng chữ giữa khung khi chưa có dữ liệu.
+    // Đặt ở 3/8 chiều cao (giữa 2 đường kẻ ngang) để không bị đường kẻ cắt ngang chữ.
+    const emptyText = isEmpty
+        ? `<text class="chart-axis-text" x="${pad.left + plotW / 2}" y="${pad.top + plotH * 0.375 + 5}" text-anchor="middle" style="font-size:14px">Chưa có dữ liệu doanh thu</text>`
+        : "";
 
     // role="img" + aria-label: mô tả biểu đồ cho phần mềm đọc màn hình.
     // Bảng ẩn (sr-only) bên dưới chứa số liệu đầy đủ cho ai không xem được hình.
@@ -259,6 +260,7 @@ function drawRevenueChart(days) {
         <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Biểu đồ cột doanh thu ${days.length} ngày qua, tổng ${formatMoney(total)}">
             ${grid}
             ${bars}
+            ${emptyText}
             <line class="chart-grid-line" x1="${pad.left}" x2="${W - pad.right}" y1="${pad.top + plotH}" y2="${pad.top + plotH}" style="stroke:#cfd4dc"/>
         </svg>
         <div class="chart-tooltip hidden" id="chartTooltip"></div>
@@ -271,6 +273,8 @@ function drawRevenueChart(days) {
     // ---- Rê chuột vào cột -> hiện hộp nhỏ ghi ngày, doanh thu, số đơn ----
     const tooltip = $("chartTooltip");
     const svg = /** @type {SVGSVGElement} */ (box.querySelector("svg"));
+
+    if (isEmpty) return;   // không có cột thì không cần hộp thông tin khi rê chuột
 
     box.querySelectorAll(".chart-col").forEach(col => {
         col.addEventListener("mouseenter", () => {

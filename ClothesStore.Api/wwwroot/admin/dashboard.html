@@ -5,8 +5,8 @@
   ============================================================================
    Ai vào được: Admin + Employee.
 
-   HIỆN TẠI: chỉ có GIAO DIỆN, số liệu là DỮ LIỆU MẪU (viết sẵn trong
-   admin/js/dashboard.js, phần "DỮ LIỆU MẪU"). Nhóm 3 nối API thật sau.
+   HIỆN TẠI: chỉ có GIAO DIỆN, CHƯA CÓ DỮ LIỆU (các ô hiện 0, bảng hiện
+   "chưa có dữ liệu"). Nhóm 3 nối API thật sau, xem admin/js/dashboard.js.
 
    Bố cục trang:
      1. Đầu trang: lời chào + ngày hôm nay + ô chọn khoảng thời gian
@@ -151,7 +151,6 @@
 
         /* ---------- Đầu trang: ngày + ô chọn thời gian ---------- */
         .range-select { width: auto; min-width: 150px; }
-        .sample-note { margin-bottom: var(--space-4); }
     </style>
 </head>
 <body>
@@ -162,10 +161,6 @@
             <header id="topbar" class="topbar"></header>
 
             <main class="admin-content">
-                <!-- Nhắc đây là dữ liệu mẫu. Xóa khối này khi đã nối API thật. -->
-                <!-- (viết chữ liền 1 dòng vì .alert giữ nguyên dấu xuống dòng trong HTML) -->
-                <div class="alert alert-info sample-note" id="sampleNote">Đang hiển thị DỮ LIỆU MẪU để xem giao diện. Số liệu thật sẽ có khi nối API (Nhóm 3).</div>
-
                 <!-- ===== 1. ĐẦU TRANG ===== -->
                 <div class="page-header">
                     <div>
