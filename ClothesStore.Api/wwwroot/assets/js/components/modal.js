@@ -56,13 +56,16 @@ import { escapeHtml, setLoading } from "../core/utils.js";
 /**
  * Mở một hộp thoại.
  *
- * @param {object} options
- * @param {string} options.title          - tiêu đề
+ * @param {object} [options]
+ * @param {string} [options.title]        - tiêu đề
  * @param {string|Node} [options.content] - nội dung: chuỗi HTML hoặc một phần tử đã tạo sẵn
- * @param {string|Node} [options.footer]  - phần chân (thường chứa các nút). Bỏ trống = không có chân.
+ * @param {string|Node|null} [options.footer] - phần chân (thường chứa các nút). Bỏ trống = không có chân.
  * @param {"sm"|"md"|"lg"} [options.size] - cỡ hộp thoại: nhỏ / vừa (mặc định) / lớn
  * @param {Function} [options.onClose]    - hàm chạy SAU KHI hộp thoại đóng
  * @param {boolean} [options.wrapInForm]  - bọc thân + chân trong thẻ <form> (formModal dùng)
+ *
+ * (Ghi chú: các dòng @param không chỉ để người đọc - VS Code cũng đọc chúng để biết
+ *  kiểu dữ liệu. Dấu [ ] quanh tên = không bắt buộc; "A|null" = kiểu A hoặc null.)
  *
  * @returns {{ element, body, footer, form, close }} - các phần của hộp thoại để dùng tiếp:
  *          element = hộp trắng, body = phần thân, close() = hàm đóng hộp thoại.
@@ -141,7 +144,11 @@ export function openModal({ title = "", content = "", footer = null, size = "md"
         if (event.key === "Escape" && !modal.dataset.busy) close();
     }
 
-    header.querySelector(".modal-close").addEventListener("click", () => {
+    // Lấy nút ✕. Chú thích @type để VS Code biết chắc đây là một nút <button>
+    // (vừa tạo ở trên nên chắc chắn có) -> không báo "possibly null".
+    const closeButton = /** @type {HTMLButtonElement} */ (header.querySelector(".modal-close"));
+
+    closeButton.addEventListener("click", () => {
         if (!modal.dataset.busy) close();
     });
 
@@ -152,19 +159,22 @@ export function openModal({ title = "", content = "", footer = null, size = "md"
     });
 
     // Bất kỳ nút nào có thuộc tính data-close (ví dụ nút "Hủy") cũng đóng hộp thoại
+    // (event.target là "thứ bị bấm"; ghi chú @type để VS Code biết đó là một thẻ HTML, có hàm closest)
     modal.addEventListener("click", event => {
-        if (event.target.closest("[data-close]") && !modal.dataset.busy) close();
+        const target = /** @type {HTMLElement} */ (event.target);
+        if (target.closest("[data-close]") && !modal.dataset.busy) close();
     });
 
     // ---- Hiện lên ----
-    const previouslyFocused = document.activeElement;
+    // Nhớ thẻ đang được chọn trước khi mở hộp thoại (có thể không có -> null)
+    const previouslyFocused = /** @type {HTMLElement|null} */ (document.activeElement);
     document.addEventListener("keydown", onKeyDown);
     document.body.classList.add("modal-open"); // khóa cuộn trang phía sau
     document.body.appendChild(backdrop);
 
     // Đặt con trỏ vào ô nhập đầu tiên (nếu có), không thì vào nút ✕
-    const firstInput = modal.querySelector("input:not([type=hidden]), select, textarea");
-    (firstInput ?? header.querySelector(".modal-close")).focus();
+    const firstInput = /** @type {HTMLElement|null} */ (modal.querySelector("input:not([type=hidden]), select, textarea"));
+    (firstInput ?? closeButton).focus();
 
     return { element: modal, body, footer: footerElement, form, close };
 }
@@ -188,9 +198,9 @@ function fillContent(target, content) {
  * Hàm trả về một "Promise" - hiểu đơn giản là "lời hứa sẽ có kết quả sau".
  * Dùng "await" để đợi kết quả: true = đồng ý, false = hủy / đóng.
  *
- * @param {object} options
+ * @param {object} [options]
  * @param {string} [options.title]
- * @param {string} options.message      - câu hỏi (chữ thường, không phải HTML)
+ * @param {string} [options.message]    - câu hỏi (chữ thường, không phải HTML)
  * @param {string} [options.confirmText] - chữ trên nút đồng ý
  * @param {string} [options.cancelText]  - chữ trên nút hủy
  * @param {boolean} [options.danger]     - true = nút đồng ý màu đỏ (dùng khi xóa)
@@ -261,13 +271,14 @@ export function confirmDialog({
 /**
  * Mở hộp thoại có form.
  *
- * @param {object} options
- * @param {string} options.title
- * @param {Array}  options.fields       - danh sách ô nhập (xem mô tả ở trên)
- * @param {object} [options.values]     - dữ liệu điền sẵn, ví dụ dữ liệu cũ khi Sửa
- * @param {Function} options.onSubmit   - hàm async nhận (data, modal). Chạy xong không lỗi -> tự đóng.
+ * @param {object} [options]
+ * @param {string} [options.title]
+ * @param {any[]}  [options.fields]     - danh sách ô nhập (xem mô tả ở trên)
+ * @param {any}    [options.values]     - dữ liệu điền sẵn, ví dụ dữ liệu cũ khi Sửa
+ * @param {(data: any, modal: any) => any} [options.onSubmit] - hàm async nhận (data, modal). Chạy xong không lỗi -> tự đóng.
  *                                        Muốn GIỮ hộp thoại mở thì cho hàm trả về false.
  * @param {string} [options.submitText] - chữ trên nút lưu
+ * @param {string} [options.cancelText] - chữ trên nút hủy
  * @param {number} [options.columns]    - 1 hoặc 2 cột
  * @param {"sm"|"md"|"lg"} [options.size]
  * @param {string} [options.description] - đoạn mô tả ngắn phía trên form

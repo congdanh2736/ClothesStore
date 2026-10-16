@@ -120,14 +120,17 @@ export function renderTableMessage(container, columns = [], message = "", { hasA
 /**
  * Vẽ bảng từ dữ liệu.
  *
- * @param {HTMLElement} container - thẻ div sẽ chứa bảng
- * @param {object} options
- * @param {Array} options.columns   - danh sách cột:
+ * @param {HTMLElement|null} container - thẻ div sẽ chứa bảng
+ * @param {object} [options]
+ * @param {any[]} [options.columns] - danh sách cột:
  *        { key, title, render?(row, index), align?: "right"|"center", width?, className? }
- * @param {Array} options.rows      - danh sách dữ liệu (mảng các object)
- * @param {Array} [options.actions] - danh sách nút ở cuối mỗi dòng:
+ * @param {any[]} [options.rows]    - danh sách dữ liệu (mảng các object)
+ * @param {any[]} [options.actions] - danh sách nút ở cuối mỗi dòng:
  *        { label, onClick(row), danger?, visible?(row), title?, className? }
  * @param {string} [options.emptyText] - chữ hiện khi không có dòng nào
+ *
+ * (Ghi chú: các dòng @param không chỉ để người đọc - VS Code cũng đọc chúng để biết
+ *  kiểu dữ liệu. Dấu [ ] quanh tên = không bắt buộc; "A|null" = kiểu A hoặc null.)
  */
 export function renderTable(container, { columns = [], rows = [], actions = [], emptyText = "Không có dữ liệu." } = {}) {
     if (!container) return;
@@ -188,7 +191,9 @@ export function renderTable(container, { columns = [], rows = [], actions = [], 
     // Thay vì gắn sự kiện cho TỪNG nút (100 dòng x 3 nút = 300 lần), ta gắn MỘT lần
     // cho cả bảng, rồi xem người dùng bấm trúng nút nào (gọi là "ủy quyền sự kiện").
     container.onclick = event => {
-        const button = event.target.closest("button[data-action]");
+        // event.target = thứ bị bấm. Ghi chú @type để VS Code biết đó là thẻ HTML (có hàm closest).
+        const target = /** @type {HTMLElement} */ (event.target);
+        const button = /** @type {HTMLButtonElement|null} */ (target.closest("button[data-action]"));
         if (!button || !container.contains(button)) return;
         const row = rows[Number(button.dataset.row)];
         const action = actions[Number(button.dataset.action)];
@@ -203,16 +208,19 @@ export function renderTable(container, { columns = [], rows = [], actions = [], 
 /**
  * Tạo bảng có tìm kiếm và phân trang.
  *
- * @param {object} options
- * @param {HTMLElement} options.container            - nơi vẽ bảng
- * @param {HTMLElement} [options.paginationContainer] - nơi vẽ thanh phân trang (bỏ trống = không phân trang)
- * @param {Array} options.columns
- * @param {Array} [options.actions]
- * @param {Array<string>} [options.searchFields] - các key dùng để tìm kiếm.
+ * @param {object} [options]
+ * @param {HTMLElement|null} [options.container]           - nơi vẽ bảng
+ * @param {HTMLElement|null} [options.paginationContainer] - nơi vẽ thanh phân trang (bỏ trống = không phân trang)
+ * @param {any[]} [options.columns]
+ * @param {any[]} [options.actions]
+ * @param {string[]|null} [options.searchFields] - các key dùng để tìm kiếm.
  *        Bỏ trống = tìm trên tất cả các cột có key.
  * @param {number} [options.pageSize]   - số dòng mỗi trang (mặc định PAGE_SIZE trong config.js)
  * @param {string} [options.emptyText]  - chữ khi danh sách trống
- * @param {Function} [options.sortBy]   - hàm sắp xếp, ví dụ (a, b) => b.id - a.id (mới nhất lên đầu)
+ * @param {((a: any, b: any) => number)|null} [options.sortBy] - hàm sắp xếp, ví dụ (a, b) => b.id - a.id (mới nhất lên đầu)
+ *
+ * (Ghi chú: các dòng @param không chỉ để người đọc - VS Code cũng đọc chúng để biết
+ *  kiểu dữ liệu. Dấu [ ] quanh tên = không bắt buộc; "A|null" = kiểu A hoặc null.)
  *
  * @returns một object điều khiển bảng: setRows, setLoading, setError, search, setFilter, refresh, getRows
  */
@@ -226,9 +234,20 @@ export function createDataTable({
     emptyText = "Không có dữ liệu.",
     sortBy = null
 } = {}) {
+    // Không tìm thấy chỗ để vẽ bảng (thường do gõ sai id trong HTML) -> báo lỗi rõ ràng
+    // ra Console (F12) ngay từ đầu, thay vì để lỗi khó hiểu xảy ra ở chỗ khác.
+    if (!container) {
+        throw new Error("createDataTable: không tìm thấy thẻ chứa bảng (container). Kiểm tra lại id trong HTML.");
+    }
+    // Sau dòng kiểm tra trên thì chắc chắn có thẻ -> cất vào hằng "box" để dùng bên dưới
+    // (VS Code nhờ vậy cũng biết box không thể là null).
+    const box = container;
+
     // "Trạng thái" bên trong bảng - các biến này được giữ lại giữa các lần vẽ
-    let allRows = [];          // toàn bộ dữ liệu
+    /** @type {any[]} */
+    let allRows = [];          // toàn bộ dữ liệu (ghi chú any[] = mảng chứa dữ liệu kiểu gì cũng được)
     let keyword = "";          // từ khóa đang tìm (đã bỏ dấu)
+    /** @type {((row: any) => boolean)|null} */
     let extraFilter = null;    // bộ lọc thêm (ví dụ lọc theo trạng thái)
     let page = 1;              // trang đang xem
 
@@ -262,26 +281,26 @@ export function createDataTable({
         if (paginationContainer) {
             const result = paginate(filtered, page, pageSize);
             page = result.page; // paginate có thể đã lùi trang (ví dụ vừa xóa dòng cuối)
-            renderTable(container, { columns, rows: result.items, actions, emptyText: message });
+            renderTable(box, { columns, rows: result.items, actions, emptyText: message });
             renderPagination(paginationContainer, {
                 ...result,
                 onChange: newPage => {
                     page = newPage;
                     draw();
                     // Cuộn lên đầu bảng cho người dùng thấy trang mới
-                    container.scrollIntoView({ behavior: "smooth", block: "start" });
+                    box.scrollIntoView({ behavior: "smooth", block: "start" });
                 }
             });
         } else {
-            renderTable(container, { columns, rows: filtered, actions, emptyText: message });
+            renderTable(box, { columns, rows: filtered, actions, emptyText: message });
         }
     }
 
     return {
         /**
          * Đổ dữ liệu mới vào bảng và vẽ lại.
-         * @param {Array} rows
-         * @param {object} [opts] - { keepPage: true } để ở nguyên trang hiện tại
+         * @param {any[]} rows
+         * @param {{ keepPage?: boolean }} [opts] - { keepPage: true } để ở nguyên trang hiện tại
          *        (dùng sau khi Sửa/Xóa, để không bị nhảy về trang 1)
          */
         setRows(rows, { keepPage = false } = {}) {
@@ -293,13 +312,13 @@ export function createDataTable({
 
         /** Hiện dòng "Đang tải..." (gọi trước khi gọi API). */
         setLoading(text = "Đang tải dữ liệu...") {
-            renderTableMessage(container, columns, `<span class="spinner"></span> ${escapeHtml(text)}`, { hasActions: actions.length > 0 });
+            renderTableMessage(box, columns, `<span class="spinner"></span> ${escapeHtml(text)}`, { hasActions: actions.length > 0 });
             if (paginationContainer) paginationContainer.innerHTML = "";
         },
 
         /** Hiện dòng báo lỗi màu đỏ (gọi khi API lỗi). */
         setError(message = "Không tải được dữ liệu.") {
-            renderTableMessage(container, columns, escapeHtml(message), { hasActions: actions.length > 0, isError: true });
+            renderTableMessage(box, columns, escapeHtml(message), { hasActions: actions.length > 0, isError: true });
             if (paginationContainer) paginationContainer.innerHTML = "";
         },
 

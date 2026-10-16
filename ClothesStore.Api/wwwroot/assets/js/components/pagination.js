@@ -70,6 +70,8 @@ function getPageNumbers(page, totalPages) {
         return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
+    // Mảng chứa cả số (1, 2, 3) lẫn chữ ("…") -> ghi chú cho VS Code biết điều đó
+    /** @type {Array<number|string>} */
     const pages = [1];
     const start = Math.max(2, page - 1);
     const end = Math.min(totalPages - 1, page + 1);
@@ -85,14 +87,17 @@ function getPageNumbers(page, totalPages) {
 /**
  * Vẽ thanh phân trang.
  *
- * @param {HTMLElement} container - thẻ div sẽ chứa thanh phân trang
- * @param {object} state
- * @param {number} state.page        - trang đang xem
- * @param {number} state.totalPages  - tổng số trang
+ * @param {HTMLElement|null} container - thẻ div sẽ chứa thanh phân trang
+ * @param {object} [state]
+ * @param {number} [state.page]       - trang đang xem
+ * @param {number} [state.totalPages] - tổng số trang
  * @param {number} [state.total]     - tổng số dòng (để hiện "Hiển thị 11–20 / 57")
  * @param {number} [state.from]      - dòng bắt đầu
  * @param {number} [state.to]        - dòng kết thúc
- * @param {Function} state.onChange  - hàm được gọi khi bấm sang trang khác, nhận số trang mới
+ * @param {(page: number) => void} [state.onChange] - hàm được gọi khi bấm sang trang khác, nhận số trang mới
+ *
+ * (Ghi chú: các dòng @param không chỉ để người đọc - VS Code cũng đọc chúng để biết
+ *  kiểu dữ liệu. Dấu [ ] quanh tên = không bắt buộc; "A|null" = kiểu A hoặc null.)
  *
  * Mẹo: có thể đưa thẳng kết quả của paginate() vào, chỉ cần thêm onChange:
  *     renderPagination(div, { ...paginate(list, page), onChange: p => { page = p; draw(); } });
@@ -134,7 +139,9 @@ export function renderPagination(container, { page = 1, totalPages = 1, total, f
     // Gắn sự kiện bấm. Dùng "onclick =" (gán đè) thay vì addEventListener để mỗi lần
     // vẽ lại không bị gắn thêm một lần nữa (gắn nhiều lần -> bấm 1 lần chạy nhiều lần).
     container.onclick = event => {
-        const button = event.target.closest("button[data-page]");
+        // event.target = thứ bị bấm. Ghi chú @type để VS Code biết đó là thẻ HTML (có hàm closest).
+        const target = /** @type {HTMLElement} */ (event.target);
+        const button = /** @type {HTMLButtonElement|null} */ (target.closest("button[data-page]"));
         if (!button || button.disabled) return;
         const newPage = Number(button.dataset.page);
         if (newPage !== page && typeof onChange === "function") onChange(newPage);

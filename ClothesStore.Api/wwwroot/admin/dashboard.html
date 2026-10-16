@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/dashboard.html  -  TRANG TỔNG QUAN (trang đầu tiên sau khi đăng nhập)
+  ============================================================================
+   Ai vào được: Admin + Employee.
+
+   HIỆN TẠI: chỉ có GIAO DIỆN, CHƯA CÓ DỮ LIỆU (các ô hiện 0, bảng hiện
+   "chưa có dữ liệu"). Nhóm 3 nối API thật sau, xem admin/js/dashboard.js.
+
+   Bố cục trang:
+     1. Đầu trang: lời chào + ngày hôm nay + ô chọn khoảng thời gian
+     2. 4 ô số liệu: doanh thu, đơn hàng mới, đơn chờ xác nhận, khách hàng mới
+     3. Biểu đồ doanh thu 7 ngày  |  Tình trạng đơn hàng
+     4. Đơn hàng mới nhất         |  Việc cần xử lý
+     5. Sản phẩm bán chạy
+
+   Các thẻ có id (ví dụ id="statRevenue") là "chỗ trống" để dashboard.js điền số vào.
+   CSS riêng của trang này nằm trong thẻ <style> ngay bên dưới.
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng quan | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+
+    <!--
+      CSS RIÊNG CỦA TRANG TỔNG QUAN.
+      Để ở đây (không bỏ vào admin.css) vì chỉ trang này dùng, tránh đụng file chung của cả nhóm.
+      Màu sắc, khoảng cách vẫn lấy từ biến trong base.css (var(--...)).
+    -->
+    <style>
+        /* ---------- Ô số liệu: thêm dòng so sánh nhỏ bên dưới số ---------- */
+        .stat-card { position: relative; }
+        .stat-trend {
+            margin-top: var(--space-1);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+        }
+        .stat-trend .up   { color: var(--color-success); font-weight: 600; }
+        .stat-trend .down { color: var(--color-danger);  font-weight: 600; }
+        /* Biểu tượng tròn nhỏ ở góc phải mỗi ô */
+        .stat-icon {
+            position: absolute;
+            top: var(--space-4);
+            right: var(--space-4);
+            display: grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius);
+            background: var(--color-primary-soft);
+            color: var(--color-primary);
+        }
+        .stat-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .stat-card.is-warning .stat-icon { background: var(--color-warning-soft); color: var(--color-warning); }
+
+        /* ---------- Lưới 2 cột lệch: cột trái rộng hơn (biểu đồ, bảng) ---------- */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-5);
+        }
+        @media (max-width: 1100px) {
+            /* minmax(0, 1fr) thay vì 1fr: cho phép cột co nhỏ hơn bảng bên trong,
+               bảng rộng quá thì tự cuộn ngang trong khung (không làm tràn cả trang) */
+            .dash-grid { grid-template-columns: minmax(0, 1fr); }
+        }
+
+        /* ---------- Biểu đồ doanh thu (SVG do dashboard.js vẽ) ---------- */
+        .chart-box {
+            position: relative;           /* để tooltip định vị theo khung này */
+            padding: var(--space-4) var(--space-5) var(--space-3);
+        }
+        .chart-box svg { display: block; width: 100%; height: auto; overflow: visible; }
+        .chart-grid-line { stroke: var(--color-border); stroke-width: 1; }
+        .chart-axis-text { fill: var(--color-text-muted); font-size: 12px; }
+        .chart-bar { fill: var(--color-primary); }
+        .chart-bar.is-today { fill: var(--color-primary-hover); }
+        .chart-hit { fill: transparent; cursor: pointer; }      /* vùng rê chuột rộng hơn cột */
+        .chart-hit:hover + .chart-bar,
+        .chart-col:hover .chart-bar { opacity: 0.85; }
+        .chart-value { fill: var(--color-text); font-size: 12px; font-weight: 600; }
+        .chart-tooltip {
+            position: absolute;
+            pointer-events: none;          /* tooltip không chặn chuột */
+            padding: var(--space-2) var(--space-3);
+            background: #1f2430;
+            color: #fff;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            white-space: nowrap;
+            transform: translate(-50%, calc(-100% - 8px));
+            box-shadow: var(--shadow);
+        }
+        .chart-tooltip strong { display: block; font-size: var(--font-size); }
+
+        /* ---------- Tình trạng đơn hàng: các thanh ngang ---------- */
+        .status-list { padding: var(--space-4) var(--space-5); }
+        .status-row + .status-row { margin-top: var(--space-4); }
+        .status-row-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-1);
+        }
+        .status-count { font-weight: 600; }
+        .status-track {
+            height: 8px;
+            border-radius: 999px;
+            background: var(--color-secondary-soft);
+            overflow: hidden;
+        }
+        .status-fill { height: 100%; border-radius: 999px; }
+        /* Màu thanh khớp màu nhãn trạng thái (badge) trong components.css */
+        .status-fill.fill-warning   { background: var(--color-warning); }
+        .status-fill.fill-info      { background: var(--color-info); }
+        .status-fill.fill-success   { background: var(--color-success); }
+        .status-fill.fill-danger    { background: var(--color-danger); }
+        .status-fill.fill-secondary { background: var(--color-secondary); }
+
+        /* ---------- Việc cần xử lý ---------- */
+        .todo-list { padding: var(--space-2) var(--space-3); }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            border-radius: var(--radius);
+            color: var(--color-text);
+        }
+        .todo-item:hover { background: var(--color-surface-hover); text-decoration: none; }
+        .todo-count {
+            display: grid;
+            place-items: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 var(--space-2);
+            border-radius: var(--radius);
+            font-weight: 700;
+        }
+        .todo-text { flex: 1; }
+        .todo-text small { display: block; color: var(--color-text-muted); }
+        .todo-arrow { color: var(--color-text-muted); }
+
+        /* ---------- Đầu trang: ngày + ô chọn thời gian ---------- */
+        .range-select { width: auto; min-width: 150px; }
+    </style>
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <!-- ===== 1. ĐẦU TRANG ===== -->
+                <div class="page-header">
+                    <div>
+                        <h1 id="greeting">Xin chào!</h1>
+                        <p class="page-subtitle" id="todayText">Tình hình kinh doanh của cửa hàng.</p>
+                    </div>
+                    <div class="page-actions">
+                        <select class="select range-select" id="rangeSelect" aria-label="Khoảng thời gian">
+                            <option value="today">Hôm nay</option>
+                            <option value="7" selected>7 ngày qua</option>
+                            <option value="30">30 ngày qua</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ===== 2. BỐN Ô SỐ LIỆU ===== -->
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <div class="stat-label">Doanh thu</div>
+                        <div class="stat-value" id="statRevenue">—</div>
+                        <div class="stat-trend" id="statRevenueTrend"></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        </div>
+                        <div class="stat-label">Đơn hàng mới</div>
+                        <div class="stat-value" id="statOrders">—</div>
+                        <div class="stat-trend" id="statOrdersTrend"></div>
+                    </div>
+                    <div class="stat-card is-warning">
+                        <div class="stat-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        </div>
+                        <div class="stat-label">Đơn chờ xác nhận</div>
+                        <div class="stat-value" id="statPending">—</div>
+                        <div class="stat-trend"><a href="sales/orders.html?status=Pending">Xử lý ngay →</a></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>
+                        </div>
+                        <div class="stat-label">Khách hàng mới</div>
+                        <div class="stat-value" id="statCustomers">—</div>
+                        <div class="stat-trend" id="statCustomersTrend"></div>
+                    </div>
+                </div>
+
+                <!-- ===== 3. BIỂU ĐỒ DOANH THU | TÌNH TRẠNG ĐƠN ===== -->
+                <div class="dash-grid">
+                    <section class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">Doanh thu 7 ngày qua</h2>
+                                <div class="text-muted text-sm" id="chartTotal"></div>
+                            </div>
+                        </div>
+                        <!-- dashboard.js vẽ biểu đồ SVG vào đây -->
+                        <div class="chart-box" id="revenueChart"></div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Tình trạng đơn hàng</h2>
+                            <a class="text-sm" href="sales/orders.html">Xem tất cả</a>
+                        </div>
+                        <div class="status-list" id="statusList"></div>
+                    </section>
+                </div>
+
+                <!-- ===== 4. ĐƠN MỚI NHẤT | VIỆC CẦN XỬ LÝ ===== -->
+                <div class="dash-grid">
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Đơn hàng mới nhất</h2>
+                            <a class="text-sm" href="sales/orders.html">Xem tất cả</a>
+                        </div>
+                        <div id="latestOrders"></div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Việc cần xử lý</h2>
+                        </div>
+                        <div class="todo-list" id="todoList"></div>
+                    </section>
+                </div>
+
+                <!-- ===== 5. SẢN PHẨM BÁN CHẠY ===== -->
+                <section class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Sản phẩm bán chạy</h2>
+                        <a class="text-sm" href="stores/statistics.html">Xem thống kê</a>
+                    </div>
+                    <div id="topProducts"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- dashboard.js nằm ở admin/js/ -> từ trang này (admin/) là "./js/dashboard.js" -->
+    <script type="module" src="./js/dashboard.js"></script>
+</body>
+</html>
