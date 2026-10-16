@@ -312,12 +312,13 @@ export function setLoading(button, isLoading, loadingText = "Đang xử lý...")
 
 /**
  * Ghép họ và tên. Backend tách firstName / lastName riêng.
- *   fullName({ lastName: "Nguyễn", firstName: "An" }) -> "Nguyễn An"
- * (Người Việt đọc họ trước tên sau. Nếu nhóm thống nhất kiểu khác thì sửa ở đây.)
+ * [SỬA] Theo quy ước backend của nhóm: firstName = HỌ (và tên đệm), lastName = TÊN
+ *       (giống backend ghép FullName = FirstName + " " + LastName).
+ *   fullName({ firstName: "Nguyễn Văn", lastName: "An" }) -> "Nguyễn Văn An"
  */
 export function fullName(person) {
     if (!person) return "";
-    return [person.lastName, person.firstName].filter(Boolean).join(" ");
+    return [person.firstName, person.lastName].filter(Boolean).join(" ");
 }
 
 /**
