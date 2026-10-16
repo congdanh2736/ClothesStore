@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/customers/customers.html  -  DANH SÁCH KHÁCH HÀNG   (Nhóm 1)
+  ============================================================================
+   Ai vào được: Admin + Employee.
+     - Cả hai: xem, tìm kiếm, lọc theo hạng, sửa, xem chi tiết.
+     - Chỉ Admin: thêm khách hàng, xóa khách hàng (backend cũng chặn y như vậy).
+
+   Toàn bộ phần xử lý nằm trong file  admin/js/customers/customers.js
+   File HTML này chỉ có khung trang.
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khách hàng | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Khách hàng</h1>
+                        <p class="page-subtitle">Quản lý hồ sơ, hạng thành viên và điểm tích lũy của khách hàng.</p>
+                    </div>
+                    <div class="page-actions">
+                        <!-- class "hidden": ẩn sẵn, customers.js sẽ hiện ra nếu người dùng là Admin -->
+                        <button type="button" class="btn btn-primary hidden" id="btnAdd">+ Thêm khách hàng</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput"
+                               placeholder="Tìm theo tên, email...">
+                        <!-- Lọc theo hạng: customers.js tự đổ danh sách hạng vào -->
+                        <select class="select" id="tierFilter" aria-label="Lọc theo hạng thành viên">
+                            <option value="">Tất cả hạng</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Đường dẫn tương đối: trang ở admin/customers/ nên "../js/..." = admin/js/... -->
+    <script type="module" src="../js/customers/customers.js"></script>
+</body>
+</html>
