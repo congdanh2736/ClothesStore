@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/customers/membership-tiers.html  -  HẠNG THÀNH VIÊN   (Nhóm 1)
+  ============================================================================
+   Ai vào được: CHỈ Admin (Employee vào sẽ bị đưa về dashboard).
+   Chức năng: xem / thêm / sửa / xóa hạng (Đồng, Bạc, Vàng, VIP...).
+
+   Toàn bộ phần xử lý nằm trong  admin/js/customers/membership-tiers.js
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hạng thành viên | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Hạng thành viên</h1>
+                        <p class="page-subtitle">
+                            Khách có tổng điểm từ "điểm tối thiểu" trở lên sẽ được xếp vào hạng đó.
+                            Hệ thống tự xếp lại hạng mỗi khi điểm của khách thay đổi.
+                        </p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Thêm hạng</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="toolbar">
+                        <span class="text-muted text-sm">Mẹo: luôn giữ một hạng có điểm tối thiểu = 0 để khách mới có hạng.</span>
+                        <button type="button" class="btn btn-secondary" id="btnReload" style="margin-left:auto">Tải lại</button>
+                    </div>
+                    <div id="tableContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/customers/membership-tiers.js"></script>
+</body>
+</html>

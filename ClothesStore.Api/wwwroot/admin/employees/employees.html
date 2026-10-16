@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/employees/employees.html  -  QUẢN LÝ NHÂN VIÊN   (Nhóm 1)
+  ============================================================================
+   Ai vào được: CHỈ Admin.
+   Chức năng:
+     - Xem danh sách, tìm kiếm, lọc theo cửa hàng
+     - Thêm nhân viên (tạo luôn tài khoản đăng nhập vai trò Employee)
+     - Sửa họ tên, cửa hàng làm việc
+     - Xóa nhân viên (xóa luôn tài khoản đăng nhập)
+
+   Toàn bộ phần xử lý nằm trong  admin/js/employees/employees.js
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhân viên | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Nhân viên</h1>
+                        <p class="page-subtitle">Tài khoản nhân viên đăng nhập được vào trang quản trị (trừ các mục chỉ dành cho Quản lý).</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Thêm nhân viên</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput"
+                               placeholder="Tìm theo tên, email...">
+                        <!-- Lọc theo cửa hàng: employees.js tự đổ danh sách cửa hàng vào -->
+                        <select class="select" id="storeFilter" aria-label="Lọc theo cửa hàng">
+                            <option value="">Tất cả cửa hàng</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/employees/employees.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/customers/customer-detail.html  -  CHI TIẾT MỘT KHÁCH HÀNG   (Nhóm 1)
+  ============================================================================
+   Mở bằng địa chỉ có id khách:  customer-detail.html?id=5
+   (bấm "Xem" hoặc bấm tên khách ở trang danh sách là tự mở đúng địa chỉ này)
+
+   Trang gồm:
+     - Thông tin khách + 4 ô số liệu (hạng, điểm, số địa chỉ, số đơn hàng)
+     - Địa chỉ giao hàng: thêm / sửa / xóa
+     - Lịch sử điểm tích lũy: cộng / trừ điểm thủ công, sửa, xóa
+     - Đơn hàng của khách: chỉ xem (quản lý đơn là trang của Nhóm 4)
+
+   Toàn bộ phần xử lý nằm trong  admin/js/customers/customer-detail.js
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết khách hàng | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <!-- Báo lỗi khi thiếu id / không tìm thấy khách (trống thì tự ẩn) -->
+                <div class="alert alert-danger mb-4" id="pageError" role="alert"></div>
+
+                <!-- Toàn bộ nội dung, ẩn cho đến khi tải xong thông tin khách -->
+                <div id="pageContent" class="hidden">
+                    <div class="page-header">
+                        <div>
+                            <div class="breadcrumb"><a href="customers.html">Khách hàng</a> / Chi tiết</div>
+                            <h1 id="customerName">Khách hàng</h1>
+                            <p class="page-subtitle" id="customerEmail"></p>
+                        </div>
+                        <div class="page-actions">
+                            <a class="btn btn-secondary" href="customers.html">← Danh sách</a>
+                            <button type="button" class="btn btn-primary" id="btnEditCustomer">Sửa thông tin</button>
+                        </div>
+                    </div>
+
+                    <!-- 4 ô số liệu: customer-detail.js điền giá trị vào các thẻ có id -->
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Hạng thành viên</div>
+                            <div class="stat-value" id="statTier">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Tổng điểm tích lũy</div>
+                            <div class="stat-value" id="statPoints">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Địa chỉ đã lưu</div>
+                            <div class="stat-value" id="statAddresses">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Đơn hàng</div>
+                            <div class="stat-value" id="statOrders">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <!-- ===== ĐỊA CHỈ ===== -->
+                        <section class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Địa chỉ giao hàng</h2>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btnAddAddress">+ Thêm địa chỉ</button>
+                            </div>
+                            <div id="addressTable"></div>
+                        </section>
+
+                        <!-- ===== ĐIỂM TÍCH LŨY ===== -->
+                        <section class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Lịch sử điểm tích lũy</h2>
+                                    <div class="text-muted text-sm">Mua hàng tự cộng điểm (10.000đ = 1 điểm). Có thể cộng / trừ thủ công khi cần.</div>
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btnAddPoints">+ Cộng / trừ điểm</button>
+                            </div>
+                            <div id="loyaltyTable"></div>
+                            <div id="loyaltyPagination"></div>
+                        </section>
+
+                        <!-- ===== ĐƠN HÀNG (chỉ xem) ===== -->
+                        <section class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Đơn hàng của khách</h2>
+                            </div>
+                            <div id="orderTable"></div>
+                            <div id="orderPagination"></div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/customers/customer-detail.js"></script>
+</body>
+</html>
