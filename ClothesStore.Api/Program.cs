@@ -22,6 +22,15 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+/*
+ * [THÊM] Không in từng câu lệnh SQL của EF Core ra cửa sổ console.
+ * Lý do: lúc thêm dữ liệu mẫu (~55.000 dòng) EF in ra hàng nghìn câu INSERT rất dài,
+ * làm chương trình và Package Manager Console (Update-Database) chạy rất chậm.
+ * Câu lệnh SQL bị LỖI vẫn được in ra bình thường.
+ * Muốn xem lại câu SQL khi gỡ lỗi: thêm // vào đầu dòng bên dưới.
+ */
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -31,7 +40,17 @@ builder.Services.AddOpenApi();
 //--------------------------------------------------------------[ĐĂNG KÍ DỊCH VỤ APPLICATION]---------------------------------------------------------//
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"))
+        /*
+         * [THÊM] Dữ liệu mẫu: mỗi lần chạy Update-Database (hoặc dotnet ef database update),
+         * EF Core tự gọi SampleDataSeeder để thêm dữ liệu mẫu (database đã có rồi thì bỏ qua).
+         * - UseSeeding     : bản thường, dùng cho Update-Database
+         * - UseAsyncSeeding: bản async, dùng khi code gọi Database.MigrateAsync()
+         * Xem chi tiết trong Common/SampleDataSeeder.cs
+         */
+        .UseSeeding((context, _) => SampleDataSeeder.Seed((ApplicationDbContext)context))
+        .UseAsyncSeeding((context, _, cancellationToken) =>
+            SampleDataSeeder.SeedAsync((ApplicationDbContext)context, cancellationToken)));
 //----------------------------------------------------------------------------------------------------------------------------------------------------//
 
 
@@ -199,6 +218,10 @@ builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService
 // Return_Request + Return_Item (bảng 17, 18)
 builder.Services.AddScoped<IReturnRequestRepository, ReturnRequestRepository>();
 builder.Services.AddScoped<IReturnRequestService, ReturnRequestService>();
+// [SỬA LỖI] Shipment (vận chuyển) đã có Controller + Service + Repository nhưng chưa đăng ký ở đây
+//           -> gọi bất kỳ API /api/Shipment nào cũng bị lỗi 500 "Unable to resolve service"
+builder.Services.AddScoped<IShipmentRepository, ShipmentRepository>();
+builder.Services.AddScoped<IShipmentService, ShipmentService>();
 // Nghiệp vụ dùng chung: tồn kho & thống kê cửa hàng tự động
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IStoreStatisticsService, StoreStatisticsService>();
@@ -222,6 +245,13 @@ using (var scope = app.Services.CreateScope())
     await RoleSeeder.SeedRolesAsync(scope.ServiceProvider);
     await AdminSeeder.SeedAdminAsync(scope.ServiceProvider);
     await MembershipTierSeeder.SeedTiersAsync(scope.ServiceProvider); // Đồng / Bạc / Vàng / VIP
+
+    // [THÊM] Dữ liệu mẫu (danh mục, sản phẩm, khách hàng, đơn hàng...) nếu database chưa có.
+    // Bình thường dữ liệu đã được thêm lúc chạy Update-Database; dòng này để phòng khi quên.
+    // Đã có dữ liệu mẫu rồi thì hàm chỉ kiểm tra rồi bỏ qua, không làm chậm lúc khởi động.
+    SampleDataSeeder.Seed(
+        scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(),
+        message => app.Logger.LogInformation("{Message}", message));
 }
 
 // Configure the HTTP request pipeline.
