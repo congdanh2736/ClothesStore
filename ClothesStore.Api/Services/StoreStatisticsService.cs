@@ -46,6 +46,10 @@ namespace ClothesStore.Api.Services
             daily.CompletedOrders += 1;
             daily.TotalRevenue += order.TotalAmount;
             daily.TotalItemsSold += order.OrderItems.Sum(i => i.Quantity);
+            // [SỬA] Đơn đặt từ hôm trước nhưng hôm nay mới hoàn tất -> ngày hôm nay có thể có Completed > Total.
+            //       Nâng TotalOrders lên để luôn đúng ràng buộc Completed + Canceled <= Total (giống lúc hủy đơn bên dưới).
+            if (daily.CompletedOrders + daily.CanceledOrders > daily.TotalOrders)
+                daily.TotalOrders = daily.CompletedOrders + daily.CanceledOrders;
             await _dailyRepository.UpdateAsync(daily);
 
             foreach (var group in order.OrderItems.GroupBy(i => i.VariantId))
