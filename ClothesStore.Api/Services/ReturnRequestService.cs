@@ -27,6 +27,7 @@ namespace ClothesStore.Api.Services
 
         private readonly IReturnRequestRepository _repository;
         private readonly IOrderRepository _orderRepository;
+        private readonly ICustomerRepository _customerRepository;
         private readonly IInventoryService _inventory;
         private readonly IStoreStatisticsService _statistics;
         private readonly ILoyaltyTransactionService _loyalty;
@@ -36,6 +37,7 @@ namespace ClothesStore.Api.Services
         public ReturnRequestService(
             IReturnRequestRepository repository,
             IOrderRepository orderRepository,
+            ICustomerRepository customerRepository,
             IInventoryService inventory,
             IStoreStatisticsService statistics,
             ILoyaltyTransactionService loyalty,
@@ -44,6 +46,7 @@ namespace ClothesStore.Api.Services
         {
             _repository = repository;
             _orderRepository = orderRepository;
+            _customerRepository = customerRepository;
             _inventory = inventory;
             _statistics = statistics;
             _loyalty = loyalty;
@@ -54,22 +57,58 @@ namespace ClothesStore.Api.Services
         public async Task<IEnumerable<ReturnRequestDto>> GetAllAsync()
             => _mapper.Map<IEnumerable<ReturnRequestDto>>(await _repository.GetAllAsync());
 
-        public async Task<ReturnRequestDto?> GetByIdAsync(int id)
+        public async Task<ReturnRequestDto?> GetByIdAsync(int id, string userId = "", bool isStaff = true)
         {
             var request = await _repository.GetByIdWithDetailsAsync(id);
-            return request is null ? null : _mapper.Map<ReturnRequestDto>(request);
+            if (request is null) return null;
+
+            if (!isStaff)
+            {
+                var customer = await GetCustomerByUserIdOrThrowAsync(userId);
+                if (request.Order == null || request.Order.CustomerId != customer.Id)
+                    throw new ForbiddenException("Bạn không có quyền xem yêu cầu trả hàng này.");
+            }
+
+            return _mapper.Map<ReturnRequestDto>(request);
         }
 
-        public async Task<IEnumerable<ReturnRequestDto>> GetByOrderIdAsync(int orderId)
-            => _mapper.Map<IEnumerable<ReturnRequestDto>>(await _repository.GetByOrderIdAsync(orderId));
-
-        public async Task<IEnumerable<ReturnRequestDto>> GetByCustomerIdAsync(int customerId)
-            => _mapper.Map<IEnumerable<ReturnRequestDto>>(await _repository.GetByCustomerIdAsync(customerId));
-
-        public async Task<ReturnRequestDto> CreateAsync(CreateReturnRequestDto dto)
+        public async Task<IEnumerable<ReturnRequestDto>> GetByOrderIdAsync(int orderId, string userId = "", bool isStaff = true)
         {
+            if (isStaff)
+                return _mapper.Map<IEnumerable<ReturnRequestDto>>(await _repository.GetByOrderIdAsync(orderId));
+
+            var customer = await GetCustomerByUserIdOrThrowAsync(userId);
+            var order = await _orderRepository.GetByIdAsync(orderId)
+                ?? throw new NotFoundException("Không tìm thấy đơn hàng.");
+
+            if (order.CustomerId != customer.Id)
+                throw new ForbiddenException("Bạn không có quyền xem yêu cầu trả hàng của đơn hàng này.");
+
+            return _mapper.Map<IEnumerable<ReturnRequestDto>>(
+                await _repository.GetByOrderIdAndCustomerIdAsync(orderId, customer.Id));
+        }
+
+        public async Task<IEnumerable<ReturnRequestDto>> GetByCustomerIdAsync(int customerId, string userId = "", bool isStaff = true)
+        {
+            if (isStaff)
+                return _mapper.Map<IEnumerable<ReturnRequestDto>>(await _repository.GetByCustomerIdAsync(customerId));
+
+            var customer = await GetCustomerByUserIdOrThrowAsync(userId);
+            if (customerId != customer.Id)
+                throw new ForbiddenException("Bạn không có quyền xem yêu cầu trả hàng của khách hàng khác.");
+
+            return _mapper.Map<IEnumerable<ReturnRequestDto>>(await _repository.GetByCustomerIdAsync(customer.Id));
+        }
+
+        public async Task<ReturnRequestDto> CreateAsync(CreateReturnRequestDto dto, string userId)
+        {
+            var customer = await GetCustomerByUserIdOrThrowAsync(userId);
+
             var order = await _orderRepository.GetByIdWithDetailsAsync(dto.OrderId)
                 ?? throw new NotFoundException("Không tìm thấy đơn hàng.");
+
+            if (order.CustomerId != customer.Id)
+                throw new ForbiddenException("Bạn không có quyền yêu cầu trả hàng cho đơn hàng này.");
 
             if (order.Status != OrderStatus.Completed)
                 throw new BusinessException("Chỉ được yêu cầu đổi/trả với đơn hàng đã giao thành công (Completed).");
@@ -112,7 +151,7 @@ namespace ClothesStore.Api.Services
             }
 
             await _repository.AddAsync(returnRequest);
-            return (await GetByIdAsync(returnRequest.Id))!;
+            return (await GetByIdAsync(returnRequest.Id, userId, isStaff: true))!;
         }
 
         public async Task<ReturnRequestDto> ApproveAsync(int id)
@@ -185,19 +224,35 @@ namespace ClothesStore.Api.Services
                 await _context.SaveChangesAsync();
             });
 
-            return (await GetByIdAsync(id))!;
+            return (await GetByIdAsync(id, "", isStaff: true))!;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, string userId = "", bool isStaff = true)
         {
-            var request = await _repository.GetByIdAsync(id);
+            var request = await _repository.GetByIdWithDetailsAsync(id);
             if (request is null) return false;
+
+            if (!isStaff)
+            {
+                var customer = await GetCustomerByUserIdOrThrowAsync(userId);
+                if (request.Order == null || request.Order.CustomerId != customer.Id)
+                    throw new ForbiddenException("Bạn không có quyền xóa yêu cầu trả hàng này.");
+            }
 
             if (request.Status != ReturnStatus.Pending && request.Status != ReturnStatus.Rejected)
                 throw new BusinessException("Chỉ được xóa yêu cầu đang chờ xử lý hoặc đã bị từ chối.");
 
             await _repository.DeleteAsync(request);
             return true;
+        }
+
+        private async Task<Customer> GetCustomerByUserIdOrThrowAsync(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ForbiddenException("Không tìm thấy thông tin xác thực tài khoản.");
+
+            return await _customerRepository.GetByApplicationUserIdAsync(userId)
+                ?? throw new ForbiddenException("Tài khoản chưa được liên kết với hồ sơ khách hàng.");
         }
 
         private async Task<ReturnRequest> GetOrThrowAsync(int id)

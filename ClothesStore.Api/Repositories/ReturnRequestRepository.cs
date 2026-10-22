@@ -1,3 +1,4 @@
+using ClothesStore.Api.Common;
 using ClothesStore.Api.Data;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Models;
@@ -33,11 +34,21 @@ namespace ClothesStore.Api.Repositories
                 .OrderByDescending(r => r.RequestDate)
                 .ToListAsync();
 
+        public async Task<IEnumerable<ReturnRequest>> GetByOrderIdAndCustomerIdAsync(int orderId, int customerId)
+            => await WithDetails()
+                .Where(r => r.OrderId == orderId && r.Order != null && r.Order.CustomerId == customerId)
+                .OrderByDescending(r => r.RequestDate)
+                .ToListAsync();
+
+        public async Task<ReturnRequest?> GetByIdAndCustomerIdAsync(int id, int customerId)
+            => await WithDetails()
+                .FirstOrDefaultAsync(r => r.Id == id && r.Order != null && r.Order.CustomerId == customerId);
+
         public async Task<Dictionary<int, int>> GetReturnedQuantitiesAsync(int orderId, int? excludeReturnRequestId = null)
             => await _context.ReturnItems
                 .Where(ri => ri.ReturnRequest != null
                     && ri.ReturnRequest.OrderId == orderId
-                    && ri.ReturnRequest.Status != "Rejected"
+                    && ri.ReturnRequest.Status != ReturnStatus.Rejected
                     && (excludeReturnRequestId == null || ri.ReturnRequestId != excludeReturnRequestId))
                 .GroupBy(ri => ri.OrderItemId)
                 .Select(g => new { OrderItemId = g.Key, Quantity = g.Sum(x => x.Quantity) })
