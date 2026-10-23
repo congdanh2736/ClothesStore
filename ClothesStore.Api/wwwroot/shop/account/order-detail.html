@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chi tiết đơn hàng | AURA Techwear</title>
+    <meta name="description" content="Chi tiết đơn hàng">
+    <!-- Đặt giao diện sáng/tối TRƯỚC khi vẽ trang để không bị nháy màu -->
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("aura-theme")||"dark"}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="../css/shop.css">
+</head>
+<body>
+    <header id="siteHeader"></header>
+    <main class="page">
+        <div class="container">
+            <nav class="crumbs" aria-label="Đường dẫn"><a href="/shop/index.html">Trang chủ</a><span class="sep">/</span><a href="/shop/account/index.html">Tài khoản</a><span class="sep">/</span><span class="current" id="crumbCurrent">Chi tiết đơn</span></nav>
+            <div class="layout-sidebar">
+                <aside id="accountNav" class="panel account-nav"><div class="skeleton" style="height:320px"></div></aside>
+                <div id="accountMain" class="stack" style="gap:18px;min-width:0">
+                    <div class="stack" id="detailRoot"><div class="skeleton" style="height:420px"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer id="siteFooter"></footer>
+    <div class="toasts" id="toasts"></div>
+    <script type="module" src="../js/account/orderDetail.js"></script>
+</body>
+</html>

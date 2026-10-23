@@ -49,9 +49,6 @@
 		<Folder Include="wwwroot\admin\sales\" />
 		<Folder Include="wwwroot\assets\js\core\" />
 		<Folder Include="wwwroot\assets\images\" />
-		<Folder Include="wwwroot\shop\account\" />
-		<Folder Include="wwwroot\shop\js\account\" />
-		<Folder Include="wwwroot\shop\partials\" />
 	</ItemGroup>
 
 </Project>

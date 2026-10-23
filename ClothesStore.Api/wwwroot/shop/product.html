@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chi tiết sản phẩm | AURA Techwear</title>
+    <meta name="description" content="Chi tiết sản phẩm AURA Techwear">
+    <!-- Đặt giao diện sáng/tối TRƯỚC khi vẽ trang để không bị nháy màu -->
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("aura-theme")||"dark"}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="./css/shop.css">
+</head>
+<body>
+    <header id="siteHeader"></header>
+    <main class="page">
+        <div class="container">
+            <nav class="crumbs" aria-label="Đường dẫn"><a href="/shop/index.html">Trang chủ</a><span class="sep">/</span><a href="/shop/products.html">Sản phẩm</a><span class="sep">/</span><a id="crumbCat" href="/shop/products.html">Danh mục</a><span class="sep">/</span><span class="current" id="crumbCurrent">...</span></nav>
+            <div id="productRoot"><div class="grid-2"><div class="skeleton" style="height:560px"></div><div class="skeleton" style="height:560px"></div></div></div>
+            <section class="section" id="reviewSection"></section>
+            <section class="section hidden" id="relatedSection">
+                <div class="section-head"><div><div class="eyebrow">Cùng danh mục</div><h2>Có thể bạn cũng thích</h2></div></div>
+                <div class="product-grid" id="related"></div>
+            </section>
+        </div>
+    </main>
+    <footer id="siteFooter"></footer>
+    <div class="toasts" id="toasts"></div>
+    <script type="module" src="./js/pages/product.js"></script>
+</body>
+</html>
