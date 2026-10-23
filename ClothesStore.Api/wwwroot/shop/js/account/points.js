@@ -4,14 +4,14 @@
  * Backend chỉ TÍCH điểm (10.000đ = 1 điểm khi đơn hoàn tất) và TRỪ khi trả hàng - chưa có đổi điểm lấy quà.
  */
 import { initAccount, memberCardHtml, tierLadderHtml } from "./accountShell.js";
-import { ICONS, $ } from "../shell.js";
+import { ICONS, $, ts } from "../shell.js";
 import { shopApi } from "../shopApi.js";
 import { escapeHtml, formatNumber, formatDateTime } from "../../../assets/js/core/utils.js";
 
 const me = await initAccount("points");
 if (me) {
     const [tiers, txns] = await Promise.all([shopApi.getTiers(), shopApi.me.getLoyalty()]);
-    const list = [...txns].sort((a, b) => +new Date(b.txnDate) - +new Date(a.txnDate));
+    const list = [...txns].sort((a, b) => ts(b.txnDate) - ts(a.txnDate));
     const earned = list.filter(t => t.pointsChange > 0).reduce((s, t) => s + t.pointsChange, 0);
     const lost = list.filter(t => t.pointsChange < 0).reduce((s, t) => s - t.pointsChange, 0);
     /** Thêm liên kết tới đơn hàng trong lý do "... đơn hàng #83" */

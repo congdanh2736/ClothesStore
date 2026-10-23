@@ -16,6 +16,8 @@
  *
  *  Dữ liệu trả về ở 2 chế độ CÓ CÙNG HÌNH DẠNG (giống các DTO của backend),
  *  nên đổi chế độ thì các trang không phải sửa gì.
+ *  Chỗ nào backend trả khác (bọc trong { data }, thiếu trường...) thì đã được
+ *  "nắn" lại ngay trong hàm tương ứng bên dưới, các trang không cần biết.
  * ============================================================================
  */
 
@@ -23,9 +25,9 @@ import { get, post, put, patch, del } from "../../assets/js/core/http.js";
 import { getCustomerId, saveLogin } from "../../assets/js/core/auth.js";
 
 /** true = dữ liệu mẫu, false = API thật */
-export const USE_MOCK = true;
+export const USE_MOCK = false;
 
-/** Tài khoản mẫu (chỉ dùng ở chế độ mẫu) */
+/** Tài khoản khách mẫu: có trong cả mock-data.js lẫn dữ liệu seed của backend (khachhang001..100 / Khach@123) */
 export const DEMO_ACCOUNT = { email: "khachhang015@clothesstore.vn", password: "Khach@123" };
 
 /* ============================================================================
@@ -150,6 +152,9 @@ function activePromotion(/** @type {string} */ code) {
     return p;
 }
 
+/** Giỏ hàng rỗng (khách chưa có giỏ trong database) */
+const emptyCart = (/** @type {number} */ id) => ({ cartId: 0, customerId: id, items: [], totalItems: 0, totalAmount: 0 });
+
 /* ============================================================================
  *  PHẦN 2: CÁC HÀM DÙNG TRONG TRANG
  *  Mỗi hàm: nếu USE_MOCK -> dùng backend giả ở trên, ngược lại gọi API thật.
@@ -257,7 +262,12 @@ export const shopApi = {
                 return reply({ productId, totalReviews: list.length, ratingDistribution: dist,
                     averageRating: list.length ? list.reduce((s, r) => s + r.rating, 0) / list.length : 0 });
             }
-            return get(`/Review/product/${productId}/summary`);
+            // Backend chỉ trả { productId, averageRating, totalReviews } -> tự đếm số đánh giá theo từng mức sao
+            const [summary, list] = await Promise.all([get(`/Review/product/${productId}/summary`), get(`/Review/product/${productId}`)]);
+            /** @type {Record<number, number>} */
+            const dist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            (list ?? []).forEach((/** @type {any} */ r) => { dist[r.rating] = (dist[r.rating] ?? 0) + 1; });
+            return { ...summary, ratingDistribution: dist };
         },
         /** GET /api/Review/customer/{id} */
         async getMine() {
@@ -308,7 +318,7 @@ export const shopApi = {
     wishlist: {
         /** GET /api/Wishlist/customer/{id} -> [{ id, productId, productName, productImageUrl, price, inStock, createdAt }] */
         async getMine() { const id = await customerId(); if (USE_MOCK) return reply(me.wishlist); return get(`/Wishlist/customer/${id}`); },
-        /** POST /api/Wishlist/toggle { customerId, productId } -> trả về true nếu sau khi bấm đang được yêu thích */
+        /** POST /api/Wishlist/toggle?customerId=..&productId=.. -> { message, isWishlisted, data }. Trả về true nếu đang được yêu thích */
         async toggle(/** @type {number} */ productId) {
             const id = await customerId();
             if (USE_MOCK) {
@@ -319,19 +329,30 @@ export const shopApi = {
                     price: p ? minPrice(p) : 0, inStock: true, createdAt: nowIso() });
                 saveMe(); return reply(true);
             }
-            const result = await post("/Wishlist/toggle", { customerId: id, productId });
-            // backend có thể trả object hoặc boolean -> hỏi lại cho chắc
-            if (typeof result === "boolean") return result;
-            const list = await get(`/Wishlist/customer/${id}`);
-            return list.some((/** @type {any} */ w) => w.productId === productId);
+            // Backend nhận customerId, productId trên địa chỉ (query string), không nhận body
+            const result = await post("/Wishlist/toggle", undefined, { customerId: id, productId });
+            return Boolean(result?.isWishlisted);
         }
     },
 
     /* ---------------- Giỏ hàng ---------------- */
     cart: {
-        /** GET /api/Cart/{customerId} -> { cartId, items: [...], totalItems, totalAmount } */
-        async get() { const id = await customerId(); if (USE_MOCK) return reply(cartDto()); return get(`/Cart/${id}`); },
-        /** POST /api/Cart/items { customerId, variantId, quantity } */
+        /**
+         * GET /api/carts/{customerId} -> { success, data: { cartId, customerId, items: [...], totalItems, totalAmount } }
+         * Khách chưa từng thêm gì thì backend trả 404 "Giỏ hàng trống." -> coi như giỏ rỗng.
+         */
+        async get() {
+            const id = await customerId();
+            if (USE_MOCK) return reply(cartDto());
+            try {
+                const result = await get(`/carts/${id}`);
+                return result?.data ?? emptyCart(id);
+            } catch (err) {
+                if (/** @type {any} */ (err)?.status === 404) return emptyCart(id);
+                throw err;
+            }
+        },
+        /** POST /api/carts/items { customerId, variantId, quantity } -> { message, data: giỏ hàng mới } */
         async add(/** @type {number} */ variantId, /** @type {number} */ quantity) {
             const id = await customerId();
             if (USE_MOCK) {
@@ -341,9 +362,9 @@ export const shopApi = {
                 if (line) line.quantity = newQty; else me.cart.push({ cartItemId: nextId(), variantId, quantity });
                 saveMe(); return reply(cartDto());
             }
-            return post("/Cart/items", { customerId: id, variantId, quantity });
+            return (await post("/carts/items", { customerId: id, variantId, quantity }))?.data;
         },
-        /** PUT /api/Cart/items { cartItemId, quantity } */
+        /** PUT /api/carts/items { cartItemId, quantity } -> { message, data: giỏ hàng mới } */
         async update(/** @type {number} */ cartItemId, /** @type {number} */ quantity) {
             await customerId();
             if (USE_MOCK) {
@@ -352,13 +373,14 @@ export const shopApi = {
                 if (quantity > totalStock(line.variantId)) fail(`Sản phẩm chỉ còn ${totalStock(line.variantId)} chiếc.`);
                 line.quantity = quantity; saveMe(); return reply(cartDto());
             }
-            return put("/Cart/items", { cartItemId, quantity });
+            return (await put("/carts/items", { cartItemId, quantity }))?.data;
         },
-        /** DELETE /api/Cart/items/{cartItemId} */
+        /** DELETE /api/carts/items/{cartItemId} */
         async remove(/** @type {number} */ cartItemId) {
             await customerId();
             if (USE_MOCK) { me.cart = me.cart.filter((/** @type {any} */ i) => i.cartItemId !== cartItemId); saveMe(); return reply(cartDto()); }
-            return del(`/Cart/items/${cartItemId}`);
+            await del(`/carts/items/${cartItemId}`);
+            return this.get();
         }
     },
 

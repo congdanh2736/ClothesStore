@@ -4,7 +4,7 @@
  *      GET /api/Order/customer/{id}, GET /api/Address/customer/{id}, GET /api/Promotion
  */
 import { initAccount, memberCardHtml, tierLadderHtml, initials } from "./accountShell.js";
-import { openModal, toast, errMsg, money, ICONS, $ } from "../shell.js";
+import { openModal, toast, errMsg, money, ICONS, $, ts } from "../shell.js";
 import { shopApi } from "../shopApi.js";
 import { escapeHtml, formatNumber, formatDate, orderStatusBadge } from "../../../assets/js/core/utils.js";
 
@@ -13,7 +13,7 @@ if (me) {
     const [tiers, orders, addresses, promos, wish] = await Promise.all([shopApi.getTiers(), shopApi.orders.getMine(), shopApi.addresses.getMine(),
         shopApi.getPromotions(), shopApi.wishlist.getMine()]);
     const now = Date.now();
-    const active = promos.filter((/** @type {any} */ p) => new Date(p.startDate).getTime() <= now && new Date(p.endDate).getTime() >= now);
+    const active = promos.filter((/** @type {any} */ p) => ts(p.startDate) <= now && ts(p.endDate) >= now);
     const done = orders.filter((/** @type {any} */ o) => o.status === "Completed");
     const spent = done.reduce((/** @type {number} */ s, /** @type {any} */ o) => s + o.totalAmount, 0);
     const running = orders.filter((/** @type {any} */ o) => ["Pending", "Confirmed", "Shipping"].includes(o.status)).length;

@@ -7,7 +7,7 @@
  *    (Backend vẫn bắt buộc có địa chỉ của khách, kể cả khi nhận tại cửa hàng.)
  *  - Thanh toán: COD, Momo, VNPay, BankTransfer (Cash chỉ dùng khi mua trực tiếp tại quầy).
  */
-import { initShop, toast, errMsg, openModal, refreshCounts, productImages, thumb, money, ICONS, $ } from "../shell.js";
+import { initShop, toast, errMsg, openModal, refreshCounts, productImages, thumb, money, ICONS, $, ts } from "../shell.js";
 import { shopApi } from "../shopApi.js";
 import { escapeHtml, formatNumber, estimatePoints } from "../../../assets/js/core/utils.js";
 
@@ -33,7 +33,7 @@ if (await initShop({ active: "cart", needLogin: true })) {
     const promoOf = (/** @type {string} */ code) => {
         const p = promotions.find((/** @type {any} */ x) => x.code.toUpperCase() === code.trim().toUpperCase());
         const now = Date.now();
-        return p && new Date(p.startDate).getTime() <= now && new Date(p.endDate).getTime() >= now ? p : null;
+        return p && ts(p.startDate) <= now && ts(p.endDate) >= now ? p : null;
     };
 
     function renderAddresses() {

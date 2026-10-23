@@ -19,7 +19,7 @@
 
 import { shopApi, USE_MOCK } from "./shopApi.js";
 import { isLoggedIn, getUser, logout, requireCustomer } from "../../assets/js/core/auth.js";
-import { escapeHtml, formatMoney } from "../../assets/js/core/utils.js";
+import { escapeHtml, formatMoney, toDate } from "../../assets/js/core/utils.js";
 
 /* ===================================================== ICON (SVG) ===================================================== */
 const svg = (/** @type {string} */ d) => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
@@ -92,6 +92,14 @@ const COLOR_HEX = {
 export const colorHex = name => /** @type {Record<string,string>} */ (COLOR_HEX)[name] ?? "#888888";
 
 /** Lấy tham số trên địa chỉ trang, ví dụ ?id=5 -> qs("id") = "5" */
+/**
+ * Đổi ngày giờ backend trả về thành số mili-giây để so sánh / sắp xếp.
+ * Backend lưu giờ UTC nhưng chuỗi JSON không có chữ "Z" -> phải dùng toDate() (tự thêm "Z"),
+ * dùng new Date() trực tiếp sẽ bị lệch 7 tiếng.
+ * @param {unknown} value
+ */
+export const ts = value => toDate(/** @type {any} */ (value))?.getTime() ?? 0;
+
 export const qs = (/** @type {string} */ name) => new URLSearchParams(location.search).get(name);
 
 /** Lấy thẻ theo id (có ghi chú kiểu để VS Code không báo "possibly null") */

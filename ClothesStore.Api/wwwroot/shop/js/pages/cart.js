@@ -5,7 +5,7 @@
  * Mã khuyến mãi: kiểm tra trước ở đây (còn hạn hay không), backend kiểm tra lại khi đặt hàng.
  * Giảm giá = min(giá trị mã, tạm tính) - giống OrderPricing ở backend.
  */
-import { initShop, toast, errMsg, refreshCounts, productImages, thumb, money, ICONS, $ } from "../shell.js";
+import { initShop, toast, errMsg, refreshCounts, productImages, thumb, money, ICONS, $, ts } from "../shell.js";
 import { shopApi } from "../shopApi.js";
 import { escapeHtml, formatNumber, formatDate, estimatePoints } from "../../../assets/js/core/utils.js";
 
@@ -16,7 +16,7 @@ if (await initShop({ active: "cart", needLogin: true })) {
     let promo = /** @type {any} */ (null);
     const promotions = await shopApi.getPromotions();
     const now = Date.now();
-    const active = promotions.filter((/** @type {any} */ p) => new Date(p.startDate).getTime() <= now && new Date(p.endDate).getTime() >= now)
+    const active = promotions.filter((/** @type {any} */ p) => ts(p.startDate) <= now && ts(p.endDate) >= now)
         .sort((/** @type {any} */ a, /** @type {any} */ b) => b.discountValue - a.discountValue);
 
     try {

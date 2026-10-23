@@ -12,13 +12,12 @@ if (!redirectIfLoggedIn()) {
     const email = /** @type {HTMLInputElement} */ ($("email"));
     const password = /** @type {HTMLInputElement} */ ($("password"));
 
-    // Chế độ dữ liệu mẫu: hiện tài khoản mẫu và nút điền nhanh
-    if (USE_MOCK) {
-        $("demoBox").innerHTML = `<div class="inset text-sm">${ICONS.user}
-            <span>Đang dùng <b>dữ liệu mẫu</b>. Tài khoản: <b class="mono">${DEMO_ACCOUNT.email}</b> / <b class="mono">${DEMO_ACCOUNT.password}</b></span>
-            <button type="button" class="btn btn-sm btn-outline mt-2" id="btnDemo">Điền tài khoản mẫu</button></div>`;
-        $("btnDemo").addEventListener("click", () => { email.value = DEMO_ACCOUNT.email; password.value = DEMO_ACCOUNT.password; });
-    }
+    // Gợi ý tài khoản khách có sẵn trong dữ liệu mẫu (seed) để chạy thử nhanh
+    $("demoBox").innerHTML = `<div class="inset text-sm">${ICONS.user}
+        <span>${USE_MOCK ? "Đang dùng <b>dữ liệu mẫu trên trình duyệt</b>." : "Tài khoản khách có sẵn trong dữ liệu mẫu:"}
+            <b class="mono">${DEMO_ACCOUNT.email}</b> / <b class="mono">${DEMO_ACCOUNT.password}</b></span>
+        <button type="button" class="btn btn-sm btn-outline mt-2" id="btnDemo">Điền tài khoản mẫu</button></div>`;
+    $("btnDemo").addEventListener("click", () => { email.value = DEMO_ACCOUNT.email; password.value = DEMO_ACCOUNT.password; });
 
     $("togglePass").addEventListener("click", () => { password.type = password.type === "password" ? "text" : "password"; });
 

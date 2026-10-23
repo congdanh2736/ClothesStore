@@ -3,7 +3,7 @@
  * API: GET /api/Promotion -> [{ id, code, discountValue, startDate, endDate }]
  * Mã giảm thẳng số tiền (tối đa bằng tạm tính), dùng chung cho mọi khách, nhập khi đặt hàng.
  */
-import { initShop, toast, money, ICONS, $ } from "../shell.js";
+import { initShop, toast, money, ICONS, $, ts } from "../shell.js";
 import { shopApi } from "../shopApi.js";
 import { escapeHtml, formatDate } from "../../../assets/js/core/utils.js";
 
@@ -12,11 +12,11 @@ const PROMO_KEY = "aura-promo";
 if (await initShop({ active: "promotions" })) {
     const all = await shopApi.getPromotions();
     const now = Date.now();
-    const statusOf = (/** @type {any} */ p) => new Date(p.startDate).getTime() > now ? "upcoming" : new Date(p.endDate).getTime() < now ? "ended" : "active";
+    const statusOf = (/** @type {any} */ p) => ts(p.startDate) > now ? "upcoming" : ts(p.endDate) < now ? "ended" : "active";
     const groups = { active: all.filter((/** @type {any} */ p) => statusOf(p) === "active"), upcoming: all.filter((/** @type {any} */ p) => statusOf(p) === "upcoming"), ended: all.filter((/** @type {any} */ p) => statusOf(p) === "ended") };
-    groups.active.sort((/** @type {any} */ a, /** @type {any} */ b) => +new Date(a.endDate) - +new Date(b.endDate));
-    groups.upcoming.sort((/** @type {any} */ a, /** @type {any} */ b) => +new Date(a.startDate) - +new Date(b.startDate));
-    groups.ended.sort((/** @type {any} */ a, /** @type {any} */ b) => +new Date(b.endDate) - +new Date(a.endDate));
+    groups.active.sort((/** @type {any} */ a, /** @type {any} */ b) => ts(a.endDate) - ts(b.endDate));
+    groups.upcoming.sort((/** @type {any} */ a, /** @type {any} */ b) => ts(a.startDate) - ts(b.startDate));
+    groups.ended.sort((/** @type {any} */ a, /** @type {any} */ b) => ts(b.endDate) - ts(a.endDate));
     /** @type {"active"|"upcoming"|"ended"} */
     let tab = "active";
 
@@ -29,7 +29,7 @@ if (await initShop({ active: "promotions" })) {
             `<button class="tab ${k === tab ? "active" : ""}" data-tab="${k}">${labels[k]} <span class="badge">${groups[k].length}</span></button>`).join("");
         const list = groups[tab];
         $("promoGrid").innerHTML = list.length ? list.map((/** @type {any} */ p) => {
-            const days = Math.ceil((new Date(p.endDate).getTime() - now) / 86400000);
+            const days = Math.ceil((ts(p.endDate) - now) / 86400000);
             return `<article class="ticket ${tab === "ended" ? "disabled" : ""}">
                 <div class="left"><span class="text-xs upper">Giảm</span><b class="price" style="font-size:24px">${money(p.discountValue)}</b></div>
                 <div class="right grow stack" style="gap:6px">
