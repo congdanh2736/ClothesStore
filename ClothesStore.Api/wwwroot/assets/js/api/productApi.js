@@ -13,7 +13,12 @@ export const productApi = {
     //chỉnh sửa đối tượng tại đường dẫn /{root}/{id}
     update: (id, data) => put(`${PRODUCT}/${id}`,data),
     //xóa đối tượng tại đường dẫn /{root}/{id}
-    remove: id => del(`${PRODUCT}/${id}`)
+    remove: id => del(`${PRODUCT}/${id}`),
+    // chi tiết sản phẩm (kèm biến thể, ảnh, bộ sưu tập)
+    getDetail: id => get(`${PRODUCT}/${id}/detail`),
+    // gắn / gỡ bộ sưu tập
+    addToCollection: (id, collectionId) => post(`${PRODUCT}/${id}/collections/${collectionId}`),
+    removeFromCollection: (id, collectionId) => del(`${PRODUCT}/${id}/collections/${collectionId}`)
 };
 
 // tạo đường dẫn gốc(root) để code nhanh
@@ -24,6 +29,8 @@ export const productVariantApi = {
     getAll: () => get(`${PRODUCT_VARIANT}`),
     //lấy đối tượng theo ID tại đường dẫn /{root}/{id}
     getById: id => get(`${PRODUCT_VARIANT}/${id}`),
+    // lấy danh sách biến thể của 1 sản phẩm
+    getByProduct: productId => get(`${PRODUCT_VARIANT}/product/${productId}`),
     // tạo đối tượng tại đường dẫn /{root}
     create: data => post(`${PRODUCT_VARIANT}`,data),
     //chỉnh sửa đối tượng tại đường dẫn /{root}/{id}

@@ -44,7 +44,7 @@ const table = createDataTable({
         {
             key: "name",
             title: "Tên sản phẩm",
-            render: row => `<strong>${escapeHtml(row.name ?? "")}</strong>`
+            render: row => `<a href="product-detail.html?id=${row.id}" class="fw-bold text-primary">${escapeHtml(row.name ?? "")}</a>`
         },
         {
             key: "categoryName",
@@ -63,6 +63,7 @@ const table = createDataTable({
         }
     ],
     actions: [
+        { label: "Chi tiết", onClick: row => window.location.href = `product-detail.html?id=${row.id}` },
         { label: "Sửa", onClick: row => openForm(row) },
         { label: "Xóa", danger: true, onClick: row => removeRow(row) }
     ]

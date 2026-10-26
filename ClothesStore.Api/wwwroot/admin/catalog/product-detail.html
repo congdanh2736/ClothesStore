@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sản phẩm | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <!-- Báo lỗi khi thiếu id hoặc không tìm thấy sản phẩm -->
+                <div class="alert alert-danger mb-4" id="pageError" role="alert" style="display: none;"></div>
+
+                <!-- Khung nội dung chi tiết -->
+                <div id="pageContent" class="hidden">
+                    <div class="page-header">
+                        <div>
+                            <div class="breadcrumb"><a href="products.html">Sản phẩm</a> / Chi tiết</div>
+                            <h1 id="productName">Tên sản phẩm</h1>
+                            <p class="page-subtitle" id="productSubtitle"></p>
+                        </div>
+                        <div class="page-actions">
+                            <a class="btn btn-secondary" href="products.html">← Danh sách</a>
+                            <button type="button" class="btn btn-primary" id="btnEditProduct">Sửa thông tin</button>
+                        </div>
+                    </div>
+
+                    <!-- 4 ô thống kê số liệu tổng quan -->
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Danh mục</div>
+                            <div class="stat-value" id="statCategory">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Số biến thể (SKU)</div>
+                            <div class="stat-value" id="statVariants">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Số lượng ảnh</div>
+                            <div class="stat-value" id="statImages">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Bộ sưu tập</div>
+                            <div class="stat-value" id="statCollections">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <!-- ===== 1. BIẾN THỂ SẢN PHẨM (MÀU, SIZE, GIÁ) ===== -->
+                        <section class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Phiên bản & Kích cỡ (Biến thể - SKU)</h2>
+                                    <div class="text-muted text-sm">Quản lý các lựa chọn Màu sắc, Size và Giá bán cụ thể cho từng phân loại.</div>
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btnAddVariant">+ Thêm biến thể</button>
+                            </div>
+                            <div id="variantTable"></div>
+                        </section>
+
+                        <!-- ===== 2. BỘ SƯU TẬP & CÔNG NGHỆ ===== -->
+                        <section class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Bộ sưu tập & Công nghệ áp dụng</h2>
+                                    <div class="text-muted text-sm">Các chiến dịch bộ sưu tập hoặc công nghệ chất liệu vải liên kết với sản phẩm này.</div>
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btnAttachCollection">+ Gắn bộ sưu tập</button>
+                            </div>
+                            <div id="collectionTable"></div>
+                        </section>
+
+                        <!-- ===== 3. HÌNH ẢNH SẢN PHẨM ===== -->
+                        <section class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Thư viện hình ảnh chi tiết</h2>
+                                    <div class="text-muted text-sm">Hình ảnh các góc độ chụp của sản phẩm.</div>
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btnAddImage">+ Thêm ảnh</button>
+                            </div>
+                            <div id="imageTable"></div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Script điều khiển -->
+    <script type="module" src="../js/catalog/product-detail.js"></script>
+</body>
+
+</html>
