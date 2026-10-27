@@ -56,9 +56,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 //-------------------------------------------------------------[ĐĂNG KÍ DỊCH VỤ IDENTITY]-------------------------------------------------------------//
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-    {
-        options.Password.RequireNonAlphanumeric = false;
-    })
+{
+    options.Password.RequireNonAlphanumeric = false;
+})
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 //----------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -94,7 +94,7 @@ builder.Services.AddAuthentication(options =>
          * Khóa ký là gì? Khóa ký là một chuỗi bí mật được sử dụng để ký token JWT, đảm bảo rằng token không bị giả mạo
          */
         ValidateIssuerSigningKey = true,
-        
+
         ValidIssuer = builder.Configuration["Jwt:Issuer"], // Xác thực issuer (người phát hành token) dựa trên cấu hình trong appsettings.json
         ValidAudience = builder.Configuration["Jwt:Audience"], // Xác thực audience (người nhận token) dựa trên cấu hình trong appsettings.json
         IssuerSigningKey = new SymmetricSecurityKey(
@@ -185,13 +185,13 @@ builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 // Category
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ICategoryService,CategoryService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 // Collection_Tech
-builder.Services.AddScoped<ICollectionTechRepository,CollectionTechRepository>();
-builder.Services.AddScoped<ICollectionTechService,CollectionTechService>();
+builder.Services.AddScoped<ICollectionTechRepository, CollectionTechRepository>();
+builder.Services.AddScoped<ICollectionTechService, CollectionTechService>();
 // Product
-builder.Services.AddScoped<IProductRepository,ProductRepository>();
-builder.Services.AddScoped<IProductService,ProductService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 // Product_Variant
 builder.Services.AddScoped<IProductVariantRepository, ProductVariantRepository>();
 builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
@@ -291,7 +291,18 @@ if (Directory.Exists(webRootPath))
 {
     var webRootFiles = new PhysicalFileProvider(webRootPath);
     app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = webRootFiles });
-    app.UseStaticFiles(new StaticFileOptions { FileProvider = webRootFiles });
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = webRootFiles,
+        /*
+         * [SỬA] Bắt trình duyệt luôn hỏi lại server xem file (html, css, js) có đổi chưa.
+         * Lý do: trước đây server không gửi kèm "Cache-Control", trình duyệt tự giữ bản cũ
+         * (ví dụ dashboard.js cũ) một thời gian -> sửa file xong F5 vẫn chạy code cũ.
+         * "no-cache" KHÔNG phải là không lưu: file không đổi thì server trả 304 (rất nhanh),
+         * file đã đổi thì trình duyệt tải bản mới ngay.
+         */
+        OnPrepareResponse = ctx => ctx.Context.Response.Headers.CacheControl = "no-cache"
+    });
 }
 else
 {

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hệ thống cửa hàng | AURA Techwear</title>
+    <meta name="description" content="Danh sách cửa hàng AURA">
+    <!-- Đặt giao diện sáng/tối TRƯỚC khi vẽ trang để không bị nháy màu -->
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("aura-theme")||"dark"}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="./css/shop.css">
+</head>
+<body>
+    <header id="siteHeader"></header>
+    <main class="page">
+        <div class="container">
+            <nav class="crumbs" aria-label="Đường dẫn"><a href="/shop/index.html">Trang chủ</a><span class="sep">/</span><span class="current">Cửa hàng</span></nav>
+            <section class="page-hero">
+                <div class="eyebrow">Hệ thống cửa hàng</div>
+                <h1 class="page-title mt-2">Tìm cửa hàng <span class="accent">gần bạn</span></h1>
+                <p class="text-muted mt-2" style="max-width:560px">Xem trước cửa hàng nào còn hàng ngay ở trang sản phẩm, rồi chọn "Nhận tại cửa hàng" khi đặt hàng.</p>
+                <div class="hero-stats"><div><b id="statStores">—</b><span>Cửa hàng</span></div><div><b id="statCities">—</b><span>Tỉnh / thành</span></div></div>
+            </section>
+            <div class="row-between wrap mt-4">
+                <div class="row wrap">
+                    <input class="input" id="storeSearch" placeholder="Tìm theo tên đường, quận..." aria-label="Tìm cửa hàng" style="width:280px;max-width:100%">
+                    <select class="select" id="citySelect" aria-label="Tỉnh / thành" style="width:auto"></select>
+                </div>
+                <span class="text-sm text-muted mono" id="storeCount"></span>
+            </div>
+            <div class="grid-3 mt-4" id="storeGrid"><div class="skeleton" style="height:200px"></div><div class="skeleton" style="height:200px"></div><div class="skeleton" style="height:200px"></div></div>
+        </div>
+    </main>
+    <footer id="siteFooter"></footer>
+    <div class="toasts" id="toasts"></div>
+    <script type="module" src="./js/pages/stores.js"></script>
+</body>
+</html>

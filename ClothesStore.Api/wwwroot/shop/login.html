@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đăng nhập | AURA Techwear</title>
+    <meta name="description" content="Đăng nhập tài khoản AURA">
+    <!-- Đặt giao diện sáng/tối TRƯỚC khi vẽ trang để không bị nháy màu -->
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("aura-theme")||"dark"}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="./css/shop.css">
+</head>
+<body>
+    <header id="siteHeader"></header>
+    <main class="page">
+        <div class="container">
+            <div class="auth-wrap mt-4">
+                <div class="auth-side">
+                    <div class="eyebrow">AURA Member</div>
+                    <div>
+                        <h2>Chào mừng <span class="text-primary">trở lại</span></h2>
+                        <p class="text-muted mt-3">Đăng nhập để mua hàng, xem đơn và điểm thưởng của bạn.</p>
+                    </div>
+                    <ul class="stack text-sm" style="list-style:none;padding:0;margin:0;gap:10px">
+                        <li class="perk"><span class="tile-ico">★</span><span>Tích 1 điểm cho mỗi 10.000đ, tự động lên hạng Bạc, Vàng, VIP</span></li>
+                        <li class="perk"><span class="tile-ico">♥</span><span>Lưu sản phẩm yêu thích, theo dõi đơn hàng, đánh giá sản phẩm</span></li>
+                        <li class="perk"><span class="tile-ico">↺</span><span>Gửi yêu cầu trả hàng online trong 30 ngày</span></li>
+                    </ul>
+                </div>
+                <form class="auth-form" id="loginForm" novalidate>
+                    <div><div class="eyebrow">Đăng nhập</div><h1 class="mt-1">Tài khoản của bạn</h1></div>
+                    <div id="demoBox"></div>
+                    <div class="field"><label for="email">Email</label><input class="input" id="email" name="email" type="email" required autocomplete="email" placeholder="ban@email.com"></div>
+                    <div class="field"><label for="password">Mật khẩu</label>
+                        <div class="input-group"><input class="input" id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••">
+                            <button type="button" class="btn" id="togglePass">Hiện</button></div></div>
+                    <button class="btn btn-primary btn-lg btn-block" id="btnLogin">Đăng nhập</button>
+                    <p class="text-sm text-muted" style="text-align:center">Chưa có tài khoản? <a class="text-primary fw-bold" id="registerLink" href="/shop/register.html">Đăng ký ngay</a></p>
+                    <p class="text-xs text-faint" style="text-align:center">Nhân viên / quản lý vui lòng đăng nhập tại <a class="text-primary" href="/admin/login.html">trang quản trị</a>.</p>
+                </form>
+            </div>
+        </div>
+    </main>
+    <footer id="siteFooter"></footer>
+    <div class="toasts" id="toasts"></div>
+    <script type="module" src="./js/pages/login.js"></script>
+</body>
+</html>
