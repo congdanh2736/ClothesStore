@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm | ClothesStore Admin</title>
+
+    <!-- Nạp 3 file CSS chuẩn của hệ thống -->
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+
+<body>
+    <div class="admin-shell">
+        <!-- 1. Menu bên trái (layout.js tự đổ vào) -->
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <!-- 2. Topbar trên cùng (layout.js tự đổ vào) -->
+            <header id="topbar" class="topbar"></header>
+
+            <!-- 3. Khu vực nội dung Quản lý Sản phẩm -->
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Quản lý sản phẩm</h1>
+                        <p class="page-subtitle">Quản lý danh sách các mặt hàng thời trang trong cửa hàng.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Thêm sản phẩm</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <!-- Thanh công cụ tìm kiếm và lọc -->
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput"
+                            placeholder="Tìm theo tên sản phẩm, mã, danh mục...">
+                        <select class="input select" id="categoryFilter" style="max-width: 220px;">
+                            <option value="">-- Tất cả danh mục --</option>
+                        </select>
+                    </div>
+
+                    <!-- Bảng dữ liệu và thanh phân trang -->
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Nạp file JS điều khiển sản phẩm -->
+    <script type="module" src="../js/catalog/products.js"></script>
+</body>
+
+</html>

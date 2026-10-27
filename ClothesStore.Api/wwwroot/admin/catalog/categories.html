@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh mục sản phẩm | ClothesStore Admin</title>
+
+    <!-- Nạp đúng 3 file CSS dùng chung của hệ thống -->
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+
+<body>
+    <div class="admin-shell">
+        <!-- 1. Thanh menu bên trái (layout.js tự đổ vào) -->
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <!-- 2. Thanh topbar trên cùng (layout.js tự đổ vào) -->
+            <header id="topbar" class="topbar"></header>
+
+            <!-- 3. Khu vực nội dung chính của trang Danh mục -->
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Danh mục sản phẩm</h1>
+                        <p class="page-subtitle">Quản lý các danh mục phân loại quần áo (Áo, Quần, Phụ kiện...).</p>
+                    </div>
+                    <div class="page-actions">
+                        <!-- Nút bấm mở Form thêm danh mục -->
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Thêm danh mục</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <!-- Thanh công cụ tìm kiếm -->
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput"
+                            placeholder="Tìm theo tên danh mục, mã...">
+                    </div>
+
+                    <!-- Nơi Javascript sẽ tự vẽ bảng dữ liệu và thanh phân  trang vào -->
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Nạp file Javascript điều khiển (thêm ?v=2 để trình duyệt không lưu cache cũ) -->
+    <script type="module" src="../js/catalog/categories.js?v=2"></script>
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bộ sưu tập & Công nghệ | ClothesStore Admin</title>
+
+    <!-- Nạp 3 file CSS chuẩn của hệ thống -->
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+
+<body>
+    <div class="admin-shell">
+        <!-- 1. Menu bên trái (layout.js tự nạp vào) -->
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <!-- 2. Topbar trên cùng (layout.js tự nạp vào) -->
+            <header id="topbar" class="topbar"></header>
+
+            <!-- 3. Khu vực nội dung Bộ sưu tập & Công nghệ -->
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Bộ sưu tập & Công nghệ</h1>
+                        <p class="page-subtitle">Quản lý các chiến dịch bộ sưu tập thời trang và công nghệ chất liệu vải.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Thêm mới</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <!-- Thanh công cụ tìm kiếm và lọc loại -->
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput"
+                            placeholder="Tìm theo tên, loại...">
+                        <select class="input select" id="typeFilter" style="max-width: 200px;">
+                            <option value="">-- Tất cả loại --</option>
+                            <option value="Bộ sưu tập">Bộ sưu tập</option>
+                            <option value="Công nghệ">Công nghệ</option>
+                        </select>
+                    </div>
+
+                    <!-- Bảng dữ liệu và thanh phân trang -->
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Nạp file Javascript điều khiển -->
+    <script type="module" src="../js/catalog/collections.js"></script>
+</body>
+
+</html>
