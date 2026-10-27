@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="ClothesStore.Api/ClothesStore.Api.csproj" Id="a9d9fe7f-659e-4a6f-98fb-a63a4a48f964" />
+  <Project Path="ClothesStore.ChatbotTrainner/ClothesStore.ChatbotTrainner.csproj" Id="0d639422-4007-4bd2-9841-d1c24945c7c8" />
 </Solution>
