@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tồn kho | ClothesStore Admin</title>
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+            <main class="admin-content">
+                <div class="page-header">
+                    <div><h1>Tồn kho cửa hàng</h1><p class="page-subtitle">Xem tồn theo cửa hàng và ghi nhận nhập, xuất hoặc điều chỉnh.</p></div>
+                    <div class="page-actions"><button type="button" class="btn btn-primary" id="btnAdjust">Điều chỉnh tồn kho</button></div>
+                </div>
+                <div class="card">
+                    <div class="toolbar"><label for="storeFilter">Cửa hàng</label><select class="select" id="storeFilter"><option value="">Chọn cửa hàng</option></select><button class="btn btn-secondary" id="btnReload">Tải lại</button></div>
+                    <div id="tableContainer"></div><div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script type="module" src="../js/stores/stock.js"></script>
+</body>
+</html>
