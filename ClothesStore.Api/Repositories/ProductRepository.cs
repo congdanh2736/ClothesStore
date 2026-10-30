@@ -10,6 +10,12 @@ namespace ClothesStore.Api.Repositories
         public readonly ApplicationDbContext _context;
         public ProductRepository(ApplicationDbContext context) => _context = context;
 
+        /*
+         * [SỬA - CHỐNG CHẬM / TIMEOUT] AsSplitQuery: có nhiều danh sách con được Include cùng lúc.
+         * Nếu gộp chung 1 câu SQL JOIN thì số dòng = TÍCH số phần tử các danh sách (nhân chéo, "cartesian explosion"),
+         * tách thành nhiều câu SQL nhỏ thì số dòng chỉ còn là TỔNG.
+         * AsNoTracking (ở hàm lấy danh sách): chỉ đọc để hiển thị, không theo dõi thay đổi -> nhanh và nhẹ hơn.
+         */
         public async Task<IEnumerable<Product>> GetAllAsync()
             => await _context.Products
                 .Include(c => c.Category)
@@ -17,6 +23,8 @@ namespace ClothesStore.Api.Repositories
                     .ThenInclude(pc => pc.CollectionTech)
                 .Include(c => c.ProductImages)
                 .Include(c => c.ProductVariants)
+                .AsSplitQuery()
+                .AsNoTracking()
                 .ToListAsync();
 
         public async Task<Product?> GetByIdAsync(int id)
@@ -30,6 +38,7 @@ namespace ClothesStore.Api.Repositories
                     .ThenInclude(pc => pc.CollectionTech)
                 .Include(c => c.ProductImages)
                 .Include(c => c.ProductVariants)
+                .AsSplitQuery() // [SỬA - CHỐNG CHẬM] xem giải thích ở GetAllAsync
                 .FirstOrDefaultAsync(c => c.Id == id);
 
         public async Task<IEnumerable<Product>> GetByCategoryIdAsync(int categoryId)
@@ -38,6 +47,8 @@ namespace ClothesStore.Api.Repositories
                 .Include(c => c.ProductImages)
                 .Include(c => c.ProductVariants)
                 .Where(c => c.CategoryId == categoryId)
+                .AsSplitQuery() // [SỬA - CHỐNG CHẬM] ảnh x biến thể không còn bị nhân chéo
+                .AsNoTracking()
                 .ToListAsync();
 
         public async Task<bool> CategoryExistsAsync(int categoryId)

@@ -15,12 +15,20 @@ namespace ClothesStore.Api.Repositories
         public CategoryRepository(ApplicationDbContext context) => _context = context;
 
         //Lấy danh sách đầy đủ tất cả dữ liệu
+        /*
+         * [SỬA - CHỐNG CHẬM / TIMEOUT] AsSplitQuery: có nhiều danh sách con được Include cùng lúc.
+         * Nếu gộp chung 1 câu SQL JOIN thì số dòng = TÍCH số phần tử các danh sách (nhân chéo, "cartesian explosion"),
+         * tách thành nhiều câu SQL nhỏ thì số dòng chỉ còn là TỔNG.
+         * AsNoTracking (ở hàm lấy danh sách): chỉ đọc để hiển thị, không theo dõi thay đổi -> nhanh và nhẹ hơn.
+         */
         public async Task<IEnumerable<Category>> GetAllAsync()
             => await _context.Categories
                 .Include(c => c.ParentCategory)
                 .Include(c => c.ChildrenCategories)
                 .Include(c => c.Products)
                 .Include(c => c.SizeCharts)
+                .AsSplitQuery()
+                .AsNoTracking()
                 .ToListAsync();
 
         // tìm danh mục tương ứng với Id
@@ -35,6 +43,7 @@ namespace ClothesStore.Api.Repositories
                 .Include(c => c.ChildrenCategories)
                 .Include(c => c.Products)
                 .Include(c => c.SizeCharts)
+                .AsSplitQuery() // [SỬA - CHỐNG CHẬM] xem giải thích ở GetAllAsync
                 .FirstOrDefaultAsync(c => c.Id == id);
 
         // thêm 1 danh mục mới

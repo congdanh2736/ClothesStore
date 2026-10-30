@@ -30,6 +30,7 @@
                     .Include(c => c.Addresses)
                     .Include(c => c.Wishlists)
                     .Include(c => c.LoyaltyTransactions)
+                    .AsSplitQuery() // [SỬA - CHỐNG CHẬM] địa chỉ x yêu thích x lịch sử điểm không còn bị nhân chéo
                     .FirstOrDefaultAsync(c => c.Id == id);
 
             public async Task<bool> ApplicationUserExistsAsync(string applicationUserId)
