@@ -9,6 +9,7 @@ using ClothesStore.Api.Middleware;
 using ClothesStore.Api.Models;
 using ClothesStore.Api.Repositories;
 using ClothesStore.Api.Services;
+using ClothesStore.Api.Services.Chatbot; // [THÊM] Chatbot AI: IntentInput, IntentPrediction, ChatIntents
 using ClothesStore.Api.Validators.Customer;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders; // [THÊM] PhysicalFileProvider: đọc file giao diện trực tiếp từ ổ đĩa
+using Microsoft.Extensions.ML; // [THÊM] Chatbot AI: PredictionEnginePool (dùng mô hình ML.NET đã train)
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
@@ -225,6 +227,25 @@ builder.Services.AddScoped<IShipmentService, ShipmentService>();
 // Nghiệp vụ dùng chung: tồn kho & thống kê cửa hàng tự động
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IStoreStatisticsService, StoreStatisticsService>();
+
+//-------------------------------------------------------------[ĐĂNG KÍ CHATBOT AI]------------------------------------------------------------------//
+/*
+ * [THÊM] Chatbot tư vấn (mô hình do nhóm tự train bằng ML.NET - project ClothesStore.ChatbotTrainner).
+ * - AddPredictionEnginePool: nạp file MLModels/intent-model.zip 1 lần, dùng chung cho mọi người chat cùng lúc (an toàn đa luồng).
+ *   watchForChanges: true -> train lại, chép đè file .zip mới là server tự dùng mô hình mới, không cần chạy lại.
+ * - AddMemoryCache: lưu tạm "từ điển" của shop (danh mục, màu, cửa hàng, mã khuyến mãi) 10 phút cho nhanh.
+ */
+var intentModelPath = Path.Combine(builder.Environment.ContentRootPath, "MLModels", "intent-model.zip");
+if (File.Exists(intentModelPath))
+{
+    builder.Services.AddPredictionEnginePool<IntentInput, IntentPrediction>()
+        .FromFile(modelName: ChatIntents.ModelName, filePath: intentModelPath, watchForChanges: true);
+}
+// (Không có file mô hình thì bot vẫn chạy, chỉ đoán ý định bằng từ khóa - xem ChatbotService.PredictIntent)
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IChatbotRepository, ChatbotRepository>();
+builder.Services.AddScoped<IChatbotService, ChatbotService>();
+//--------------------------------------------------------------------------------------------------------------------------------------------------//
 
 
 

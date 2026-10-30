@@ -40,6 +40,17 @@
 		<EmbeddedResource Include="Data\SeedData\*.json" LogicalName="SeedData.%(Filename)%(Extension)" />
 	</ItemGroup>
 
+	<!--
+    [THÊM] Chatbot AI: file mô hình đã train (do project ClothesStore.ChatbotTrainner tạo ra).
+    Chép kèm khi build / publish để server đọc được ở cả lúc chạy thử và lúc triển khai.
+  -->
+	<ItemGroup>
+		<None Update="MLModels\intent-model.zip">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
+
 	<ItemGroup>
 		<Folder Include="Helpers\" />
 		<Folder Include="Extensions\" />
