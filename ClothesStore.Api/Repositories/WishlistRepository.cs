@@ -18,6 +18,7 @@ namespace ClothesStore.Api.Repositories
                     .ThenInclude(p => p!.ProductImages)
                 .Include(w => w.Product)
                     .ThenInclude(p => p!.ProductVariants)
+                .AsSplitQuery() // [SỬA - CHỐNG CHẬM] ảnh x biến thể của sản phẩm không còn bị nhân chéo
                 .ToListAsync();
 
         public async Task<Wishlist?> GetByIdAsync(int id)
@@ -30,6 +31,7 @@ namespace ClothesStore.Api.Repositories
                     .ThenInclude(p => p!.ProductImages)
                 .Include(w => w.Product)
                     .ThenInclude(p => p!.ProductVariants)
+                .AsSplitQuery() // [SỬA - CHỐNG CHẬM]
                 .FirstOrDefaultAsync(w => w.Id == id);
 
         public async Task<IEnumerable<Wishlist>> GetByCustomerIdAsync(int customerId)
@@ -40,6 +42,7 @@ namespace ClothesStore.Api.Repositories
                     .ThenInclude(p => p!.ProductVariants)
                 .Where(w => w.CustomerId == customerId)
                 .OrderByDescending(w => w.CreatedAt)
+                .AsSplitQuery() // [SỬA - CHỐNG CHẬM]
                 .ToListAsync();
 
         public async Task<Wishlist?> GetByCustomerAndProductAsync(int customerId, int productId)
@@ -48,6 +51,7 @@ namespace ClothesStore.Api.Repositories
                     .ThenInclude(p => p!.ProductImages)
                 .Include(w => w.Product)
                     .ThenInclude(p => p!.ProductVariants)
+                .AsSplitQuery() // [SỬA - CHỐNG CHẬM]
                 .FirstOrDefaultAsync(w => w.CustomerId == customerId && w.ProductId == productId);
 
         public async Task<bool> CustomerExistsAsync(int customerId)

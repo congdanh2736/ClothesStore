@@ -26,7 +26,11 @@ namespace ClothesStore.Api.Services
 
         public async Task<StoreDto?> GetByIdAsync(int id)
         {
-            var store = await _repository.GetByIdWithDetailsAsync(id);
+            /*
+             * [SỬA - CHỐNG CHẬM] Trước đây dùng GetByIdWithDetailsAsync -> xem Kho Online phải tải ~17.000 dòng tồn kho
+             * + thống kê, trong khi StoreDto chỉ cần Id, Name, Location. Lấy riêng bảng cửa hàng là đủ.
+             */
+            var store = await _repository.GetByIdAsync(id);
             return store is null ? null : _mapper.Map<StoreDto>(store);
         }
 

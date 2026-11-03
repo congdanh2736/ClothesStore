@@ -10,7 +10,8 @@ namespace ClothesStore.Api.Repositories
         private readonly ApplicationDbContext _context;
         public StoreStockRepository(ApplicationDbContext context) => _context = context;
 
-        public async Task<IEnumerable<StoreStock>> GetAllAsync() => await _context.StoreStocks.Include(x => x.Store).Include(x => x.ProductVariant).ThenInclude(v => v!.Product).ToListAsync();
+        // [SỬA - CHỐNG CHẬM] ~21.000 dòng chỉ để hiển thị -> AsNoTracking (không theo dõi thay đổi) cho nhẹ
+        public async Task<IEnumerable<StoreStock>> GetAllAsync() => await _context.StoreStocks.Include(x => x.Store).Include(x => x.ProductVariant).ThenInclude(v => v!.Product).AsNoTracking().ToListAsync();
         public async Task<StoreStock?> GetByIdAsync(int id) => await _context.StoreStocks.FindAsync(id);
         public async Task<StoreStock?> GetByIdWithDetailsAsync(int id) => await _context.StoreStocks.Include(x => x.Store).Include(x => x.ProductVariant).ThenInclude(v => v!.Product).FirstOrDefaultAsync(x => x.Id == id);
         public async Task<bool> StoreExistsAsync(int storeId) => await _context.Stores.AnyAsync(x => x.Id == storeId);
@@ -23,6 +24,7 @@ namespace ClothesStore.Api.Repositories
                 .Include(x => x.ProductVariant)
                     .ThenInclude(v => v!.Product)
                 .Where(x => x.StoreId == storeId)
+                .AsNoTracking() // [SỬA - CHỐNG CHẬM] Kho Online có ~17.000 dòng, chỉ để hiển thị
                 .ToListAsync();
 
         public async Task<IEnumerable<StoreStock>> GetByVariantIdsAsync(IEnumerable<int> variantIds)
