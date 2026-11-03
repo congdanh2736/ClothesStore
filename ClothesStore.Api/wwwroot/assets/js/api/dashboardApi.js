@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ============================================================================
  *  dashboardApi.js  -  CÁC API MÀ TRANG TỔNG QUAN (admin/dashboard.html) CẦN
  * ============================================================================
@@ -16,6 +16,7 @@
  */
 
 import { get } from "../core/http.js";
+import { returnApi } from "./returnApi.js";
 
 export const dashboardApi = {
     /**
@@ -39,7 +40,7 @@ export const dashboardApi = {
     getItemStats: () => get("/StoreItemStat"),
 
     /** Yêu cầu đổi / trả hàng: { id, orderId, status, requestDate, ... }   GET /api/ReturnRequest */
-    getReturnRequests: () => get("/ReturnRequest"),
+    getReturnRequests: () => returnApi.getAll(),
 
     /** Vận đơn: { id, orderId, status, orderStatus, ... }                  GET /api/Shipment */
     getShipments: () => get("/Shipment"),

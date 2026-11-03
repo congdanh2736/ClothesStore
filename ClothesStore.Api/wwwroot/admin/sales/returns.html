@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đổi / trả hàng | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Đổi / trả hàng</h1>
+                        <p class="page-subtitle">Xem danh sách, kiểm tra và xử lý các yêu cầu đổi trả sản phẩm từ khách hàng.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput" placeholder="Tìm theo mã yêu cầu, mã đơn, khách hàng, lý do...">
+                        <select class="input select" id="statusFilter" style="width: auto;">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            <option value="Pending">Chờ duyệt</option>
+                            <option value="Approved">Đã duyệt</option>
+                            <option value="Rejected">Từ chối</option>
+                            <option value="Completed">Hoàn tất</option>
+                        </select>
+                    </div>
+
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/sales/returns.js"></script>
+</body>
+</html>
