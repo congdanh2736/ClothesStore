@@ -11,9 +11,10 @@
    Nhờ app.UseDefaultFiles() trong Program.cs, mở địa chỉ gốc "/" thì server
    tự trả về file index.html này.
 
-   TẠM THỜI: nhóm đang làm phần admin trước, chưa có trang shop, nên
-   SHOP_READY = false -> mọi người được đưa tới trang đăng nhập admin.
-   Khi làm xong shop/index.html thì đổi thành true.
+   [SỬA] Đã có trang shop (wwwroot/shop) nên SHOP_READY = true:
+   khách / người chưa đăng nhập được đưa tới trang chủ shop.
+   Nhân viên vào trang quản trị bằng link "trang quản trị" ở trang đăng nhập shop
+   hoặc mở thẳng /admin/login.html.
   ============================================================================
 -->
 <html lang="vi">
@@ -25,14 +26,14 @@
 <body>
     <!-- Hiện tạm dòng này trong tích tắc trước khi chuyển trang (hoặc khi JS bị tắt) -->
     <p style="font-family: system-ui, sans-serif; padding: 24px;">
-        Đang chuyển trang... Nếu không tự chuyển, hãy vào <a href="/admin/login.html">trang quản trị</a>.
+        Đang chuyển trang... Nếu không tự chuyển, hãy vào <a href="/shop/index.html">cửa hàng</a> hoặc <a href="/admin/login.html">trang quản trị</a>.
     </p>
 
     <script type="module">
         import { isStaff } from "./assets/js/core/auth.js";
         import { PAGES } from "./assets/js/core/config.js";
 
-        const SHOP_READY = false; // ✏️ đổi thành true khi đã có trang shop
+        const SHOP_READY = true; // [SỬA] đã có trang shop
 
         if (isStaff()) {
             window.location.replace(PAGES.ADMIN_HOME);

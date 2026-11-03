@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đổi / trả hàng | AURA Techwear</title>
+    <meta name="description" content="Đổi / trả hàng">
+    <!-- Đặt giao diện sáng/tối TRƯỚC khi vẽ trang để không bị nháy màu -->
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("aura-theme")||"dark"}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="../css/shop.css">
+</head>
+<body>
+    <header id="siteHeader"></header>
+    <main class="page">
+        <div class="container">
+            <nav class="crumbs" aria-label="Đường dẫn"><a href="/shop/index.html">Trang chủ</a><span class="sep">/</span><a href="/shop/account/index.html">Tài khoản</a><span class="sep">/</span><span class="current" id="crumbCurrent">Đổi / trả hàng</span></nav>
+            <div class="layout-sidebar">
+                <aside id="accountNav" class="panel account-nav"><div class="skeleton" style="height:320px"></div></aside>
+                <div id="accountMain" class="stack" style="gap:18px;min-width:0">
+                    <div class="row-between wrap">
+                        <div><div class="eyebrow">Tài khoản</div><h1 class="page-title mt-1" style="font-size:clamp(24px,3.4vw,34px)">Đổi / trả <span class="accent">hàng</span></h1>
+                            <p class="text-muted text-sm mt-1"><span id="eligibleNote"></span></p></div>
+                        <a class="btn btn-primary" href="/shop/account/return-new.html">+ Tạo yêu cầu trả hàng</a>
+                    </div>
+                    <div class="stack" id="returnList"><div class="skeleton" style="height:200px"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer id="siteFooter"></footer>
+    <div class="toasts" id="toasts"></div>
+    <script type="module" src="../js/account/returns.js"></script>
+</body>
+</html>

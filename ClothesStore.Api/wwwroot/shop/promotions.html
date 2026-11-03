@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ưu đãi | AURA Techwear</title>
+    <meta name="description" content="Mã khuyến mãi AURA">
+    <!-- Đặt giao diện sáng/tối TRƯỚC khi vẽ trang để không bị nháy màu -->
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("aura-theme")||"dark"}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="./css/shop.css">
+</head>
+<body>
+    <header id="siteHeader"></header>
+    <main class="page">
+        <div class="container">
+            <nav class="crumbs" aria-label="Đường dẫn"><a href="/shop/index.html">Trang chủ</a><span class="sep">/</span><span class="current">Ưu đãi</span></nav>
+            <section class="page-hero">
+                <div class="eyebrow">Mã khuyến mãi</div>
+                <h1 class="page-title mt-2">Ưu đãi <span class="accent">đang chạy</span></h1>
+                <p class="text-muted mt-2" style="max-width:560px">Nhập mã ở giỏ hàng hoặc trang thanh toán. Mỗi đơn dùng 1 mã, giảm thẳng vào tổng tiền.</p>
+                <div class="hero-stats"><div><b id="statActive">—</b><span>Mã đang dùng được</span></div><div><b id="statMax">—</b><span>Giảm cao nhất</span></div></div>
+            </section>
+            <div class="tabs mt-4" id="promoTabs" style="display:inline-flex"></div>
+            <div class="grid-3 mt-4" id="promoGrid"><div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:140px"></div></div>
+        </div>
+    </main>
+    <footer id="siteFooter"></footer>
+    <div class="toasts" id="toasts"></div>
+    <script type="module" src="./js/pages/promotions.js"></script>
+</body>
+</html>

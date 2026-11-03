@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thanh toán | AURA Techwear</title>
+    <meta name="description" content="Đặt hàng và thanh toán">
+    <!-- Đặt giao diện sáng/tối TRƯỚC khi vẽ trang để không bị nháy màu -->
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("aura-theme")||"dark"}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="./css/shop.css">
+</head>
+<body>
+    <header id="siteHeader"></header>
+    <main class="page">
+        <div class="container">
+            <nav class="crumbs" aria-label="Đường dẫn"><a href="/shop/index.html">Trang chủ</a><span class="sep">/</span><a href="/shop/cart.html">Giỏ hàng</a><span class="sep">/</span><span class="current">Thanh toán</span></nav>
+            <h1 class="page-title">Thanh toán <span class="accent">// Checkout</span></h1>
+            <div class="mt-4" id="checkoutRoot"><div class="skeleton" style="height:480px"></div></div>
+        </div>
+    </main>
+    <footer id="siteFooter"></footer>
+    <div class="toasts" id="toasts"></div>
+    <script type="module" src="./js/pages/checkout.js"></script>
+</body>
+</html>
