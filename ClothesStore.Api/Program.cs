@@ -245,6 +245,10 @@ if (File.Exists(intentModelPath))
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IChatbotRepository, ChatbotRepository>();
 builder.Services.AddScoped<IChatbotService, ChatbotService>();
+// [THÊM] Trang quản lý chatbot: lịch sử chat, câu huấn luyện, huấn luyện lại mô hình ngay trên web
+builder.Services.AddScoped<IChatbotAdminRepository, ChatbotAdminRepository>();
+builder.Services.AddScoped<IChatbotAdminService, ChatbotAdminService>();
+builder.Services.AddSingleton<IChatbotTrainingRunner, ChatbotTrainingRunner>(); // 1 đối tượng cho cả server: biết đang train hay không
 //--------------------------------------------------------------------------------------------------------------------------------------------------//
 
 
@@ -341,4 +345,4 @@ app.UseAuthorization();    // rồi mới check quyền (Role)
 app.MapControllers();
 
 app.Run();
-//--------------------------------------------------------------------------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------------------------------------//

@@ -10,5 +10,8 @@ namespace ClothesStore.Api.Interface.Services
         /// applicationUserId: Id tài khoản lấy từ token (null nếu khách chưa đăng nhập) - dùng để tra cứu đơn hàng của chính khách.
         /// </summary>
         Task<ChatResponseDto> AskAsync(ChatRequestDto request, string? applicationUserId);
+
+        /// <summary>[THÊM] Khách bấm 👍 / 👎 cho câu trả lời</summary>
+        Task<bool> FeedbackAsync(int logId, bool helpful);
     }
 }

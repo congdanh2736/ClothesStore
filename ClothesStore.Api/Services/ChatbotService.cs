@@ -5,6 +5,7 @@ using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.Chatbot;
 using ClothesStore.Api.Interface.Repositories;
 using ClothesStore.Api.Interface.Services;
+using ClothesStore.Api.Models;
 using ClothesStore.Api.Services.Chatbot;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.ML;
@@ -49,6 +50,7 @@ namespace ClothesStore.Api.Services
             public required ChatVocabulary Vocab { get; init; }
             public required ChatResponseDto Response { get; init; }
             public string? UserId { get; init; }
+            public int? CustomerId { get; init; }                    // khách đã đăng nhập (null = khách vãng lai)
 
             public bool Says(params string[] words) => words.Any(w => Plain.Contains(" " + w + " "));
         }
@@ -61,8 +63,10 @@ namespace ClothesStore.Api.Services
             var entities = EntityExtractor.Extract(message, vocab);
             var context = request.Context ?? new ChatContextDto();
 
-            var (intent, confidence) = PredictIntent(message);
+            var (predicted, confidence) = PredictIntent(message);
+            var intent = predicted;
             if (confidence < MinConfidence) intent = GuessFromEntities(entities) ?? ChatIntents.KhongHieu;
+            var customerId = applicationUserId != null ? await _repository.GetCustomerIdByUserIdAsync(applicationUserId) : null;
 
             var turn = new Turn
             {
@@ -72,7 +76,8 @@ namespace ClothesStore.Api.Services
                 Context = context,
                 Vocab = vocab,
                 Response = new ChatResponseDto { Intent = intent, Confidence = confidence },
-                UserId = applicationUserId
+                UserId = applicationUserId,
+                CustomerId = customerId
             };
 
             switch (intent)
@@ -100,7 +105,40 @@ namespace ClothesStore.Api.Services
             response.Context.Colors = entities.Colors.Count > 0 ? entities.Colors : context.Colors;
             response.Context.ProductId ??= context.ProductId;
             if (response.Suggestions.Count == 0) response.Suggestions.AddRange(ChatbotKnowledge.DefaultSuggestions);
+
+            response.LogId = await SaveLogAsync(message, response, predicted, customerId);
             return response;
+        }
+
+        /* [THÊM] Khách bấm 👍 / 👎 cho 1 câu trả lời */
+        public Task<bool> FeedbackAsync(int logId, bool helpful) => _repository.SetFeedbackAsync(logId, helpful);
+
+        /*
+         * Lưu lượt hỏi đáp vào bảng ChatLogs để admin xem lại, gán nhãn đúng và train lại.
+         * Lưu lỗi (ví dụ chưa chạy migration) thì vẫn trả lời khách bình thường.
+         */
+        private async Task<int?> SaveLogAsync(string message, ChatResponseDto response, string predicted, int? customerId)
+        {
+            try
+            {
+                var reply = response.Reply.Length > 2000 ? response.Reply[..2000] : response.Reply;
+                return await _repository.AddLogAsync(new ChatLog
+                {
+                    Message = message.Length > 500 ? message[..500] : message,
+                    Reply = reply,
+                    Intent = response.Intent,
+                    PredictedIntent = predicted,
+                    Confidence = response.Confidence,
+                    ProductCount = response.Products.Count,
+                    CustomerId = customerId,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Chatbot: không lưu được lịch sử chat (đã chạy Update-Database chưa?).");
+                return null;
+            }
         }
 
         // ======================================================================================== MÔ HÌNH ML
@@ -561,7 +599,7 @@ namespace ClothesStore.Api.Services
         // ======================================================================================== 10. ĐƠN HÀNG
         private async Task AnswerOrdersAsync(Turn t)
         {
-            var customerId = t.UserId != null ? await _repository.GetCustomerIdByUserIdAsync(t.UserId) : null;
+            var customerId = t.CustomerId;
             if (customerId == null)
             {
                 t.Response.Reply = "Để xem đơn hàng, bạn cần đăng nhập bằng tài khoản khách hàng nhé.";

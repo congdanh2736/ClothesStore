@@ -20,6 +20,7 @@
 import { shopApi, USE_MOCK } from "./shopApi.js";
 import { isLoggedIn, getUser, logout, requireCustomer } from "../../assets/js/core/auth.js";
 import { escapeHtml, formatMoney, toDate } from "../../assets/js/core/utils.js";
+import { mountChatbot } from "./chatbot.js"; // [THÊM] khung chat AI tư vấn ở góc phải mọi trang
 
 /* ===================================================== ICON (SVG) ===================================================== */
 const svg = (/** @type {string} */ d) => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
@@ -389,6 +390,7 @@ export async function initShop({ active = "", needLogin = false } = {}) {
         $("btnLogout").addEventListener("click", logout);
     }
     refreshCounts();
+    mountChatbot(); // [THÊM] nút chat AI ở góc phải màn hình
     return true;
 }
 

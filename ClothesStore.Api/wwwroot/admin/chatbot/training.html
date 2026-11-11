@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--
+  admin/chatbot/training.html - HUẤN LUYỆN CHATBOT (chỉ Quản lý)
+  - Thông tin mô hình hiện tại + nút "Huấn luyện lại" (chạy ngay trên server, vài phút)
+  - Lịch sử các lần huấn luyện kèm độ chính xác
+  - Số câu huấn luyện của từng intent
+  - Thêm / sửa / xóa câu huấn luyện (bổ sung cho file intents.csv có sẵn)
+  API: /api/ChatbotAdmin/model, /train, /intents, /samples
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huấn luyện chatbot | ClothesStore Admin</title>
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="/assets/css/chatbot-admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Huấn luyện chatbot</h1>
+                        <p class="page-subtitle">Bổ sung câu hỏi mẫu cho từng intent rồi huấn luyện lại để bot hiểu khách tốt hơn.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnTrain">Huấn luyện lại</button>
+                    </div>
+                </div>
+
+                <div class="stack">
+                    <section class="card">
+                        <div class="card-header"><h2 class="card-title">Mô hình hiện tại</h2></div>
+                        <div class="cb-card-body">
+                            <div id="modelInfo"><span class="spinner"></span></div>
+                            <div class="cb-training" id="trainingBox" hidden><span class="spinner"></span><span id="trainingText">Đang huấn luyện...</span></div>
+                        </div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header"><h2 class="card-title">Lịch sử huấn luyện</h2></div>
+                        <div id="runsTable"></div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header"><h2 class="card-title">Dữ liệu theo intent</h2></div>
+                        <div id="intentsTable"></div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Câu huấn luyện do quản lý thêm</h2>
+                            <button type="button" class="btn btn-sm btn-primary" id="btnAddSample">+ Thêm câu</button>
+                        </div>
+                        <div class="toolbar">
+                            <input type="search" class="input search-input" id="sampleSearch" placeholder="Tìm câu...">
+                            <select class="select" id="sampleIntent" aria-label="Intent"><option value="">Mọi intent</option></select>
+                        </div>
+                        <div id="samplesTable"></div>
+                        <div id="samplesPagination"></div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script type="module" src="../js/chatbot/training.js"></script>
+</body>
+</html>

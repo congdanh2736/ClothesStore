@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--
+  admin/chatbot/overview.html - TỔNG QUAN CHATBOT AI
+  Thống kê câu hỏi của khách, phân bố intent (ý định), độ tin cậy của mô hình, đánh giá của khách
+  + khung "Chat thử" để quản lý / nhân viên kiểm tra bot trả lời thế nào.
+  API: GET /api/ChatbotAdmin/stats, GET /api/ChatbotAdmin/model, POST /api/Chatbot/ask
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot AI | ClothesStore Admin</title>
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="/assets/css/chatbot-admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Chatbot AI</h1>
+                        <p class="page-subtitle">Mô hình do nhóm tự huấn luyện (ML.NET), chạy ngay trên server, không dùng API bên ngoài.</p>
+                    </div>
+                    <div class="page-actions">
+                        <select class="select" id="daysSelect" aria-label="Khoảng thời gian">
+                            <option value="7">7 ngày qua</option>
+                            <option value="30" selected>30 ngày qua</option>
+                            <option value="90">90 ngày qua</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+                </div>
+
+                <div class="stat-grid" id="statGrid"></div>
+
+                <div class="cb-grid">
+                    <div class="stack">
+                        <section class="card">
+                            <div class="card-header"><h2 class="card-title">Số câu hỏi theo ngày</h2></div>
+                            <div class="cb-card-body" id="dayChart"><span class="spinner"></span></div>
+                        </section>
+                        <section class="card">
+                            <div class="card-header"><h2 class="card-title">Khách hỏi về điều gì (theo intent)</h2></div>
+                            <div class="cb-card-body" id="intentChart"><span class="spinner"></span></div>
+                        </section>
+                        <section class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Mô hình hiện tại</h2>
+                                <a class="btn btn-sm btn-secondary" href="/admin/chatbot/training.html" data-role="admin">Quản lý huấn luyện</a>
+                            </div>
+                            <div class="cb-card-body" id="modelInfo"><span class="spinner"></span></div>
+                        </section>
+                    </div>
+
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Chat thử</h2>
+                            <button type="button" class="btn btn-sm btn-ghost" id="btnClearChat">Xóa</button>
+                        </div>
+                        <div class="cb-chat">
+                            <div class="cb-chat-log" id="chatLog"></div>
+                            <div class="cb-chips" id="chatChips"></div>
+                            <form class="cb-chat-form" id="chatForm">
+                                <input class="input" id="chatInput" maxlength="500" placeholder="Nhập câu hỏi như khách hàng..." autocomplete="off">
+                                <button class="btn btn-primary" type="submit">Gửi</button>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script type="module" src="../js/chatbot/overview.js"></script>
+</body>
+</html>

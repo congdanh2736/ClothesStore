@@ -171,5 +171,21 @@ namespace ClothesStore.Api.Repositories
                     TrackingNumber = o.Shipment != null ? o.Shipment.TrackingNumber : null
                 })
                 .ToListAsync();
+
+        public async Task<int> AddLogAsync(ChatLog log)
+        {
+            _context.ChatLogs.Add(log);
+            await _context.SaveChangesAsync();
+            return log.Id;
+        }
+
+        public async Task<bool> SetFeedbackAsync(int logId, bool helpful)
+        {
+            var log = await _context.ChatLogs.FirstOrDefaultAsync(x => x.Id == logId);
+            if (log == null || log.IsHelpful != null) return false;
+            log.IsHelpful = helpful;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
