@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết yêu cầu đổi / trả | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <!-- Thông báo lỗi khi ID sai hoặc không tìm thấy -->
+                <div class="alert alert-danger mb-4 hidden" id="pageError" role="alert"></div>
+
+                <!-- Toàn bộ nội dung trang chi tiết -->
+                <div id="pageContent" class="hidden">
+                    <div class="page-header">
+                        <div>
+                            <div class="breadcrumb">
+                                <a href="returns.html">Đổi / trả hàng</a> / Chi tiết
+                            </div>
+                            <h1 id="returnTitle">Yêu cầu đổi / trả</h1>
+                            <p class="page-subtitle" id="returnSubtitle"></p>
+                        </div>
+                        <div class="page-actions" id="actionButtons">
+                            <a class="btn btn-secondary" href="returns.html">← Danh sách</a>
+                            <button type="button" class="btn btn-primary hidden" id="btnApprove">Duyệt yêu cầu</button>
+                            <button type="button" class="btn btn-success hidden" id="btnComplete">Hoàn tất nhận hàng</button>
+                            <button type="button" class="btn btn-warning hidden" id="btnReject">Từ chối</button>
+                            <button type="button" class="btn btn-danger hidden" id="btnDelete">Xóa</button>
+                        </div>
+                    </div>
+
+                    <!-- 4 ô số liệu tóm tắt -->
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Trạng thái</div>
+                            <div class="stat-value" id="statStatus">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Tổng tiền hoàn dự kiến</div>
+                            <div class="stat-value text-danger" id="statRefund">0 ₫</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Mã đơn hàng</div>
+                            <div class="stat-value" id="statOrder">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Mã khách hàng</div>
+                            <div class="stat-value" id="statCustomer">—</div>
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <!-- Thông tin lý do đổi trả -->
+                        <section class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Thông tin yêu cầu</h2>
+                            </div>
+                            <div class="p-4">
+                                <div class="mb-3">
+                                    <span class="text-muted fw-bold">Lý do đổi / trả:</span>
+                                    <p class="mt-1 p-3 bg-light rounded" id="returnReason" style="background: var(--color-bg-subtle, #f8f9fa); border-radius: 6px;"></p>
+                                </div>
+                                <div id="statusNotice"></div>
+                            </div>
+                        </section>
+
+                        <!-- Bảng danh sách sản phẩm trả lại -->
+                        <section class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Sản phẩm đổi / trả</h2>
+                            </div>
+                            <div id="itemsTable"></div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/sales/return-detail.js"></script>
+</body>
+</html>

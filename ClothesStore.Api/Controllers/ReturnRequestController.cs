@@ -1,5 +1,6 @@
 // [THÊM MỚI] File mới - toàn bộ nội dung file này là phần thêm.
 // Mục đích: API đổi/trả hàng /api/ReturnRequest (bảng Return_Request, Return_Item - trước đây chưa có)
+using System.Security.Claims;
 using ClothesStore.Api.Common;
 using ClothesStore.Api.DTOs.ReturnRequest;
 using ClothesStore.Api.Interface.Services;
@@ -25,23 +26,23 @@ namespace ClothesStore.Api.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ReturnRequestDto>> GetById(int id)
         {
-            var request = await _service.GetByIdAsync(id);
+            var request = await _service.GetByIdAsync(id, GetCurrentUserId(), IsStaff());
             return request is null ? NotFound() : Ok(request);
         }
 
         [HttpGet("order/{orderId:int}")]
         public async Task<ActionResult<IEnumerable<ReturnRequestDto>>> GetByOrder(int orderId)
-            => Ok(await _service.GetByOrderIdAsync(orderId));
+            => Ok(await _service.GetByOrderIdAsync(orderId, GetCurrentUserId(), IsStaff()));
 
         [HttpGet("customer/{customerId:int}")]
         public async Task<ActionResult<IEnumerable<ReturnRequestDto>>> GetByCustomer(int customerId)
-            => Ok(await _service.GetByCustomerIdAsync(customerId));
+            => Ok(await _service.GetByCustomerIdAsync(customerId, GetCurrentUserId(), IsStaff()));
 
         // Khách gửi yêu cầu đổi/trả cho đơn đã giao thành công
         [HttpPost]
         public async Task<ActionResult<ReturnRequestDto>> Create(CreateReturnRequestDto dto)
         {
-            var request = await _service.CreateAsync(dto);
+            var request = await _service.CreateAsync(dto, GetCurrentUserId());
             return CreatedAtAction(nameof(GetById), new { id = request.Id }, request);
         }
 
@@ -63,6 +64,12 @@ namespace ClothesStore.Api.Controllers
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
-            => await _service.DeleteAsync(id) ? NoContent() : NotFound();
+            => await _service.DeleteAsync(id, GetCurrentUserId(), IsStaff()) ? NoContent() : NotFound();
+
+        private string GetCurrentUserId()
+            => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+        private bool IsStaff()
+            => User.IsInRole(AppRole.Admin.ToString()) || User.IsInRole(AppRole.Employee.ToString());
     }
 }

@@ -21,4 +21,12 @@ namespace ClothesStore.Api.Common
     {
         public NotFoundException(string message) : base(message, StatusCodes.Status404NotFound) { }
     }
+
+    // Ngoại lệ khi không có quyền truy cập -> HTTP 403
+    public class ForbiddenException : BusinessException
+    {
+        public ForbiddenException(string message = "Bạn không có quyền thực hiện thao tác này.")
+            : base(message, StatusCodes.Status403Forbidden) { }
+    }
 }
+
