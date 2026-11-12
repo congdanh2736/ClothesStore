@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/sales/shipments.html  -  QUẢN LÝ VẬN CHUYỂN (VẬN ĐƠN)   (Nhóm 4)
+  ============================================================================
+   Ai vào được: Admin + Employee.
+     - Xem danh sách vận đơn, tìm kiếm theo mã vận đơn, mã đơn hàng, đơn vị
+       vận chuyển, mã theo dõi (tracking number).
+     - Lọc theo trạng thái giao hàng (Đang giao, Đã giao, Giao thất bại).
+     - Tạo vận đơn cho các đơn hàng đã xác nhận (Confirmed).
+     - Sửa đơn vị vận chuyển / mã tracking, cập nhật kết quả giao hàng.
+
+   Toàn bộ phần xử lý nằm trong file  admin/js/sales/shipments.js
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vận chuyển | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Vận chuyển</h1>
+                        <p class="page-subtitle">Theo dõi vận đơn, đơn vị vận chuyển và cập nhật kết quả giao hàng.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Tạo vận đơn</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput"
+                               placeholder="Tìm theo mã vận đơn, mã đơn, đơn vị VC, mã tracking...">
+
+                        <select class="select" id="statusFilter" aria-label="Lọc theo trạng thái vận chuyển">
+                            <option value="">Tất cả trạng thái</option>
+                        </select>
+
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/sales/shipments.js"></script>
+</body>
+</html>

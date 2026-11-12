@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/sales/orders.html  -  DANH SÁCH ĐƠN HÀNG   (Nhóm 4)
+  ============================================================================
+   Ai vào được: Admin + Employee.
+     - Xem danh sách, tìm kiếm, lọc theo trạng thái đơn và trạng thái thanh toán.
+     - Tạo đơn hàng mới tại quầy (+ Tạo đơn hàng).
+     - Xác nhận nhanh, Hủy đơn, Xem chi tiết (sang order-detail.html).
+     - Xóa đơn hàng đã hủy (chỉ Admin).
+
+   Toàn bộ phần xử lý nằm trong file  admin/js/sales/orders.js
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Đơn hàng</h1>
+                        <p class="page-subtitle">Quản lý đơn đặt hàng, xác nhận, thanh toán và tiến độ giao hàng.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Tạo đơn hàng</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput"
+                               placeholder="Tìm theo mã đơn, khách hàng, địa chỉ...">
+
+                        <select class="select" id="statusFilter" aria-label="Lọc theo trạng thái đơn hàng">
+                            <option value="">Tất cả trạng thái</option>
+                        </select>
+
+                        <select class="select" id="paymentFilter" aria-label="Lọc theo trạng thái thanh toán">
+                            <option value="">Tất cả thanh toán</option>
+                        </select>
+
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/sales/orders.js"></script>
+</body>
+</html>

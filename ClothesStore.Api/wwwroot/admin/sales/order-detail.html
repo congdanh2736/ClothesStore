@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/sales/order-detail.html  -  CHI TIẾT ĐƠN HÀNG   (Nhóm 4)
+  ============================================================================
+   Mở bằng địa chỉ có id đơn:  order-detail.html?id=10
+   (bấm "Xem" hoặc bấm mã đơn ở trang danh sách / trang khách hàng / tổng quan)
+
+   Trang gồm:
+     - Đầu trang: tiêu đề đơn + các nút chuyển trạng thái (Xác nhận / Tạo vận đơn / Hoàn tất / Hủy / Xóa)
+     - 4 ô số liệu: trạng thái đơn, trạng thái thanh toán, vận chuyển, tổng thanh toán
+     - Thông tin đơn hàng & Tổng kết tiền (sửa địa chỉ, mã khuyến mãi khi đơn còn Pending)
+     - Giao dịch thanh toán (xác nhận đã thu tiền, báo lỗi, đổi phương thức, tạo giao dịch)
+     - Thông tin vận chuyển (tạo vận đơn, sửa mã vận đơn, cập nhật Đã giao / Giao thất bại / Giao lại)
+     - Danh sách sản phẩm trong đơn (thêm / sửa / xóa món khi đơn còn Pending)
+
+   Toàn bộ phần xử lý nằm trong  admin/js/sales/order-detail.js
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <!-- Báo lỗi khi thiếu id / không tìm thấy đơn hàng (trống thì tự ẩn) -->
+                <div class="alert alert-danger mb-4" id="pageError" role="alert"></div>
+
+                <!-- Toàn bộ nội dung, ẩn cho đến khi tải xong thông tin đơn -->
+                <div id="pageContent" class="hidden">
+                    <div class="page-header">
+                        <div>
+                            <div class="breadcrumb"><a href="orders.html">Đơn hàng</a> / Chi tiết</div>
+                            <h1 id="orderTitle">Đơn hàng</h1>
+                            <p class="page-subtitle" id="orderSubtitle"></p>
+                        </div>
+                        <div class="page-actions">
+                            <a class="btn btn-secondary" href="orders.html">← Danh sách</a>
+                            <button type="button" class="btn btn-secondary hidden" id="btnEditOrder">Sửa đơn hàng</button>
+                            <button type="button" class="btn btn-primary hidden" id="btnConfirmOrder">Xác nhận đơn</button>
+                            <button type="button" class="btn btn-primary hidden" id="btnCreateShipment">Tạo vận đơn</button>
+                            <button type="button" class="btn btn-primary hidden" id="btnCompleteOrder">Hoàn tất (Nhận tại quầy)</button>
+                            <button type="button" class="btn btn-danger hidden" id="btnCancelOrder">Hủy đơn</button>
+                            <button type="button" class="btn btn-danger hidden" id="btnDeleteOrder">Xóa đơn</button>
+                        </div>
+                    </div>
+
+                    <!-- 4 ô số liệu tổng quan của đơn -->
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Trạng thái đơn hàng</div>
+                            <div class="stat-value" id="statOrderStatus">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Thanh toán</div>
+                            <div class="stat-value" id="statPaymentStatus">—</div>
+                            <div class="text-muted text-sm mt-2" id="statPaymentMethod"></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Vận chuyển</div>
+                            <div class="stat-value" id="statShipmentStatus">—</div>
+                            <div class="text-muted text-sm mt-2" id="statTracking"></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Tổng thanh toán</div>
+                            <div class="stat-value" id="statTotalAmount">0 ₫</div>
+                            <div class="text-muted text-sm mt-2" id="statPoints"></div>
+                        </div>
+                    </div>
+
+                    <div class="stack">
+                        <!-- ===== HÀNG 1: THÔNG TIN ĐƠN HÀNG & TỔNG KẾT TIỀN ===== -->
+                        <div class="grid-2">
+                            <section class="card">
+                                <div class="card-header">
+                                    <h2 class="card-title">Thông tin đơn hàng</h2>
+                                    <button type="button" class="btn btn-secondary btn-sm hidden" id="btnEditOrderCard">Sửa địa chỉ / KM</button>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="info-list" id="orderInfoList"></dl>
+                                </div>
+                            </section>
+
+                            <section class="card">
+                                <div class="card-header">
+                                    <h2 class="card-title">Chi tiết thanh toán</h2>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="info-list" id="pricingInfoList"></dl>
+                                </div>
+                            </section>
+                        </div>
+
+                        <!-- ===== HÀNG 2: GIAO DỊCH THANH TOÁN & VẬN ĐƠN ===== -->
+                        <div class="grid-2">
+                            <section class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h2 class="card-title">Giao dịch thanh toán</h2>
+                                        <div class="text-muted text-sm">Quản lý trạng thái thu tiền và phương thức thanh toán.</div>
+                                    </div>
+                                    <div class="flex flex-wrap" id="paymentActions"></div>
+                                </div>
+                                <div class="card-body" id="paymentBody"></div>
+                            </section>
+
+                            <section class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h2 class="card-title">Vận chuyển (Vận đơn)</h2>
+                                        <div class="text-muted text-sm">Bàn giao đơn vị vận chuyển và theo dõi hành trình giao hàng.</div>
+                                    </div>
+                                    <div class="flex flex-wrap" id="shipmentActions"></div>
+                                </div>
+                                <div class="card-body" id="shipmentBody"></div>
+                            </section>
+                        </div>
+
+                        <!-- ===== HÀNG 3: DANH SÁCH SẢN PHẨM TRONG ĐƠN ===== -->
+                        <section class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h2 class="card-title">Sản phẩm trong đơn</h2>
+                                    <div class="text-muted text-sm" id="orderItemsSub">Danh sách các sản phẩm khách đã đặt.</div>
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm hidden" id="btnAddItem">+ Thêm sản phẩm</button>
+                            </div>
+                            <div id="itemsTable"></div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/sales/order-detail.js"></script>
+</body>
+</html>
