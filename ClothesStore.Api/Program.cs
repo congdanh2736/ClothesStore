@@ -211,7 +211,7 @@ builder.Services.AddScoped<ISizeChartService, SizeChartService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
-builder.Services.AddScoped<IPaymentMethodRepository, PaymentTransactionRepository>();
+builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderItemService, OrderItemService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
@@ -345,4 +345,4 @@ app.UseAuthorization();    // rồi mới check quyền (Role)
 app.MapControllers();
 
 app.Run();
-//--------------------------------------------------------------------------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------------------------------------//

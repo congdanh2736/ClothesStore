@@ -1,10 +1,12 @@
 // [THÊM MỚI] Chatbot AI - các truy vấn database bot cần (chỉ ĐỌC, không sửa dữ liệu)
 using ClothesStore.Api.DTOs.Chatbot;
+using ClothesStore.Api.Interface.Repositories.Base;
 using ClothesStore.Api.Models;
 
 namespace ClothesStore.Api.Interface.Repositories
 {
-    public interface IChatbotRepository
+    // Kế thừa IRepository<ChatLog>: CRUD cơ bản cho bảng lịch sử chat
+    public interface IChatbotRepository : IRepository<ChatLog>
     {
         /// <summary>Từ điển của shop: danh mục, màu, bộ sưu tập / công nghệ, cửa hàng, mã khuyến mãi, hạng thành viên</summary>
         Task<ChatVocabulary> GetVocabularyAsync();

@@ -1,10 +1,12 @@
 // [THÊM MỚI] Chatbot AI - truy vấn cho trang quản lý chatbot (lịch sử chat, câu huấn luyện, lần huấn luyện)
 using ClothesStore.Api.DTOs.Chatbot;
+using ClothesStore.Api.Interface.Repositories.Base;
 using ClothesStore.Api.Models;
 
 namespace ClothesStore.Api.Interface.Repositories
 {
-    public interface IChatbotAdminRepository
+    // Kế thừa IRepository<ChatTrainingSample>: CRUD cơ bản cho bảng câu huấn luyện
+    public interface IChatbotAdminRepository : IRepository<ChatTrainingSample>
     {
         // ---- Lịch sử hội thoại ----
         Task<ChatStatsDto> GetStatsAsync(DateTime fromUtc, float lowConfidence);

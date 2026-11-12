@@ -17,6 +17,39 @@ namespace ClothesStore.Api.Repositories
         private readonly ApplicationDbContext _context;
         public ChatbotRepository(ApplicationDbContext context) => _context = context;
 
+        // ===== [THÊM] Các hàm CRUD cơ bản kế thừa từ IRepository<ChatLog> =====
+        public async Task<IEnumerable<ChatLog>> GetAllAsync()
+            => await _context.ChatLogs.AsNoTracking()
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
+
+        public async Task<ChatLog?> GetByIdAsync(int id)
+            => await _context.ChatLogs.FindAsync(id);
+
+        public async Task<ChatLog?> GetByIdWithDetailsAsync(int id)
+            => await _context.ChatLogs
+                .Include(x => x.Customer)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+        public async Task AddAsync(ChatLog entity)
+        {
+            await _context.ChatLogs.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(ChatLog entity)
+        {
+            _context.ChatLogs.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(ChatLog entity)
+        {
+            _context.ChatLogs.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+        // ===== Hết phần CRUD cơ bản =====
+
         public async Task<ChatVocabulary> GetVocabularyAsync()
         {
             return new ChatVocabulary

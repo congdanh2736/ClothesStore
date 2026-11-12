@@ -11,11 +11,11 @@ namespace ClothesStore.Api.Services;
 
 public class PaymentTransactionService : IPaymentTransactionService
 {
-    private readonly IPaymentMethodRepository _repository;
+    private readonly IPaymentTransactionRepository _repository;
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
-    public PaymentTransactionService(IPaymentMethodRepository repository, ApplicationDbContext context, IMapper mapper)
+    public PaymentTransactionService(IPaymentTransactionRepository repository, ApplicationDbContext context, IMapper mapper)
     {
         _repository = repository;
         _context = context;

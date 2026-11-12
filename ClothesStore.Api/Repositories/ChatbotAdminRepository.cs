@@ -14,6 +14,23 @@ namespace ClothesStore.Api.Repositories
         public ChatbotAdminRepository(ApplicationDbContext context) => _context = context;
 
         // ================================================================== Thống kê
+        // ===== [THÊM] Các hàm CRUD cơ bản kế thừa từ IRepository<ChatTrainingSample> =====
+        public async Task<IEnumerable<ChatTrainingSample>> GetAllAsync()
+            => await GetSamplesAsync(null);
+
+        public async Task<ChatTrainingSample?> GetByIdAsync(int id)
+            => await GetSampleAsync(id);
+
+        public async Task<ChatTrainingSample?> GetByIdWithDetailsAsync(int id)
+            => await GetSampleAsync(id);   // bảng này không có bảng con nên giống GetByIdAsync
+
+        public Task AddAsync(ChatTrainingSample entity) => AddSampleAsync(entity);
+
+        public Task UpdateAsync(ChatTrainingSample entity) => UpdateSampleAsync(entity);
+
+        public Task DeleteAsync(ChatTrainingSample entity) => DeleteSampleAsync(entity);
+        // ===== Hết phần CRUD cơ bản =====
+
         public async Task<ChatStatsDto> GetStatsAsync(DateTime fromUtc, float lowConfidence)
         {
             var logs = _context.ChatLogs.AsNoTracking().Where(x => x.CreatedAt >= fromUtc);
