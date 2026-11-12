@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   admin/sales/promotions.html  -  QUẢN LÝ KHUYẾN MÃI (VOUCHER)   (Nhóm 4)
+  ============================================================================
+   Ai vào được: Admin + Employee.
+     - Xem danh sách mã khuyến mãi, tìm kiếm theo mã code, lọc theo thời hạn
+       hiệu lực (Đang áp dụng, Sắp diễn ra, Đã hết hạn).
+     - Thêm mới, Sửa, Xóa mã khuyến mãi (mã đã dùng cho đơn hàng không xóa được,
+       nhân viên có thể đổi ngày kết thúc để ngừng áp dụng).
+
+   Toàn bộ phần xử lý nằm trong file  admin/js/sales/promotions.js
+  ============================================================================
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khuyến mãi | ClothesStore Admin</title>
+
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Khuyến mãi</h1>
+                        <p class="page-subtitle">Quản lý mã giảm giá (voucher), mức giảm và thời gian áp dụng cho đơn hàng.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-primary" id="btnAdd">+ Thêm khuyến mãi</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput"
+                               placeholder="Tìm theo mã khuyến mãi...">
+
+                        <select class="select" id="stateFilter" aria-label="Lọc theo tình trạng hiệu lực">
+                            <option value="">Tất cả tình trạng</option>
+                            <option value="active">Đang áp dụng</option>
+                            <option value="upcoming">Sắp diễn ra</option>
+                            <option value="expired">Đã hết hạn</option>
+                        </select>
+
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="../js/sales/promotions.js"></script>
+</body>
+</html>
