@@ -28,5 +28,12 @@ namespace ClothesStore.Api.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return Ok(await _service.AskAsync(request, userId));
         }
+
+        /// <summary>[THÊM] Khách đánh giá câu trả lời: { "logId": 12, "helpful": true }</summary>
+        [HttpPost("feedback")]
+        public async Task<IActionResult> Feedback(ChatFeedbackDto dto)
+            => await _service.FeedbackAsync(dto.LogId, dto.Helpful)
+                ? NoContent()
+                : BadRequest(new { message = "Câu trả lời không tồn tại hoặc đã được đánh giá." });
     }
 }

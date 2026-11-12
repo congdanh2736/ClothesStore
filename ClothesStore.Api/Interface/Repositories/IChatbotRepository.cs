@@ -1,9 +1,12 @@
 // [THÊM MỚI] Chatbot AI - các truy vấn database bot cần (chỉ ĐỌC, không sửa dữ liệu)
 using ClothesStore.Api.DTOs.Chatbot;
+using ClothesStore.Api.Interface.Repositories.Base;
+using ClothesStore.Api.Models;
 
 namespace ClothesStore.Api.Interface.Repositories
 {
-    public interface IChatbotRepository
+    // Kế thừa IRepository<ChatLog>: CRUD cơ bản cho bảng lịch sử chat
+    public interface IChatbotRepository : IRepository<ChatLog>
     {
         /// <summary>Từ điển của shop: danh mục, màu, bộ sưu tập / công nghệ, cửa hàng, mã khuyến mãi, hạng thành viên</summary>
         Task<ChatVocabulary> GetVocabularyAsync();
@@ -25,5 +28,11 @@ namespace ClothesStore.Api.Interface.Repositories
 
         /// <summary>Đơn hàng gần nhất của khách (hoặc đúng 1 đơn nếu có orderId)</summary>
         Task<List<ChatOrderInfo>> GetOrdersAsync(int customerId, int? orderId, int take);
+
+        /// <summary>[THÊM] Lưu 1 lượt hỏi đáp, trả về Id</summary>
+        Task<int> AddLogAsync(ChatLog log);
+
+        /// <summary>[THÊM] Ghi đánh giá 👍 / 👎 (chỉ ghi lần đầu). Trả về false nếu không tìm thấy hoặc đã đánh giá.</summary>
+        Task<bool> SetFeedbackAsync(int logId, bool helpful);
     }
 }

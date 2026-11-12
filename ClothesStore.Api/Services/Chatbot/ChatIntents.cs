@@ -22,5 +22,28 @@ namespace ClothesStore.Api.Services.Chatbot
 
         // Không phải intent của mô hình: dùng khi mô hình không đủ chắc chắn
         public const string KhongHieu = "khong_hieu";
+
+        /// <summary>Tên tiếng Việt của từng intent (hiển thị ở trang admin)</summary>
+        public static readonly IReadOnlyDictionary<string, string> Labels = new Dictionary<string, string>
+        {
+            [TimSanPham] = "Tìm sản phẩm",
+            [TuVanSize] = "Tư vấn size",
+            [TuVanDip] = "Tư vấn theo dịp",
+            [TuVanThoiTiet] = "Thời tiết / chất liệu",
+            [PhoiDo] = "Phối đồ",
+            [KhuyenMai] = "Khuyến mãi",
+            [ConHang] = "Còn hàng",
+            [CuaHang] = "Cửa hàng",
+            [ChinhSach] = "Chính sách",
+            [DonHang] = "Đơn hàng",
+            [ChaoHoi] = "Chào hỏi",
+            [CamOn] = "Cảm ơn / tạm biệt",
+            [NgoaiPhamVi] = "Ngoài phạm vi"
+        };
+
+        /// <summary>Các intent mô hình học (không gồm khong_hieu)</summary>
+        public static IEnumerable<string> All => Labels.Keys;
+
+        public static bool IsValid(string? intent) => intent != null && Labels.ContainsKey(intent);
     }
 }

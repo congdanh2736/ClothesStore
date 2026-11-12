@@ -645,3 +645,83 @@ p { margin: 0; }
 /* Khối đánh giá ở trang sản phẩm: tổng quan bên trái, danh sách bên phải */
 .layout-reviews { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 22px; align-items: start; }
 @media (max-width: 960px) { .layout-reviews { grid-template-columns: minmax(0, 1fr); } }
+
+/* ============================================================================
+   KHUNG CHAT "AURA STYLIST" (shop/js/chatbot.js) - nút tròn góc phải dưới + bảng chat
+   ============================================================================ */
+.aura-chat { position: fixed; right: 20px; bottom: 20px; z-index: 900; font: inherit; }
+.aura-chat svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.aura-chat-fab {
+    display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 20px 0 16px;
+    border: 0; border-radius: 999px; cursor: pointer; font: inherit; font-weight: 600;
+    background: var(--primary); color: var(--on-primary); box-shadow: var(--glow);
+    transition: transform .15s ease, background .15s ease;
+}
+.aura-chat-fab:hover { background: var(--primary-hover); transform: translateY(-2px); }
+.aura-chat.is-open .aura-chat-fab { display: none; }
+
+.aura-chat-panel {
+    width: 380px; height: min(600px, calc(100vh - 40px)); display: flex; flex-direction: column;
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    border-radius: 16px; box-shadow: var(--shadow); overflow: hidden;
+}
+.aura-chat-panel[hidden] { display: none; }
+.aura-chat-head { display: flex; align-items: center; gap: 10px; padding: 12px 12px 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-soft); }
+.aura-chat-avatar { width: 36px; height: 36px; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--primary-soft); color: var(--primary); }
+.aura-chat-title { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.aura-chat-title small { color: var(--text-muted); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.aura-chat-title .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+.aura-chat-icon { width: 34px; height: 34px; border: 0; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; display: grid; place-items: center; }
+.aura-chat-icon:hover { background: var(--primary-soft); color: var(--text); }
+.aura-chat-icon svg { width: 18px; height: 18px; }
+
+.aura-chat-log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
+.aura-msg { max-width: 88%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.aura-msg.user { align-self: flex-end; white-space: pre-line; background: var(--primary); color: var(--on-primary); border-bottom-right-radius: 4px; }
+.aura-msg.bot { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.aura-msg-text { white-space: pre-line; }
+
+.aura-msg-products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.aura-msg-product { display: flex; flex-direction: column; gap: 4px; padding: 6px; border: 1px solid var(--border); border-radius: 10px; color: inherit; text-decoration: none; background: var(--bg-soft); }
+.aura-msg-product:hover { border-color: var(--primary); }
+.aura-msg-product img, .aura-msg-noimg { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; background: var(--border); display: block; }
+.aura-msg-product .name { font-size: 12px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.aura-msg-product .price { font-size: 12px; font-weight: 700; color: var(--primary); }
+
+.aura-msg-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.aura-msg-link { font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; padding: 4px 10px; border-radius: 999px; background: var(--primary-soft); }
+.aura-msg-link:hover { text-decoration: underline; }
+
+.aura-msg-feedback { display: flex; align-items: center; gap: 4px; margin-top: 8px; color: var(--text-faint); font-size: 12px; }
+.aura-msg-feedback button { width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--text-faint); cursor: pointer; display: grid; place-items: center; }
+.aura-msg-feedback button svg { width: 15px; height: 15px; }
+.aura-msg-feedback button:hover:not(:disabled) { background: var(--primary-soft); color: var(--text); }
+.aura-msg-feedback button.on { color: var(--primary); }
+.aura-msg-feedback button:disabled { cursor: default; }
+
+.aura-msg.typing { display: flex; gap: 4px; padding: 14px; }
+.aura-msg.typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--text-faint); animation: aura-typing 1s infinite ease-in-out; }
+.aura-msg.typing span:nth-child(2) { animation-delay: .15s; }
+.aura-msg.typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes aura-typing { 0%, 80%, 100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+.aura-chat-chips { display: flex; gap: 6px; padding: 8px 12px 0; overflow-x: auto; scrollbar-width: none; }
+.aura-chat-chips:empty { display: none; }
+.aura-chip { flex: none; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.aura-chip:hover { border-color: var(--primary); color: var(--primary); }
+
+.aura-chat-form { display: flex; gap: 8px; padding: 10px 12px; }
+.aura-chat-input { flex: 1; min-width: 0; height: 42px; padding: 0 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--text); font: inherit; font-size: 14px; }
+.aura-chat-input:focus { outline: none; border-color: var(--primary); }
+.aura-chat-send { width: 42px; height: 42px; flex: none; border: 0; border-radius: 50%; background: var(--primary); color: var(--on-primary); cursor: pointer; display: grid; place-items: center; }
+.aura-chat-send:hover { background: var(--primary-hover); }
+.aura-chat-note { margin: 0; padding: 0 12px 10px; font-size: 11px; color: var(--text-faint); text-align: center; }
+
+/* Điện thoại: nút chỉ còn icon, bảng chat phủ toàn màn hình */
+@media (max-width: 640px) {
+    .aura-chat { right: 14px; bottom: 14px; }
+    .aura-chat-fab { width: 52px; padding: 0; justify-content: center; }
+    .aura-chat-fab-text { display: none; }
+    .aura-chat.is-open { inset: 0; }
+    .aura-chat-panel { width: 100%; height: 100%; border-radius: 0; border: 0; }
+}

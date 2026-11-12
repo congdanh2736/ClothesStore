@@ -48,6 +48,16 @@ namespace ClothesStore.Api.DTOs.Chatbot
 
         /// <summary>Ngữ cảnh mới - giao diện gửi lại ở câu hỏi sau</summary>
         public ChatContextDto Context { get; set; } = new();
+
+        /// <summary>[THÊM] Id dòng lịch sử chat - giao diện gửi lại khi khách bấm 👍 / 👎</summary>
+        public int? LogId { get; set; }
+    }
+
+    /* [THÊM] Khách đánh giá câu trả lời */
+    public class ChatFeedbackDto
+    {
+        public int LogId { get; set; }
+        public bool Helpful { get; set; }
     }
 
     public class ChatProductDto

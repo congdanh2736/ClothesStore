@@ -17,6 +17,39 @@ namespace ClothesStore.Api.Repositories
         private readonly ApplicationDbContext _context;
         public ChatbotRepository(ApplicationDbContext context) => _context = context;
 
+        // ===== [THÊM] Các hàm CRUD cơ bản kế thừa từ IRepository<ChatLog> =====
+        public async Task<IEnumerable<ChatLog>> GetAllAsync()
+            => await _context.ChatLogs.AsNoTracking()
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
+
+        public async Task<ChatLog?> GetByIdAsync(int id)
+            => await _context.ChatLogs.FindAsync(id);
+
+        public async Task<ChatLog?> GetByIdWithDetailsAsync(int id)
+            => await _context.ChatLogs
+                .Include(x => x.Customer)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+        public async Task AddAsync(ChatLog entity)
+        {
+            await _context.ChatLogs.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(ChatLog entity)
+        {
+            _context.ChatLogs.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(ChatLog entity)
+        {
+            _context.ChatLogs.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+        // ===== Hết phần CRUD cơ bản =====
+
         public async Task<ChatVocabulary> GetVocabularyAsync()
         {
             return new ChatVocabulary
@@ -171,5 +204,21 @@ namespace ClothesStore.Api.Repositories
                     TrackingNumber = o.Shipment != null ? o.Shipment.TrackingNumber : null
                 })
                 .ToListAsync();
+
+        public async Task<int> AddLogAsync(ChatLog log)
+        {
+            _context.ChatLogs.Add(log);
+            await _context.SaveChangesAsync();
+            return log.Id;
+        }
+
+        public async Task<bool> SetFeedbackAsync(int logId, bool helpful)
+        {
+            var log = await _context.ChatLogs.FirstOrDefaultAsync(x => x.Id == logId);
+            if (log == null || log.IsHelpful != null) return false;
+            log.IsHelpful = helpful;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

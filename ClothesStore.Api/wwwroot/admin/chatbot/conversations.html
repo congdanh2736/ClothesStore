@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!--
+  admin/chatbot/conversations.html - LỊCH SỬ HỘI THOẠI CỦA CHATBOT
+  Xem khách đã hỏi gì, bot hiểu thành intent nào, độ tin cậy, khách đánh giá ra sao.
+  Câu bot hiểu sai -> gán intent đúng + đưa vào dữ liệu huấn luyện để lần train sau bot thông minh hơn.
+  API: GET /api/ChatbotAdmin/logs, PATCH /api/ChatbotAdmin/logs/{id}/review, DELETE /api/ChatbotAdmin/logs/{id}
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử hội thoại | ClothesStore Admin</title>
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="/assets/css/chatbot-admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside id="sidebar" class="sidebar"></aside>
+        <div class="admin-main">
+            <header id="topbar" class="topbar"></header>
+            <main class="admin-content">
+                <div class="page-header">
+                    <div>
+                        <h1>Lịch sử hội thoại</h1>
+                        <p class="page-subtitle">Câu hỏi của khách và cách bot hiểu. Gán intent đúng cho câu bot hiểu sai để huấn luyện lại.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-secondary" id="btnReload">Tải lại</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="toolbar">
+                        <input type="search" class="input search-input" id="searchInput" placeholder="Tìm trong câu hỏi...">
+                        <select class="select" id="filterSelect" aria-label="Lọc">
+                            <option value="all">Tất cả câu hỏi</option>
+                            <option value="unreviewed">Cần xem lại (chưa xem)</option>
+                            <option value="low">Bot chưa chắc / chưa hiểu</option>
+                            <option value="unhelpful">Khách đánh giá 👎</option>
+                        </select>
+                        <select class="select" id="intentSelect" aria-label="Intent">
+                            <option value="">Mọi intent</option>
+                        </select>
+                    </div>
+                    <div id="tableContainer"></div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script type="module" src="../js/chatbot/conversations.js"></script>
+</body>
+</html>

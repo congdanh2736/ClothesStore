@@ -1,8 +1,9 @@
+using ClothesStore.Api.Interface.Repositories.Base;
 using ClothesStore.Api.Models;
 
 namespace ClothesStore.Api.Interface.Repositories
 {
-    public interface ICartRepository
+    public interface ICartRepository : IRepository<Cart>
     {
         Task<Cart?> GetCartByCustomerIdAsync(int customerId);
         Task<CartItem?> GetCartItemByIdAsync(int cartItemId);

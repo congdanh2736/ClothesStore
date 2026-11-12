@@ -7,7 +7,7 @@ using ClothesStore.Api.Models;
 
 namespace ClothesStore.Api.Interface.Repositories
 {
-    public interface IPaymentMethodRepository : IRepository<PaymentTransaction>
+    public interface IPaymentTransactionRepository : IRepository<PaymentTransaction>
     {
         
     }

@@ -516,6 +516,26 @@ export const shopApi = {
         }
     },
 
+    /* ---------------- [THÊM] Chatbot AI tư vấn ---------------- */
+    chatbot: {
+        /**
+         * POST /api/Chatbot/ask { message, context } -> { reply, intent, confidence, products, links, suggestions, context, logId }
+         * Có đăng nhập thì http.js tự gửi token -> bot tra cứu được đơn hàng của khách.
+         */
+        async ask(/** @type {string} */ message, /** @type {any} */ context) {
+            if (USE_MOCK) {
+                return reply({ reply: "Chatbot cần chạy cùng backend thật (đổi USE_MOCK = false trong shopApi.js).", intent: "khong_hieu",
+                    confidence: 0, products: [], links: [], suggestions: [], context: context ?? {}, logId: null });
+            }
+            return post("/Chatbot/ask", { message, context });
+        },
+        /** POST /api/Chatbot/feedback { logId, helpful } - khách bấm 👍 / 👎 */
+        async feedback(/** @type {number} */ logId, /** @type {boolean} */ helpful) {
+            if (USE_MOCK) return null;
+            return post("/Chatbot/feedback", { logId, helpful });
+        }
+    },
+
     /* ---------------- Khách hàng + điểm thưởng ---------------- */
     me: {
         /** GET /api/Customer/{id} -> { id, fullName, firstName, lastName, email, membershipTierName, totalPoints, ... } */

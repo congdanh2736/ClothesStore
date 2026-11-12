@@ -46,6 +46,11 @@ namespace ClothesStore.Api.Data
         public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
         public DbSet<Shipment> Shipments => Set<Shipment>();
 
+        // [THÊM] Chatbot AI
+        public DbSet<ChatLog> ChatLogs => Set<ChatLog>();
+        public DbSet<ChatTrainingSample> ChatTrainingSamples => Set<ChatTrainingSample>();
+        public DbSet<ChatModelTraining> ChatModelTrainings => Set<ChatModelTraining>();
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder); // Identity tables (AspNetUsers, AspNetRoles, ...)
@@ -452,6 +457,38 @@ namespace ClothesStore.Api.Data
                     .WithMany(oi => oi.ReturnItems)
                     .HasForeignKey(x => x.OrderItemId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ============ [THÊM] CHATBOT AI ============
+            builder.Entity<ChatLog>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Message).IsRequired().HasMaxLength(500);
+                e.Property(x => x.Reply).IsRequired().HasMaxLength(2000);
+                e.Property(x => x.Intent).IsRequired().HasMaxLength(50);
+
+                // Xóa khách hàng thì giữ lại lịch sử chat (CustomerId -> null)
+                e.HasOne(x => x.Customer)
+                    .WithMany()
+                    .HasForeignKey(x => x.CustomerId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                e.HasIndex(x => x.CreatedAt); // trang admin lọc / sắp xếp theo thời gian
+                e.HasIndex(x => x.Intent);
+            });
+
+            builder.Entity<ChatTrainingSample>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Text).IsRequired().HasMaxLength(500);
+                e.Property(x => x.Label).IsRequired().HasMaxLength(50);
+                e.HasIndex(x => x.Label);
+            });
+
+            builder.Entity<ChatModelTraining>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Status).IsRequired().HasMaxLength(20);
             });
         }
 

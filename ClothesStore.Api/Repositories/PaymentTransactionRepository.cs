@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClothesStore.Api.Repositories
 {
-    public class PaymentTransactionRepository : IPaymentMethodRepository
+    public class PaymentTransactionRepository : IPaymentTransactionRepository
     {
         public readonly ApplicationDbContext _context ;
         public PaymentTransactionRepository(ApplicationDbContext context) => _context = context;

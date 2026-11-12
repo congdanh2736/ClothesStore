@@ -23,6 +23,13 @@ namespace ClothesStore.Api.Services
             return _mapper.Map<IEnumerable<WishlistDto>>(wishlists);
         }
 
+        // [THÊM] kế thừa từ IService
+        public async Task<WishlistDto?> GetByIdAsync(int id)
+        {
+            var wishlist = await _repository.GetByIdWithDetailsAsync(id);
+            return wishlist is null ? null : _mapper.Map<WishlistDto>(wishlist);
+        }
+
         public async Task<IEnumerable<WishlistDto>> GetByCustomerIdAsync(int customerId)
         {
             var wishlists = await _repository.GetByCustomerIdAsync(customerId);
@@ -46,6 +53,25 @@ namespace ClothesStore.Api.Services
 
             var created = await _repository.GetByIdWithDetailsAsync(wishlist.Id);
             return (true, null, _mapper.Map<WishlistDto>(created));
+        }
+
+        // [THÊM] kế thừa từ IService: đổi sản phẩm của 1 dòng yêu thích
+        public async Task<(bool Success, string? Error)> UpdateAsync(int id, UpdateWishlistDto dto)
+        {
+            var wishlist = await _repository.GetByIdAsync(id);
+            if (wishlist is null)
+                return (false, "Không tìm thấy mục yêu thích.");
+
+            if (!await _repository.ProductExistsAsync(dto.ProductId))
+                return (false, "Sản phẩm không tồn tại.");
+
+            if (wishlist.ProductId != dto.ProductId
+                && await _repository.IsWishlistedAsync(wishlist.CustomerId, dto.ProductId))
+                return (false, "Sản phẩm đã có trong danh sách yêu thích.");
+
+            wishlist.ProductId = dto.ProductId;
+            await _repository.UpdateAsync(wishlist);
+            return (true, null);
         }
 
         public async Task<bool> DeleteAsync(int id)
